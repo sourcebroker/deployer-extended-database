@@ -7,7 +7,8 @@ use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 
 task('db:import', function () {
     if (null !== input()->getArgument('stage')) {
-        throw new \RuntimeException("You can not set target instance for db:import command. It can only run on current instance. [Error code: 1488143716512]");
+        throw new \RuntimeException("You can not set target instance for db:import command. It can only run on current 
+        instance. [Error code: 1488143716512]");
     }
     if (input()->getOption('dumpcode')) {
         $dumpCode = input()->getOption('dumpcode');
@@ -16,7 +17,8 @@ task('db:import', function () {
     }
     $currentInstanceDatabaseStoragePath = get('db_settings_storage_path');
     foreach (get('databases_config') as $databaseCode => $databaseConfig) {
-        $link = mysqli_connect($databaseConfig['host'], $databaseConfig['user'], $databaseConfig['password'], $databaseConfig['dbname']);
+        $link = mysqli_connect($databaseConfig['host'], $databaseConfig['user'], $databaseConfig['password'],
+            $databaseConfig['dbname']);
 
         $glob = $currentInstanceDatabaseStoragePath . DIRECTORY_SEPARATOR
             . '*dbcode:' . FileUtility::normalizeFilename($databaseCode)
@@ -26,7 +28,8 @@ task('db:import', function () {
         $structureSqlFile = glob($glob);
 
         if (empty($structureSqlFile)) {
-            throw new \RuntimeException('No structure file for $dumpcode: ' . $dumpCode . '. Glob build: ' . $glob . '.  [Error code: 1458494633]');
+            throw new \RuntimeException('No structure file for $dumpcode: ' . $dumpCode . '. Glob build: ' . $glob
+                . '.  [Error code: 1458494633]');
         }
 
         $dataSqlFile = glob($currentInstanceDatabaseStoragePath . DIRECTORY_SEPARATOR
@@ -81,26 +84,30 @@ task('db:import', function () {
                     if (parse_url($publicUrl, PHP_URL_SCHEME) && parse_url($publicUrl, PHP_URL_HOST)) {
                         $publicUrlCollected[] = "'" . parse_url($publicUrl, PHP_URL_HOST) . "'";
                     } else {
-                        throw new \RuntimeException('The configuration setting "public_urls" should have full url like "https://www.example.com" but the value is only "' . $publicUrl . '" . [Error code: 1491384103020]');
+                        throw new \RuntimeException('The configuration setting "public_urls" should have full url like 
+                        "https://www.example.com" but the value is only "' . $publicUrl . '" . [Error code: 1491384103020]');
                     }
                 }
                 $markersArray['{{domainsSeparatedByComma}}'] = implode(',', $publicUrlCollected);
             }
-            $post_sql_in_with_markers = str_replace(array_keys($markersArray), $markersArray, $databaseConfig['post_sql_in_with_markers']);
+            $post_sql_in_with_markers = str_replace(array_keys($markersArray), $markersArray,
+                $databaseConfig['post_sql_in_with_markers']);
         }
-
-        $importSql = $currentInstanceDatabaseStoragePath . DIRECTORY_SEPARATOR . $dumpCode . '.sql';
-        file_put_contents($importSql, str_replace("\n", ' ', $databaseConfig['post_sql_in'] . ' ' . $post_sql_in_with_markers));
-        runLocally(sprintf(
-            'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e "SOURCE %s" ',
-            escapeshellarg($databaseConfig['password']),
-            get('db_settings_mysql_path'),
-            $databaseConfig['host'],
-            (isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306,
-            $databaseConfig['user'],
-            $databaseConfig['dbname'],
-            $importSql
-        ), 0);
-        unlink($importSql);
+        if (isset($databaseConfig['post_sql_in'])) {
+            $importSql = $currentInstanceDatabaseStoragePath . DIRECTORY_SEPARATOR . $dumpCode . '.sql';
+            file_put_contents($importSql,
+                str_replace("\n", ' ', $databaseConfig['post_sql_in'] . ' ' . $post_sql_in_with_markers));
+            runLocally(sprintf(
+                'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e "SOURCE %s" ',
+                escapeshellarg($databaseConfig['password']),
+                get('db_settings_mysql_path'),
+                $databaseConfig['host'],
+                (isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306,
+                $databaseConfig['user'],
+                $databaseConfig['dbname'],
+                $importSql
+            ), 0);
+            unlink($importSql);
+        }
     }
 })->desc('Import the database with "dumpcode" from current database dumps storage to database.');
