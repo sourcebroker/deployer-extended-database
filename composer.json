@@ -1,0 +1,26 @@
+{
+  "name": "sourcebroker/deployer-extended-database",
+  "description": "Database synchronisation between application instances.",
+  "license": "MIT",
+  "keywords": [
+    "deployer",
+    "database"
+  ],
+  "authors": [
+    {
+      "name": "Krystian Szymukowicz",
+      "email": "k.szymukowicz@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "SourceBroker\\DeployerExtendedDatabase\\": "src/"
+    },
+    "files": [
+      "src/Autoload.php"
+    ]
+  }
+}
