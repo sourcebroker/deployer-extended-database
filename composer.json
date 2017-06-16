@@ -4,7 +4,9 @@
   "license": "MIT",
   "keywords": [
     "deployer",
-    "database"
+    "deployer.org",
+    "database",
+    "synchronization"
   ],
   "authors": [
     {
@@ -12,15 +14,9 @@
       "email": "k.szymukowicz@gmail.com"
     }
   ],
-  "require": {
-    "php": ">=5.4"
-  },
   "autoload": {
     "psr-4": {
       "SourceBroker\\DeployerExtendedDatabase\\": "src/"
-    },
-    "files": [
-      "src/Autoload.php"
-    ]
+    }
   }
 }
