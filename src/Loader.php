@@ -19,7 +19,7 @@ class Loader
         } else {
             throw new \RuntimeException('Can not set "current_dir" var. Are you in folder with deploy.php file?');
         }
-        if (getenv("INSTANCE") === false && getenv("INSTANCE_DEPLOYER") == false) {
+        if (getenv("INSTANCE") === false && getenv("INSTANCE_DEPLOYER") === false) {
             $configDir = \Deployer\get('current_dir');
             if (file_exists($configDir . '/.env')) {
                 $dotenv = new \Dotenv\Dotenv($configDir);
@@ -28,7 +28,7 @@ class Loader
                 throw new \Exception('Missing file "' . $configDir . '/.env"');
             }
         }
-        if (getenv("INSTANCE") === false && getenv("INSTANCE_DEPLOYER") == false) {
+        if (getenv("INSTANCE") === false && getenv("INSTANCE_DEPLOYER") === false) {
             throw new \Exception('Neither env var INSTANCE or INSTANCE_DEPLOYER is set. Please
             set one of them with the name of INSTANCE which should coresspond to server() name."');
 
