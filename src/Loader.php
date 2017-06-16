@@ -19,6 +19,24 @@ class Loader
         } else {
             throw new \RuntimeException('Can not set "current_dir" var. Are you in folder with deploy.php file?');
         }
+        if (getenv("INSTANCE") === false && getenv("INSTANCE_DEPLOYER") == false) {
+            $configDir = \Deployer\get('current_dir');
+            if (file_exists($configDir . '/.env')) {
+                $dotenv = new \Dotenv\Dotenv($configDir);
+                $dotenv->load();
+            } else {
+                throw new \Exception('Missing file "' . $configDir . '/.env"');
+            }
+        }
+        if (getenv("INSTANCE") === false && getenv("INSTANCE_DEPLOYER") == false) {
+            throw new \Exception('Neither env var INSTANCE or INSTANCE_DEPLOYER is set. Please
+            set one of them with the name of INSTANCE which should coresspond to server() name."');
+
+        }
+        $instance = getenv('INSTANCE') === false ? getenv('INSTANCE_DEPLOYER') : getenv('INSTANCE');
+        \Deployer\set('instance', $instance);
+        \Deployer\set('default_stage', $instance);
+
         $recipePath = dirname((new \ReflectionClass('\SourceBroker\DeployerExtendedDatabase\Loader'))->getFileName()) . '/../deployer/';
         \SourceBroker\DeployerExtendedDatabase\Utility\FileUtility::requireFilesFromDirectoryReqursively($recipePath);
     }
