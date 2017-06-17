@@ -55,9 +55,24 @@ set('db_databases_merged', function () {
     return $dbConfigsMerged;
 });
 
-setDefault('db_storage_path', function(){
-    $databaseStoragePath = get('deploy_path') . '/database/dumps';
-    run("[ -d " . escapeshellarg($databaseStoragePath) . " ] || mkdir -p " . escapeshellarg($databaseStoragePath));
+set('db_storage_path_current', function () {
+    if (get('db_current_server')->get('db_storage_path_relative', false) == false) {
+        $dbStoragePathCurrent = get('db_current_server')->get('deploy_path') . '/database/dumps';
+    } else {
+        $dbStoragePathCurrent = get('db_current_server')->get('deploy_path') . '/' . get('db_current_server')->get('db_storage_path_relative');
+    }
+    runLocally("[ -d " . $dbStoragePathCurrent . " ] || mkdir -p " . $dbStoragePathCurrent);
+    return $dbStoragePathCurrent;
+});
+
+set('db_storage_path', function () {
+    if (get('db_storage_path_relative', false) == false) {
+        $dbStoragePath = get('deploy_path') . '/database/dumps';
+    } else {
+        $dbStoragePath = get('deploy_path') . '/' . get('db_storage_path_relative');
+    }
+    run("[ -d " . $dbStoragePath . " ] || mkdir -p " . $dbStoragePath);
+    return $dbStoragePath;
 });
 
 set('bin/deployer', function () {

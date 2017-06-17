@@ -13,8 +13,8 @@ task('db:download', function () {
     } else {
         throw new \InvalidArgumentException('No --dumpcode option set. [Error code: 1458937128561]');
     }
+    $currentInstanceDatabaseStoragePath = FileUtility::normalizeFolder(get('db_current_server')->get('db_storage_path_current'));
 
-    $currentInstanceDatabaseStoragePath = FileUtility::normalizeFolder(get('db_current_server')->get('db_storage_path'));
     if (!file_exists($currentInstanceDatabaseStoragePath)) {
         mkdir($currentInstanceDatabaseStoragePath, 0755, true);
     }

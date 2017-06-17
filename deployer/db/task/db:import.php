@@ -15,7 +15,7 @@ task('db:import', function () {
     } else {
         throw new \RuntimeException('No dumpcode set. [Error code: 1458937128560]');
     }
-    $currentInstanceDatabaseStoragePath = get('db_storage_path');
+    $currentInstanceDatabaseStoragePath = get('db_storage_path_current');
     foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
         $link = mysqli_connect($databaseConfig['host'], $databaseConfig['user'], $databaseConfig['password'],
             $databaseConfig['dbname']);
