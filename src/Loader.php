@@ -4,7 +4,7 @@ namespace SourceBroker\DeployerExtendedDatabase;
 
 class Loader
 {
-    public function __construct()
+    public function init()
     {
         // Local call of deployer can be not standard. For example someone could have "dep3" and "dep4" symlinks and call
         // "dep3 deploy live". He could expect then that if we will use deployer call inside task we will use then "dep3" and not "dep"

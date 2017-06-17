@@ -21,36 +21,78 @@ What does it do?
 ----------------
 
 The package provides additional tasks for deployer (deployer.org) for synchronising databases between instances.
-
-How this can be useful for me?
-------------------------------
-
-The most useful is "db:pull [target]" task which allows you to pull whole database from target instance.
-Having possibility to fast synchronise database can speed up instance dependent development.
+The most useful is "db:pull [target]" task which allows you to pull database from target instance.
 
 Installation
 ------------
+
+1) Install package with composer:
 ::
 
    composer require sourcebroker/deployer-extended-database
 
 
-Task's documentation
---------------------
+2) If you are using deployer as composer package then just put following line in your deploy.php:
+::
 
-Options:
+   (new \SourceBroker\DeployerExtendedDatabase\Loader())->init();
 
+
+3) If you are using deployer as phar then put following lines in your deploy.php:
+::
+
+   require __DIR__ . '/vendor/autoload.php';
+   new \SourceBroker\DeployerExtendedDatabase\Loader();
+
+4) Create ".env" file in your root with one line.
+::
+
+   INSTANCE="local"
+
+The INSTANCE must correspond to server() name. You need to put the .env file with proper INSTANCE name
+on each of you instances.
+
+Options
+-------
+
+- | **host**
+  | *default value:* null
+  |
+  | Database host.
+
+  |
+- | **user**
+  | *default value:* null
+  |
+  | Database user.
+
+  |
+- | **password**
+  | *default value:* null
+  |
+  | Database user password.
+
+  |
+- | **dbname**
+  | *default value:* null
+  |
+  | Database name.
+
+  |
 - | **caching_tables**
   | *default value:* null
   |
-  | Tables that will be truncated with task `db:truncate`_. Usually it should be some caching tables that
-    should be truncated while deployment.
+  | Array of tables names that will be truncated with task `db:truncate`_. Usually it should be some caching tables that
+    will be truncated while deployment. Table name is put between ^ and $ and treated as preg_match. For example
+    you can write "cf_.*" to truncate all tables that starts with "cf_". The final preg_match checked is /^cf_.*$/i
 
   |
 - | **ignore_tables_out**
   | *default value:* null
   |
-  | Tables that will be ignored while pulling database from target instance with task `db:pull`_
+  | Tables that will be ignored while pulling database from target instance with task `db:pull`_ Table name is put
+    between ^ and $ and treated as preg_match. For example you can write "cf_.*" to ignore all tables that starts
+    with "cf_". The final preg_match checked is /^cf_.*$/i
 
   |
 - | **post_sql_in**
@@ -59,41 +101,63 @@ Options:
   | SQL that will be executed after importing database on current instance.
 
 |
-There is support to synchronise more than one database. Below and example for two database config.
-All of the arrays in each database defined by key will be merged.
-::
 
-   set(
-       'db_databases',
-       [
-           'database_foo' => [
-               [
-                   'host' => '127.0.0.1',
-                   'database' => 'foo',
-                   'user' => 'foo',
-                   'password' => 'foopass',
-               ],
-               get('db_default')
-           ],
-           'database_bar' => [
-               [
-                   'host' => '127.0.0.1',
-                   'database' => 'bar',
-                   'user' => 'bar',
-                   'password' => 'barpass',
-               ],
-               get('db_default'),
-               get('current_dir') . '/path/to/file/with/config_array.php'
-           ],
-       ]
-   );
+Config is stored in var "db_databases" which is an array of "database configurations".
+"database configuration" is array of configuration parts. Configuration part can be array or string.
+If its string then its treated as absolute path to file which should return array of configuration.
+Each or array configuration parts is merged.
 
-Example configuration for TYPO3:
+Below example should illustrate above:
 
 ::
 
    set('db_default', [
-       'caching_tables' => [
+      'ignore_tables_out' => [
+          'cf_*'
+      ]
+
+   ]);
+
+   set(
+          'db_databases',
+          [
+              'database_foo' => [
+                  [
+                      'host' => '127.0.0.1',
+                      'user' => 'foo',
+                      'password' => 'foopass',
+                      'dbname' => 'foo',
+                  ],
+                  get('db_default')
+              ],
+              'database_bar' => [
+                  get('db_default'),
+                  get('current_dir') . '/.database/config-out-of-git/database_bar.php'
+              ],
+          ]
+      );
+
+Its advisable that you create a special method that will return you framework database data. So example
+configuration can look then like:
+
+::
+
+   set(
+          'db_databases',
+          [
+              'database_default' => [
+                  get('db_default'),
+                  (new \MyVendor\MyClass\MySystem())->getDatabaseConfig()
+              ],
+          ]
+      );
+
+
+Another example for CMS TYPO3:
+::
+
+   set('db_default', [
+       'truncate_tables' => [
            'cf_.*'
        ],
        'ignore_tables_out' => [
@@ -120,6 +184,10 @@ Example configuration for TYPO3:
        ],
        'post_sql_in' => ''
    ]);
+
+
+Tasks
+-----
 
 db:download
 +++++++++++
@@ -239,8 +307,4 @@ and store it on database storage folder.
 ::
 
    dep db:upload live --dumpcode=0772a8d396911951022db5ea385535f6
-
-
-
-
 
