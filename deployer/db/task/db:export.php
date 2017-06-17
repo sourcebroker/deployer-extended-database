@@ -18,7 +18,7 @@ task('db:export', function () {
         $dumpCode = md5(microtime(true) . rand(0, 10000));
     }
     $dateTime = date('Y-m-d_H:i:s');
-    foreach (get('databases_config') as $databaseCode => $databaseConfig) {
+    foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
         $filenameParts = [
             $dateTime,
             'server:' . FileUtility::normalizeFilename(get('server')['name']),
@@ -26,12 +26,12 @@ task('db:export', function () {
             'type',
             'dumpcode:' . FileUtility::normalizeFilename($dumpCode),
         ];
-        if (!file_exists(get('db_settings_storage_path'))) {
-            mkdir(get('db_settings_storage_path'), 0755, true);
+        if (!file_exists(get('db_storage_path'))) {
+            mkdir(get('db_storage_path'), 0755, true);
         }
         $mysqlDumpArgs = [
             'password' => escapeshellarg($databaseConfig['password']),
-            'db_settings_mysqldump_path' => get('db_settings_mysqldump_path'),
+            'bin/mysqldump' => get('bin/mysqldump'),
             'host' => escapeshellarg($databaseConfig['host']),
             'port' => escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
             'user' => escapeshellarg($databaseConfig['user']),
@@ -40,7 +40,7 @@ task('db:export', function () {
         ];
         // dump database structure
         $filenameParts[3] = 'type:structure';
-        $mysqlDumpArgs['type'] = FileUtility::normalizeFolder(get('db_settings_storage_path')) . '/' . implode('#', $filenameParts) . '.sql';
+        $mysqlDumpArgs['type'] = FileUtility::normalizeFolder(get('db_storage_path')) . '/' . implode('#', $filenameParts) . '.sql';
         runLocally(vsprintf(
             'export MYSQL_PWD=%s && %s --no-data=true --default-character-set=utf8 -h%s -P%s -u%s %s -r %s',
             $mysqlDumpArgs
@@ -53,7 +53,7 @@ task('db:export', function () {
             $ignoreTables = ArrayUtility::filterWithRegexp($databaseConfig['ignore_tables_out'], $allTables);
         }
         $filenameParts[3] = 'type:data';
-        $mysqlDumpArgs['type'] = FileUtility::normalizeFolder(get('db_settings_storage_path')) . '/' . implode('#', $filenameParts) . '.sql';
+        $mysqlDumpArgs['type'] = FileUtility::normalizeFolder(get('db_storage_path')) . '/' . implode('#', $filenameParts) . '.sql';
         $mysqlDumpArgs[] = implode(' --ignore-table=' . $databaseConfig['dbname'] . '.', $ignoreTables);
         runLocally(vsprintf(
             'export MYSQL_PWD=%s && %s --create-options -e -K -q -n --default-character-set=utf8 -h%s -P%s -u%s %s -r %s %s',

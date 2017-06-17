@@ -14,7 +14,7 @@ task('db:download', function () {
         throw new \InvalidArgumentException('No --dumpcode option set. [Error code: 1458937128561]');
     }
 
-    $currentInstanceDatabaseStoragePath = FileUtility::normalizeFolder(get('current_server')->get('db_settings_storage_path'));
+    $currentInstanceDatabaseStoragePath = FileUtility::normalizeFolder(get('db_current_server')->get('db_storage_path'));
     if (!file_exists($currentInstanceDatabaseStoragePath)) {
         mkdir($currentInstanceDatabaseStoragePath, 0755, true);
     }
@@ -33,7 +33,7 @@ task('db:download', function () {
         $dumpCode,
         $targetInstance->getUser() ? $targetInstance->getUser() . '@' : '',
         $targetInstance->getHost(),
-        get('db_settings_storage_path'),
+        get('db_storage_path'),
         $currentInstanceDatabaseStoragePath
     ), 0);
 })->desc('Download the database dumps with dumpcode from target database dumps storage.');

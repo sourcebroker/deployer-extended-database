@@ -15,7 +15,7 @@ task('db:upload', function () {
     }
 
     $targetInstance = Task\Context::get()->getServer()->getConfiguration();
-    $targetInstanceDatabaseStoragePath = FileUtility::normalizeFolder(get('db_settings_storage_path'));
+    $targetInstanceDatabaseStoragePath = FileUtility::normalizeFolder(get('db_storage_path'));
 
     $port = $targetInstance->getPort() ? ' -p' . $targetInstance->getPort() : '';
     $identityFile = $targetInstance->getPrivateKey() ? ' -i ' . $targetInstance->getPrivateKey() : '';
@@ -31,7 +31,7 @@ task('db:upload', function () {
         "rsync -rz --remove-source-files %s --include=*dumpcode:%s*.sql --exclude=* '%s/' '%s%s:%s/'",
         $sshOptions,
         $dumpCode,
-        get('current_server')->get('db_settings_storage_path'),
+        get('db_current_server')->get('db_storage_path'),
         $targetInstance->getUser() ? $targetInstance->getUser() . '@' : '',
         $targetInstance->getHost(),
         $targetInstanceDatabaseStoragePath

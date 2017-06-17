@@ -15,8 +15,8 @@ task('db:import', function () {
     } else {
         throw new \RuntimeException('No dumpcode set. [Error code: 1458937128560]');
     }
-    $currentInstanceDatabaseStoragePath = get('db_settings_storage_path');
-    foreach (get('databases_config') as $databaseCode => $databaseConfig) {
+    $currentInstanceDatabaseStoragePath = get('db_storage_path');
+    foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
         $link = mysqli_connect($databaseConfig['host'], $databaseConfig['user'], $databaseConfig['password'],
             $databaseConfig['dbname']);
 
@@ -54,7 +54,7 @@ task('db:import', function () {
         runLocally(sprintf(
             'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e "SOURCE %s" ',
             escapeshellarg($databaseConfig['password']),
-            get('db_settings_mysql_path'),
+            get('bin/mysql'),
             $databaseConfig['host'],
             (isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306,
             $databaseConfig['user'],
@@ -65,7 +65,7 @@ task('db:import', function () {
         runLocally(sprintf(
             'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e "SOURCE %s" ',
             escapeshellarg($databaseConfig['password']),
-            get('db_settings_mysql_path'),
+            get('bin/mysql'),
             $databaseConfig['host'],
             (isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306,
             $databaseConfig['user'],
@@ -100,7 +100,7 @@ task('db:import', function () {
             runLocally(sprintf(
                 'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e "SOURCE %s" ',
                 escapeshellarg($databaseConfig['password']),
-                get('db_settings_mysql_path'),
+                get('bin/mysql'),
                 $databaseConfig['host'],
                 (isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306,
                 $databaseConfig['user'],

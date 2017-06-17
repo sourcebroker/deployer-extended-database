@@ -2,7 +2,7 @@
 
 namespace Deployer;
 
-task('db:move', function () {
+task('db:copy', function () {
     if (null === input()->getArgument('stage')) {
         throw new \RuntimeException("The source instance is required for db:move command.");
     }
@@ -38,7 +38,7 @@ task('db:move', function () {
     run("cd {{deploy_path}}/current && {{bin/php}} {{bin/deployer}} -q db:export --dumpcode=$dumpCode");
     runLocally("{{local/bin/deployer}} db:download $sourceInstance --dumpcode=$dumpCode", 0);
     runLocally("{{local/bin/deployer}} db:process --dumpcode=$dumpCode", 0);
-    if (get('instance') == $targetInstanceName) {
+    if (get('db_instance') == $targetInstanceName) {
         runLocally("{{local/bin/deployer}} db:import --dumpcode=$dumpCode", 0);
     } else {
         runLocally("{{local/bin/deployer}} db:upload $targetInstanceName --dumpcode=$dumpCode", 0);

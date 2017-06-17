@@ -21,7 +21,11 @@ What does it do?
 ----------------
 
 The package provides additional tasks for deployer (deployer.org) for synchronising databases between instances.
-The most useful is "db:pull [target]" task which allows you to pull database from target instance.
+Most useful are two tasks:
+
+1) task "`db:pull`_ [source-instance]" task which allows you to pull database from source instance to current
+instance,
+2) task "`db:copy`_ [source-instance] [target-instance]" which allows to copy database between instances.
 
 Installation
 ------------
@@ -31,12 +35,10 @@ Installation
 
    composer require sourcebroker/deployer-extended-database
 
-
 2) If you are using deployer as composer package then just put following line in your deploy.php:
 ::
 
-   (new \SourceBroker\DeployerExtendedDatabase\Loader())->init();
-
+   new \SourceBroker\DeployerExtendedDatabase\Loader();
 
 3) If you are using deployer as phar then put following lines in your deploy.php:
 ::
@@ -52,8 +54,57 @@ Installation
 The INSTANCE must correspond to server() name. You need to put the .env file with proper INSTANCE name
 on each of you instances.
 
+5) Define "local" server and set the "db_databases" for it. Example:
+::
+
+   server('local', 'localhost')
+       ->set('deploy_path', getcwd())
+       ->set('db_databases', [
+           'database_default' => [
+               [
+                   'host' => '127.0.0.1',
+                   'dbname' => 'my_database_local',
+                   'user' => 'user',
+                   'password' => 'password',
+               ]
+           ]
+       ])
+       ->set('db_storage_path', getcwd() . '/.deploy/database/dumps')
+
+6) Add "db_databases" var for all other servers. For example for live server it can be:
+::
+
+   server('live', 'my-server.example.com')
+       ->user('deploy')
+       ->set('db_databases', [
+           'database_default' => [
+               [
+                   'host' => '127.0.0.1',
+                   'dbname' => 'my_database_live',
+                   'user' => 'user',
+                   'password' => 'password',
+               ]
+           ]
+       ])
+       ->set('deploy_path', '/var/www/myapplication/')
+       ->set('db_storage_path', '/var/www/myapplication/shared/database/dumps')
+
+
+7) Make sure all instances have /vendors folder with deployer-extended-database and deploy.php file.
+
 Options
 -------
+
+You can set following options:
+
+bin/mysqldump
+bin/mysql
+local/bin/deployer
+bin/deployer
+
+
+Options for "db_databases"
+--------------------------
 
 - | **host**
   | *default value:* null
@@ -79,7 +130,7 @@ Options
   | Database name.
 
   |
-- | **caching_tables**
+- | **truncate_tables**
   | *default value:* null
   |
   | Array of tables names that will be truncated with task `db:truncate`_. Usually it should be some caching tables that
@@ -92,7 +143,7 @@ Options
   |
   | Tables that will be ignored while pulling database from target instance with task `db:pull`_ Table name is put
     between ^ and $ and treated as preg_match. For example you can write "cf_.*" to ignore all tables that starts
-    with "cf_". The final preg_match checked is /^cf_.*$/i
+    with "cf_". The final preg_match checked is "/^cf_.*$/i"
 
   |
 - | **post_sql_in**
@@ -111,7 +162,7 @@ Below example should illustrate above:
 
 ::
 
-   set('db_default', [
+   set('db_defaults', [
       'ignore_tables_out' => [
           'cf_*'
       ]
@@ -128,11 +179,11 @@ Below example should illustrate above:
                       'password' => 'foopass',
                       'dbname' => 'foo',
                   ],
-                  get('db_default')
+                  get('db_defaults')
               ],
               'database_bar' => [
-                  get('db_default'),
-                  get('current_dir') . '/.database/config-out-of-git/database_bar.php'
+                  get('db_defaults'),
+                  __DIR__ . '/.database/config-out-of-git/database_bar.php'
               ],
           ]
       );
@@ -189,51 +240,10 @@ Another example for CMS TYPO3:
 Tasks
 -----
 
-db:download
-+++++++++++
-
-Download database from target instance to current instance.
-There is required option --dumpcode to be passed.
-
-**Example**
-::
-
-   dep db:download live --dumpcode=0772a8d396911951022db5ea385535f6
-
-db:export
-+++++++++
-
-Export database to database storage on current instance. The database will be stored in two separate files.
-One with tables structure. The second with data only. This tasks return json structure with dumpcode to
-be used in other tasks.
-
-**Example**
-
-Example task call:
-::
-
-   dep db:export
-
-Example output files:
-::
-
-   2017-02-26_14:56:08#server:live#dbcode:database_default#type:data#dumpcode:362d7ca0ff065f489c9b79d0a73720f5.sql
-   2017-02-26_14:56:08#server:live#dbcode:database_default#type:structure#dumpcode:362d7ca0ff065f489c9b79d0a73720f5.sql
-
-db:import
-+++++++++
-
-Import database from current instance database storage. There is required option --dumpcode to be passed.
-
-**Example**
-::
-
-   dep db:import --dumpcode=0772a8d396911951022db5ea385535f66
-
-db:move
+db:copy
 +++++++
 
-This command allows you to move database between instances.
+This command allows you to copy database between instances.
 In the background it runs several other tasks to accomplish this.
 
 Here is the list of tasks that will be done afer "db:move":
@@ -252,6 +262,62 @@ Example call when you are on your local instance can be:
 
    dep db:move live dev
 
+If you would be logged to ssh of dev instance then you could just use "dep db:pull live".
+
+
+db:download
++++++++++++
+
+Download database from target instance to current instance.
+There is required option --dumpcode to be passed.
+
+**Example**
+::
+
+   dep db:download live --dumpcode=0772a8d396911951022db5ea385535f6
+
+db:export
++++++++++
+
+Export database to database storage folder on current instance. The database will be stored in two separate files.
+One with tables structure. The second with data only. There is option --dumpcode that can be passed. If there is
+no --dumpcode option then its created and returned as json structure.
+
+**Example**
+
+Example task call:
+::
+
+   dep db:export
+
+Example output files:
+::
+
+   2017-02-26_14:56:08#server:live#dbcode:database_default#type:data#dumpcode:362d7ca0ff065f489c9b79d0a73720f5.sql
+   2017-02-26_14:56:08#server:live#dbcode:database_default#type:structure#dumpcode:362d7ca0ff065f489c9b79d0a73720f5.sql
+
+
+Example task call with dumpcode:
+::
+
+   dep db:export --dumpcode=123456
+
+Example output files:
+::
+
+   2017-02-26_14:56:08#server:live#dbcode:database_default#type:data#dumpcode:123456.sql
+   2017-02-26_14:56:08#server:live#dbcode:database_default#type:structure#dumpcode:123456.sql
+
+db:import
++++++++++
+
+Import database from current instance database storage. There is required option --dumpcode to be passed.
+
+**Example**
+::
+
+   dep db:import --dumpcode=0772a8d396911951022db5ea385535f66
+
 db:process
 ++++++++++
 
@@ -262,7 +328,6 @@ directly on sql file before importing. There is required option --dumpcode to be
 ::
 
    dep db:process --dumpcode=0772a8d396911951022db5ea385535f66
-
 
 db:pull
 +++++++
@@ -285,26 +350,23 @@ Here is the list of tasks that will be done afer "db:pull":
 db:truncate
 +++++++++++
 
-This command allows you to truncate database tables defined in database config var "caching_tables"
+This command allows you to truncate database tables defined in database config var "truncate_tables"
 
 **Example**
 ::
 
    dep db:truncate --dumpcode=0772a8d396911951022db5ea385535f6
 
-
 db:upload
 +++++++++
 
-This command uploads the sql dump file to target instance.
-There is required option --dumpcode to be passed.
+This command uploads the sql dump file from current instance database storage to target instance
+database storage. There is required option --dumpcode to be passed.
 
 **Example**
 
-Upload database with dumpcode 0772a8d396911951022db5ea385535f6 to live instance
-and store it on database storage folder.
-
+Take database with dumpcode 0772a8d396911951022db5ea385535f6 from current instance and upload it to
+database storage folder on live instance.
 ::
 
    dep db:upload live --dumpcode=0772a8d396911951022db5ea385535f6
-

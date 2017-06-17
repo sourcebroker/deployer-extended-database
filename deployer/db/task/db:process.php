@@ -12,7 +12,7 @@ task('db:process', function () {
         throw new \InvalidArgumentException('No --dumpcode option set. [Error code: 1458937128562]');
     }
 
-    $currentInstanceDatabaseStoragePath = get('current_server')->get('db_settings_storage_path');
+    $currentInstanceDatabaseStoragePath = get('db_current_server')->get('db_storage_path');
 
     // remove "DEFINER" from the dump files to avoid problems with DEFINER views permissions
     // use hack for set multiple OS support (OSX/Linux) @see http://stackoverflow.com/a/38595160/1588346
