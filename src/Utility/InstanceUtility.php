@@ -11,7 +11,7 @@ class InstanceUtility
     public static function getCurrentInstance()
     {
         if (getenv("INSTANCE") === false && getenv("INSTANCE_DEPLOYER") === false) {
-            $configDir = \Deployer\get('current_dir');
+            $configDir = getcwd();
             if (file_exists($configDir . '/.env')) {
                 $dotenv = new \Dotenv\Dotenv($configDir);
                 $dotenv->load();
