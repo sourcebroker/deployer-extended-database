@@ -26,9 +26,6 @@ task('db:export', function () {
             'type',
             'dumpcode:' . FileUtility::normalizeFilename($dumpCode),
         ];
-        if (!file_exists(get('db_storage_path'))) {
-            mkdir(get('db_storage_path'), 0755, true);
-        }
         $mysqlDumpArgs = [
             'password' => escapeshellarg($databaseConfig['password']),
             'bin/mysqldump' => get('bin/mysqldump'),
