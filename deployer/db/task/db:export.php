@@ -38,14 +38,14 @@ task('db:export', function () {
         ), 0);
 
         // dump database data
-        $ignoreTablesWithPatterns = $databaseConfig['ignore_tables_out'];
-        $allTables = DatabaseUtility::getTables($databaseConfig);
-        $ignoreTables = ArrayUtility::filterWithRegexp($ignoreTablesWithPatterns, $allTables);
-
-        $ignoreTablesCmd = ($ignoreTables) ? '--ignore-table=' . $databaseConfig['dbname'] . '.%s' : '%s';
+        $ignoreTables = [];
+        if(isset($databaseConfig['ignore_tables_out']) && is_array($databaseConfig['ignore_tables_out'])) {
+            $allTables = DatabaseUtility::getTables($databaseConfig);
+            $ignoreTables = ArrayUtility::filterWithRegexp($databaseConfig['ignore_tables_out'], $allTables);
+        }
         $filenameParts[3] = 'type:data';
         runLocally(sprintf(
-            'export MYSQL_PWD=%s && %s --create-options -e -K -q -n --default-character-set=utf8 -h%s -P%s -u%s %s -r %s ' . $ignoreTablesCmd,
+            'export MYSQL_PWD=%s && %s --create-options -e -K -q -n --default-character-set=utf8 -h%s -P%s -u%s %s -r %s %s',
             escapeshellarg($databaseConfig['password']),
             get('db_settings_mysqldump_path'),
             escapeshellarg($databaseConfig['host']),
