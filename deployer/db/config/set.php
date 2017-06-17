@@ -3,6 +3,7 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
+use SourceBroker\DeployerExtendedDatabase\Utility\InstanceUtility;
 
 set('deployer_version', 4);
 
@@ -23,23 +24,27 @@ set('db_settings_mysql_path', function () {
 });
 
 set('databases_config', function () {
-    $databaseConfigsMerged = [];
-    foreach (get('db_databases') as $databaseIdentifies => $databaseConfigs) {
-        $databaseConfigsMerged[$databaseIdentifies] = [];
-        foreach ($databaseConfigs as $databaseConfig) {
-            if (is_array($databaseConfig)) {
-                $databaseConfigsMerged[$databaseIdentifies] = ArrayUtility::arrayMergeRecursiveDistinct($databaseConfigsMerged[$databaseIdentifies], $databaseConfig);
+    $dbConfigsMerged = [];
+    foreach (get('db_databases') as $dbIdentifier => $dbConfigs) {
+        $dbConfigsMerged[$dbIdentifier] = [];
+        foreach ($dbConfigs as $dbConfig) {
+            if (is_array($dbConfig)) {
+                $dbConfigsMerged[$dbIdentifier]
+                    = ArrayUtility::arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier], $dbConfig);
                 continue;
             }
-            if (file_exists(get('current_dir') . DIRECTORY_SEPARATOR . $databaseConfig)) {
-                $mergeArray = include(get('current_dir') . DIRECTORY_SEPARATOR . $databaseConfig);
-                $databaseConfigsMerged[$databaseIdentifies] = ArrayUtility::arrayMergeRecursiveDistinct($databaseConfigsMerged[$databaseIdentifies], $mergeArray);
-            } else {
-                throw new \RuntimeException('The config file does not exists: ' . $databaseConfig);
+            if (is_string($dbConfig)) {
+                if (file_exists($dbConfig)) {
+                    $mergeArray = include($dbConfig);
+                    $dbConfigsMerged[$dbIdentifier] = ArrayUtility::arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier],
+                        $mergeArray);
+                } else {
+                    throw new \RuntimeException('The config file does not exists: ' . $dbConfig);
+                }
             }
         }
     }
-    return $databaseConfigsMerged;
+    return $dbConfigsMerged;
 });
 
 set('bin/deployer', function () {
@@ -112,30 +117,13 @@ set('bin/deployer', function () {
     return $deployerBin;
 });
 
-function currentInstance() {
-    if (getenv("INSTANCE") === false && getenv("INSTANCE_DEPLOYER") === false) {
-        $configDir = \Deployer\get('current_dir');
-        if (file_exists($configDir . '/.env')) {
-            $dotenv = new \Dotenv\Dotenv($configDir);
-            $dotenv->load();
-        } else {
-            throw new \Exception('Missing file "' . $configDir . '/.env"');
-        }
-    }
-    if (getenv("INSTANCE") === false && getenv("INSTANCE_DEPLOYER") === false) {
-        throw new \Exception('Neither env var INSTANCE or INSTANCE_DEPLOYER is set. Please
-            set one of them with the name of INSTANCE which should coresspond to server() name."');
-    }
-    return getenv('INSTANCE') === false ? getenv('INSTANCE_DEPLOYER') : getenv('INSTANCE');
-}
-set('instance', currentInstance());
-set('default_stage', currentInstance());
-
+set('instance', InstanceUtility::getCurrentInstance());
+set('default_stage', InstanceUtility::getCurrentInstance());
 
 // Local call of deployer can be not standard. For example someone could have "dep3" and "dep4" symlinks and call
 // "dep3 deploy live". He could expect then that if we will use deployer call inside task we will use then "dep3" and not "dep"
 // so we store actual way of calling deployer into "local/bin/deployer" var to use it whenever we call local deployer again in tasks.
-set('local/bin/deployer', function(){
+set('local/bin/deployer', function () {
     if ($_SERVER['_'] == $_SERVER['PHP_SELF']) {
         return $_SERVER['_'];
     } else {

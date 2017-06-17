@@ -63,4 +63,4 @@ task('db:export', function () {
     if($returnDumpCode) {
         echo json_encode(['dumpCode' => $dumpCode]);
     }
-})->desc('Export database dump to local database dumps storage. Returns dumpcode as json.');
+})->desc('Export database dump to local database dumps storage.');
