@@ -57,7 +57,7 @@ set('db_databases_merged', function () {
 
 set('db_storage_path_current', function () {
     if (get('db_current_server')->get('db_storage_path_relative', false) == false) {
-        $dbStoragePathCurrent = get('db_current_server')->get('deploy_path') . '/database/dumps';
+        $dbStoragePathCurrent = get('db_current_server')->get('deploy_path') . '/.dep/database/dumps';
     } else {
         $dbStoragePathCurrent = get('db_current_server')->get('deploy_path') . '/' . get('db_current_server')->get('db_storage_path_relative');
     }
@@ -67,7 +67,7 @@ set('db_storage_path_current', function () {
 
 set('db_storage_path', function () {
     if (get('db_storage_path_relative', false) == false) {
-        $dbStoragePath = get('deploy_path') . '/database/dumps';
+        $dbStoragePath = get('deploy_path') . '/.dep/database/dumps';
     } else {
         $dbStoragePath = get('deploy_path') . '/' . get('db_storage_path_relative');
     }
