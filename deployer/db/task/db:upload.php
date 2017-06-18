@@ -13,7 +13,6 @@ task('db:upload', function () {
     } else {
         throw new \InvalidArgumentException('No --dumpcode option set. [Error code: 1458937128560]');
     }
-
     $targetInstance = Task\Context::get()->getServer()->getConfiguration();
     $targetInstanceDatabaseStoragePath = FileUtility::normalizeFolder(get('db_storage_path'));
 
@@ -24,9 +23,6 @@ task('db:upload', function () {
     } else {
         $sshOptions = '';
     }
-
-    run("[ -d " . $targetInstanceDatabaseStoragePath . " ] || mkdir -p " . $targetInstanceDatabaseStoragePath);
-
     runLocally(sprintf(
         "rsync -rz --remove-source-files %s --include=*dumpcode:%s*.sql --exclude=* '%s/' '%s%s:%s/'",
         $sshOptions,

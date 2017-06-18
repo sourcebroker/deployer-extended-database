@@ -15,9 +15,6 @@ task('db:download', function () {
     }
     $currentInstanceDatabaseStoragePath = FileUtility::normalizeFolder(get('db_current_server')->get('db_storage_path_current'));
 
-    if (!file_exists($currentInstanceDatabaseStoragePath)) {
-        mkdir($currentInstanceDatabaseStoragePath, 0755, true);
-    }
     $targetInstance = Task\Context::get()->getServer()->getConfiguration();
     $port = $targetInstance->getPort() ? ' -p' . $targetInstance->getPort() : '';
     $identityFile = $targetInstance->getPrivateKey() ? ' -i ' . $targetInstance->getPrivateKey() : '';
@@ -26,7 +23,6 @@ task('db:download', function () {
     } else {
         $sshOptions = '';
     }
-
     runLocally(sprintf(
         "rsync -rz --remove-source-files %s --include=*dumpcode:%s*.sql --exclude=* '%s%s:%s/' '%s/'",
         $sshOptions,
