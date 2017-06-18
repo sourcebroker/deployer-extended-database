@@ -37,7 +37,8 @@ task('db:export', function () {
         ];
         // dump database structure
         $filenameParts[3] = 'type:structure';
-        $mysqlDumpArgs['type'] = FileUtility::normalizeFolder(get('db_storage_path_current')) . '/' . implode('#', $filenameParts) . '.sql';
+        $mysqlDumpArgs['type'] = FileUtility::normalizeFolder(get('db_storage_path_current'))
+            . '/' . implode('#', $filenameParts) . '.sql';
         runLocally(vsprintf(
             'export MYSQL_PWD=%s && %s --no-data=true --default-character-set=utf8 -h%s -P%s -u%s %s -r %s',
             $mysqlDumpArgs
@@ -50,14 +51,15 @@ task('db:export', function () {
             $ignoreTables = ArrayUtility::filterWithRegexp($databaseConfig['ignore_tables_out'], $allTables);
         }
         $filenameParts[3] = 'type:data';
-        $mysqlDumpArgs['type'] = FileUtility::normalizeFolder(get('db_storage_path_current')) . '/' . implode('#', $filenameParts) . '.sql';
+        $mysqlDumpArgs['type'] = FileUtility::normalizeFolder(get('db_storage_path_current'))
+            . '/' . implode('#', $filenameParts) . '.sql';
         $mysqlDumpArgs[] = implode(' --ignore-table=' . $databaseConfig['dbname'] . '.', $ignoreTables);
         runLocally(vsprintf(
             'export MYSQL_PWD=%s && %s --create-options -e -K -q -n --default-character-set=utf8 -h%s -P%s -u%s %s -r %s %s',
             $mysqlDumpArgs
         ), 0);
     }
-    if($returnDumpCode) {
+    if ($returnDumpCode) {
         echo json_encode(['dumpCode' => $dumpCode]);
     }
 })->desc('Export database dump to local database dumps storage.');

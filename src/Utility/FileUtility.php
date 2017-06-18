@@ -48,7 +48,10 @@ class FileUtility
     public static function requireFilesFromDirectoryReqursively($absolutePath, $excludePattern = null)
     {
         if (is_dir($absolutePath)) {
-            $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($absolutePath), \RecursiveIteratorIterator::SELF_FIRST);
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($absolutePath),
+                \RecursiveIteratorIterator::SELF_FIRST
+            );
             foreach ($iterator as $file) {
                 /** @var $file \SplFileInfo */
                 if ($file->isFile()) {

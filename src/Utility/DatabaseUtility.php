@@ -10,12 +10,12 @@ class DatabaseUtility
 {
 
     /**
-     * @param $databasesConf
+     * @param $dbConf
      * @return array
      */
-    public static function getTables($databasesConf)
+    public static function getTables($dbConf)
     {
-        $link = mysqli_connect($databasesConf['host'], $databasesConf['user'], $databasesConf['password'], $databasesConf['dbname']);
+        $link = mysqli_connect($dbConf['host'], $dbConf['user'], $dbConf['password'], $dbConf['dbname']);
         $result = $link->query('SHOW TABLES');
         $allTables = [];
         while ($row = $result->fetch_row()) {

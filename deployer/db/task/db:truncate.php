@@ -9,7 +9,10 @@ task('db:truncate', function () {
     if (get('db_instance') == get('server')['name']) {
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
             $cachingTablesWithPatterns = $databaseConfig['truncate_tables'];
-            $cachingTables = ArrayUtility::filterWithRegexp($cachingTablesWithPatterns, DatabaseUtility::getTables($databaseConfig));
+            $cachingTables = ArrayUtility::filterWithRegexp(
+                $cachingTablesWithPatterns,
+                DatabaseUtility::getTables($databaseConfig)
+            );
             foreach ($cachingTables as $cachingTable) {
                 runLocally(sprintf(
                     'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e \'%s\' ',
