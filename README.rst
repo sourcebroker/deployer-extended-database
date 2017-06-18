@@ -27,6 +27,8 @@ Most useful are two tasks:
 instance,
 2) task "`db:copy`_ [source-instance] [target-instance]" which allows to copy database between instances.
 
+Rest of task are subtasks of db:pull or db:copy
+
 Installation
 ------------
 
@@ -46,65 +48,75 @@ Installation
    require __DIR__ . '/vendor/autoload.php';
    new \SourceBroker\DeployerExtendedDatabase\Loader();
 
-4) Create ".env" file in your root with one line.
+4) Create ".env" file in your project root (where you store deploy.php file). The .env file should be out of
+git because you need to store here information about instance name. Additionally put there info about database
+you want to synchronise. You can move the info about database data to other later but for the tests its better
+to put it in .env file. Remember to protect .env file from downloading with https request.
 ::
 
    INSTANCE="local"
 
-The INSTANCE must correspond to server() name. You need to put the .env file with proper INSTANCE name
-on each of you instances.
+   DATABASE_HOST="127.0.0.1"
+   DATABASE_NAME="database_name"
+   DATABASE_USER="database_user"
+   DATABASE_PASSWORD="password"
 
-5) Define "local" server and set the "db_databases" for it. Example:
+The INSTANCE must correspond to server() name. You need to put the .env file with proper INSTANCE name and
+database access data on on each of you instances.
+
+5) Define "local" server and set the "db_databases" for it. Use
+``(new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()``:
+which will read database data from .env file.
 ::
 
    server('local', 'localhost')
        ->set('deploy_path', getcwd())
        ->set('db_databases', [
            'database_default' => [
-               [
-                   'host' => '127.0.0.1',
-                   'dbname' => 'my_database_local',
-                   'user' => 'user',
-                   'password' => 'password',
-               ]
+               (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
            ]
        ])
-       ->set('db_storage_path', getcwd() . '/.deploy/database/dumps')
 
 6) Add "db_databases" var for all other servers. For example for live server it can be:
 ::
 
    server('live', 'my-server.example.com')
        ->user('deploy')
+       ->set('deploy_path', '/var/www/myapplication/')
        ->set('db_databases', [
            'database_default' => [
-               [
-                   'host' => '127.0.0.1',
-                   'dbname' => 'my_database_live',
-                   'user' => 'user',
-                   'password' => 'password',
-               ]
+               (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
            ]
        ])
-       ->set('deploy_path', '/var/www/myapplication/')
-       ->set('db_storage_path', '/var/www/myapplication/shared/database/dumps')
 
+7) Make sure all instances have the same /vendors folder with deployer-extended-database and the same deploy.php file.
+Most problems are because of differences in deploy.php file between instances.
 
-7) Make sure all instances have /vendors folder with deployer-extended-database and deploy.php file.
+8) Run ``dep db:pull live`` to test if all works.
 
 Options
 -------
 
-You can set following options:
+- | **db_databases**
+  | *default value:* null
+  |
+  | Databases to be synchronized. You can define more than one database to be synchronized. See `db_databases`_ for
+    options available inside db_databases. Look for `Examples`_ for better understanding of structure.
 
-bin/mysqldump
-bin/mysql
-local/bin/deployer
-bin/deployer
+- | **db_storage_path_relative**
+  | *default value:* .dep/database/dumps
+  |
+  | Path relative to "deploy_path" where you want to store database dumps produced during database synchro commands.
 
 
+.. _db_databases:
 Options for "db_databases"
 --------------------------
+
+"db_databases" is an array of "database configurations" and "database configuration" is array of configuration parts.
+Configuration part can be array or string. If its string then its treated as absolute path to file which should
+return array of configuration. Each or array configuration parts is merged. Look for `Examples`_ for better
+understanding.
 
 - | **host**
   | *default value:* null
@@ -141,9 +153,9 @@ Options for "db_databases"
 - | **ignore_tables_out**
   | *default value:* null
   |
-  | Tables that will be ignored while pulling database from target instance with task `db:pull`_ Table name is put
-    between ^ and $ and treated as preg_match. For example you can write "cf_.*" to ignore all tables that starts
-    with "cf_". The final preg_match checked is "/^cf_.*$/i"
+  | Array of tables names that will be ignored while pulling database from target instance with task `db:pull`_
+    Table name is put between ^ and $ and treated as preg_match. For example you can write "cf_.*" to ignore all
+    tables that starts with "cf_". The final preg_match checked is "/^cf_.*$/i"
 
   |
 - | **post_sql_in**
@@ -151,60 +163,201 @@ Options for "db_databases"
   |
   | SQL that will be executed after importing database on current instance.
 
+  |
+- | **post_sql_in_markers**
+  | *default value:* null
+  |
+  | SQL that will be executed after importing database on current instance. The diffrence over "post_sql_in"
+    is that you can use some predefined markers. For now only marker is {{domainsSeparatedByComma}} which consist of all
+    domains defined in ``->set('public_urls', ['https://live.example.com']);`` and separated by comma. Having such
+    marker allows to change active domain in database after import to other instnace as some frameworks keeps domain
+    names in database.
+
+
 |
 
-Config is stored in var "db_databases" which is an array of "database configurations".
-"database configuration" is array of configuration parts. Configuration part can be array or string.
-If its string then its treated as absolute path to file which should return array of configuration.
-Each or array configuration parts is merged.
 
-Below example should illustrate above:
+Examples
+--------
 
+Below examples should illustrate how you should build your database configuration.
+
+Config with one database and database data read from .env file
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Deploy.php file:
 ::
 
    set('db_defaults', [
       'ignore_tables_out' => [
-          'cf_*'
+          'caching_*'
       ]
-
    ]);
 
-   set(
-          'db_databases',
-          [
+   server('live', 'my-server.example.com')
+         ->user('deploy')
+         ->set('deploy_path', '/var/www/myapplication/')
+         ->set('db_databases',
+            [
               'database_foo' => [
-                  [
-                      'host' => '127.0.0.1',
-                      'user' => 'foo',
-                      'password' => 'foopass',
-                      'dbname' => 'foo',
-                  ],
-                  get('db_defaults')
-              ],
-              'database_bar' => [
                   get('db_defaults'),
-                  __DIR__ . '/.database/config-out-of-git/database_bar.php'
-              ],
-          ]
-      );
+                  (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
+               ],
+            ]
+         );
 
-Its advisable that you create a special method that will return you framework database data. So example
-configuration can look then like:
+   server('local', 'localhost')
+         ->set('deploy_path', getcwd())
+         ->set('db_databases',
+            [
+              'database_foo' => [
+                  get('db_defaults'),
+                  (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
+               ],
+            ]
+         );
+
+Mind that because the db_* settings for all server will be the same then you can make the 'db_databases' setting global
+and put it out of server configurations. Look for below example where we simplified the config.
+
+Deploy.php file:
+::
+
+   set('db_databases',
+       [
+           'database_foo' => [
+               'ignore_tables_out' => [
+                  'caching_*'
+               ]
+               (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
+            ],
+       ]
+   );
+
+   server('live', 'my-server.example.com')
+       ->user('deploy')
+       ->set('deploy_path', '/var/www/myapplication/');
+
+   server('local', 'localhost')
+      ->set('deploy_path', getcwd());
+
+
+The .env file should look then like:
+::
+
+   INSTANCE="[instance name]"
+
+   DATABASE_HOST="127.0.0.1"
+   DATABASE_NAME="database_name"
+   DATABASE_USER="database_user"
+   DATABASE_PASSWORD="password"
+
+Config with two databases and database data read from .env file
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Deploy.php file:
+::
+
+   set('db_databases',
+       [
+            'database_application1' => [
+               'ignore_tables_out' => [
+                  'caching_*'
+               ]
+            (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig('APP1_')
+         ],
+            'database_application2' => [
+               'ignore_tables_out' => [
+                  'cf_*'
+                ]
+            (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig('APP2_')
+         ],
+       ]
+   );
+
+   server('live', 'my-server.example.com')
+       ->user('deploy')
+       ->set('deploy_path', '/var/www/myapplication/');
+
+   server('local', 'localhost')
+       ->set('deploy_path', getcwd());
+
+The .env file should look then like:
+::
+
+   INSTANCE="[instance name]"
+
+   APP1_DATABASE_HOST="127.0.0.1"
+   APP1_DATABASE_NAME="database_name"
+   APP1_DATABASE_USER="database_user"
+   APP1_DATABASE_PASSWORD="password"
+
+   APP2_DATABASE_HOST="127.0.0.1"
+   APP2_DATABASE_NAME="database_name"
+   APP2_DATABASE_USER="database_user"
+   APP2_DATABASE_PASSWORD="password"
+
+Config with one database and database config read from from different sources
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+In examples we will use:
+1) array,
+2) get() which returns array,
+3) direct file include (which should return array)
+4) class/method (which should return array)
+
+Each of this arrays are merged to build final configuration for database synchro.
+
+Deploy.php file:
+::
+
+   set('db_default', [
+      'post_sql_in' => 'UPDATE sys_domains SET hidden=1;'
+   ]);
+
+   set('db_databases',
+       [
+           'database_foo' => [
+               'ignore_tables_out' => [
+                  'caching_*'
+               ]
+               get('db_default'),
+               __DIR__ . '/databases/conifg/additional_db_config.php
+               (new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig(),
+            ],
+       ]
+   );
+
+   server('live', 'my-server.example.com')
+       ->user('deploy')
+       ->set('deploy_path', '/var/www/myapplication/');
+
+   server('local', 'localhost')
+      ->set('deploy_path', getcwd());
+
+
+Config with one database and database config read from "my framework" file
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Its advisable that you create you own special method that will return you framework database data. In below example
+its call to ``\YourVendor\YourPackage\Driver\MyDriver()``. This way you do not need to repeat the data of database
+in .env file.
 
 ::
 
-   set(
-          'db_databases',
+   set('db_databases',
           [
               'database_default' => [
-                  get('db_default'),
-                  (new \MyVendor\MyClass\MySystem())->getDatabaseConfig()
+                  (new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig()
               ],
           ]
       );
 
 
-Another example for CMS TYPO3:
+Config of truncate_tables, ignore_tables_out, post_sql_in_markers
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Real life example for CMS TYPO3:
 ::
 
    set('db_default', [
@@ -215,6 +368,7 @@ Another example for CMS TYPO3:
            'cf_.*',
            'cache_.*',
            'be_sessions',
+           'fe_sessions',
            'sys_history',
            'sys_file_processedfile',
            'sys_log',
@@ -233,7 +387,10 @@ Another example for CMS TYPO3:
            'tx_crawler_queue',
            'tx_crawler_process',
        ],
-       'post_sql_in' => ''
+       'post_sql_in_markers' => 'UPDATE sys_domain SET hidden = 1;
+                                 UPDATE sys_domain SET sorting = sorting + 100;
+                                 UPDATE sys_domain SET sorting = 1, hidden = 0 WHERE domainName IN ({{domainsSeparatedByComma}});
+                                '
    ]);
 
 
