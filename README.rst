@@ -23,10 +23,10 @@ What does it do?
 The package provides additional tasks for deployer (deployer.org) for synchronising databases between instances.
 Most useful are two tasks:
 
-1) task "`db:pull`_ [source-instance]" task which allows you to pull database from source instance to current
+1. task "`db:pull`_ [source-instance]" task which allows you to pull database from source instance to current
 instance,
 
-2) task "`db:copy`_ [source-instance] [target-instance]" which allows to copy database between instances.
+2. task "`db:copy`_ [source-instance] [target-instance]" which allows to copy database between instances.
 
 Rest of task are subtasks of db:pull or db:copy
 
