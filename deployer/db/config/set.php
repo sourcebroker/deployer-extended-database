@@ -175,4 +175,3 @@ set('bin/mysql', function () {
         throw new \RuntimeException('The mysql path on server "' . get('server')['name'] . '" is unknown. You can set it in env var "bin/mysql" . [Error code: 1458412748]');
     }
 });
-
