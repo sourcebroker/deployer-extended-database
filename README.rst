@@ -38,19 +38,16 @@ Installation
 
       composer require sourcebroker/deployer-extended-database
 
-
 2) If you are using deployer as composer package then just put following line in your deploy.php:
    ::
 
       new \SourceBroker\DeployerExtendedDatabase\Loader();
 
-
 3) If you are using deployer as phar then put following lines in your deploy.php:
    ::
 
-   require __DIR__ . '/vendor/autoload.php';
-   new \SourceBroker\DeployerExtendedDatabase\Loader();
-
+      require __DIR__ . '/vendor/autoload.php';
+      new \SourceBroker\DeployerExtendedDatabase\Loader();
 
 4) Create ".env" file in your project root (where you store deploy.php file). The .env file should be out of
    git because you need to store here information about instance name. Additionally put there info about database
@@ -58,12 +55,12 @@ Installation
    to put it in .env file. Remember to protect .env file from downloading with https request.
    ::
 
-   INSTANCE="local"
+      INSTANCE="local"
 
-   DATABASE_HOST="127.0.0.1"
-   DATABASE_NAME="database_name"
-   DATABASE_USER="database_user"
-   DATABASE_PASSWORD="password"
+      DATABASE_HOST="127.0.0.1"
+      DATABASE_NAME="database_name"
+      DATABASE_USER="database_user"
+      DATABASE_PASSWORD="password"
 
    The INSTANCE must correspond to server() name. You need to put the .env file with proper INSTANCE name and
    database access data on on each of you instances.
@@ -73,26 +70,25 @@ Installation
    which will read database data from .env file.
    ::
 
-   server('local', 'localhost')
-       ->set('deploy_path', getcwd())
-       ->set('db_databases', [
-           'database_default' => [
-               (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
-           ]
-       ])
+      server('local', 'localhost')
+          ->set('deploy_path', getcwd())
+          ->set('db_databases', [
+              'database_default' => [
+                  (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
+              ]
+          ])
 
 6) Add "db_databases" var for all other servers. For example for live server it can be:
    ::
 
-   server('live', 'my-server.example.com')
-       ->user('deploy')
-       ->set('deploy_path', '/var/www/myapplication/')
-       ->set('db_databases', [
-           'database_default' => [
-               (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
-           ]
-       ])
-
+      server('live', 'my-server.example.com')
+          ->user('deploy')
+          ->set('deploy_path', '/var/www/myapplication/')
+          ->set('db_databases', [
+              'database_default' => [
+                  (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
+              ]
+          ])
 
 7) Make sure all instances have the same /vendors folder with deployer-extended-database and the same deploy.php file.
    Most problems are because of differences in deploy.php file between instances.
