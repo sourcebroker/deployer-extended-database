@@ -110,7 +110,7 @@ Options
   | Path relative to "deploy_path" where you want to store database dumps produced during database synchro commands.
 
 
-.. _db_databases:
+.. _db\_databases:
 
 Options for "db_databases"
 --------------------------
