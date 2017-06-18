@@ -34,17 +34,15 @@ Installation
 ------------
 
 1) Install package with composer:
-
    ::
 
-   composer require sourcebroker/deployer-extended-database
+      composer require sourcebroker/deployer-extended-database
 
 
 2) If you are using deployer as composer package then just put following line in your deploy.php:
-
    ::
 
-   new \SourceBroker\DeployerExtendedDatabase\Loader();
+      new \SourceBroker\DeployerExtendedDatabase\Loader();
 
 
 3) If you are using deployer as phar then put following lines in your deploy.php:
