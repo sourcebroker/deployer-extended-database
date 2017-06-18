@@ -25,6 +25,7 @@ Most useful are two tasks:
 
 1) task "`db:pull`_ [source-instance]" task which allows you to pull database from source instance to current
 instance,
+
 2) task "`db:copy`_ [source-instance] [target-instance]" which allows to copy database between instances.
 
 Rest of task are subtasks of db:pull or db:copy
@@ -37,16 +38,19 @@ Installation
 
    composer require sourcebroker/deployer-extended-database
 
+
 2) If you are using deployer as composer package then just put following line in your deploy.php:
 ::
 
    new \SourceBroker\DeployerExtendedDatabase\Loader();
+
 
 3) If you are using deployer as phar then put following lines in your deploy.php:
 ::
 
    require __DIR__ . '/vendor/autoload.php';
    new \SourceBroker\DeployerExtendedDatabase\Loader();
+
 
 4) Create ".env" file in your project root (where you store deploy.php file). The .env file should be out of
 git because you need to store here information about instance name. Additionally put there info about database
@@ -88,6 +92,7 @@ which will read database data from .env file.
                (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
            ]
        ])
+
 
 7) Make sure all instances have the same /vendors folder with deployer-extended-database and the same deploy.php file.
 Most problems are because of differences in deploy.php file between instances.
