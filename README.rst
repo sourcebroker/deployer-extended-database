@@ -24,7 +24,7 @@ The package provides additional tasks for deployer (deployer.org) for synchronis
 Most useful are two tasks:
 
 1. task "`db:pull`_ [source-instance]" task which allows you to pull database from source instance to current
-instance,
+   instance,
 
 2. task "`db:copy`_ [source-instance] [target-instance]" which allows to copy database between instances.
 
@@ -34,29 +34,29 @@ Installation
 ------------
 
 1) Install package with composer:
-::
+   ::
 
    composer require sourcebroker/deployer-extended-database
 
 
 2) If you are using deployer as composer package then just put following line in your deploy.php:
-::
+   ::
 
    new \SourceBroker\DeployerExtendedDatabase\Loader();
 
 
 3) If you are using deployer as phar then put following lines in your deploy.php:
-::
+   ::
 
    require __DIR__ . '/vendor/autoload.php';
    new \SourceBroker\DeployerExtendedDatabase\Loader();
 
 
 4) Create ".env" file in your project root (where you store deploy.php file). The .env file should be out of
-git because you need to store here information about instance name. Additionally put there info about database
-you want to synchronise. You can move the info about database data to other later but for the tests its better
-to put it in .env file. Remember to protect .env file from downloading with https request.
-::
+   git because you need to store here information about instance name. Additionally put there info about database
+   you want to synchronise. You can move the info about database data to other later but for the tests its better
+   to put it in .env file. Remember to protect .env file from downloading with https request.
+   ::
 
    INSTANCE="local"
 
@@ -65,13 +65,13 @@ to put it in .env file. Remember to protect .env file from downloading with http
    DATABASE_USER="database_user"
    DATABASE_PASSWORD="password"
 
-The INSTANCE must correspond to server() name. You need to put the .env file with proper INSTANCE name and
-database access data on on each of you instances.
+   The INSTANCE must correspond to server() name. You need to put the .env file with proper INSTANCE name and
+   database access data on on each of you instances.
 
 5) Define "local" server and set the "db_databases" for it. Use
-``(new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()``:
-which will read database data from .env file.
-::
+   ``(new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()``:
+   which will read database data from .env file.
+   ::
 
    server('local', 'localhost')
        ->set('deploy_path', getcwd())
@@ -82,7 +82,7 @@ which will read database data from .env file.
        ])
 
 6) Add "db_databases" var for all other servers. For example for live server it can be:
-::
+   ::
 
    server('live', 'my-server.example.com')
        ->user('deploy')
@@ -95,7 +95,7 @@ which will read database data from .env file.
 
 
 7) Make sure all instances have the same /vendors folder with deployer-extended-database and the same deploy.php file.
-Most problems are because of differences in deploy.php file between instances.
+   Most problems are because of differences in deploy.php file between instances.
 
 8) Run ``dep db:pull live`` to test if all works.
 
