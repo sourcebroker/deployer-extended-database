@@ -45,15 +45,21 @@ task('db:export', function () {
         ), 0);
 
         // dump database data
-        $ignoreTables = [];
         if (isset($databaseConfig['ignore_tables_out']) && is_array($databaseConfig['ignore_tables_out'])) {
-            $allTables = DatabaseUtility::getTables($databaseConfig);
-            $ignoreTables = ArrayUtility::filterWithRegexp($databaseConfig['ignore_tables_out'], $allTables);
+            $ignoreTables = ArrayUtility::filterWithRegexp(
+                $databaseConfig['ignore_tables_out'],
+                DatabaseUtility::getTables($databaseConfig)
+            );
+            if (!empty($ignoreTables)) {
+                $mysqlDumpArgs[] = '--ignore-table=' . $databaseConfig['dbname'] . '.' . implode(' --ignore-table=' . $databaseConfig['dbname'] . '.',
+                        $ignoreTables);
+            } else {
+                $mysqlDumpArgs[] = '';
+            }
         }
         $filenameParts[3] = 'type:data';
         $mysqlDumpArgs['type'] = FileUtility::normalizeFolder(get('db_storage_path_current'))
             . '/' . implode('#', $filenameParts) . '.sql';
-        $mysqlDumpArgs[] = implode(' --ignore-table=' . $databaseConfig['dbname'] . '.', $ignoreTables);
         runLocally(vsprintf(
             'export MYSQL_PWD=%s && %s --create-options -e -K -q -n --default-character-set=utf8 -h%s -P%s -u%s %s -r %s %s',
             $mysqlDumpArgs
