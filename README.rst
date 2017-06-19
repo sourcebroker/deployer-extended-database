@@ -28,7 +28,7 @@ Most useful are two tasks:
 
 2. task "`db:copy`_ [source-instance] [target-instance]" which allows to copy database between instances.
 
-Rest of task are subtasks of db:pull or db:copy
+**NOTE! Its tested only with Deployer 4.3.0!**
 
 Installation
 ------------
