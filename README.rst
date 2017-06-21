@@ -20,7 +20,7 @@ deployer-extended-database
 What does it do?
 ----------------
 
-The package provides additional tasks for deployer (deployer.org) for synchronising databases between instances.
+The package provides additional tasks for deployer (deployer.org) for synchronizing databases between instances.
 Most useful are two tasks:
 
 1. task "`db:pull`_ [source-instance]" task which allows you to pull database from source instance to current
@@ -148,7 +148,7 @@ understanding.
   | *default value:* null
   |
   | Array of tables names that will be truncated with task `db:truncate`_. Usually it should be some caching tables that
-    will be truncated while deployment. Table name is put between ^ and $ and treated as preg_match. For example
+    will be truncated while deployment. The value is put between ^ and $ and treated as preg_match. For example
     you can write "cf_.*" to truncate all tables that starts with "cf_". The final preg_match checked is /^cf_.*$/i
 
   |
@@ -156,8 +156,8 @@ understanding.
   | *default value:* null
   |
   | Array of tables names that will be ignored while pulling database from target instance with task `db:pull`_
-    Table name is put between ^ and $ and treated as preg_match. For example you can write "cf_.*" to ignore all
-    tables that starts with "cf_". The final preg_match checked is "/^cf_.*$/i"
+    The value is put between ^ and $ and treated as preg_match. For example you can write "cf_.*" to truncate all
+    tables that starts with "cf_". The final preg_match checked is /^cf_.*$/i
 
   |
 - | **post_sql_in**
@@ -172,13 +172,11 @@ understanding.
   | SQL that will be executed after importing database on current instance. The diffrence over "post_sql_in"
     is that you can use some predefined markers. For now only marker is {{domainsSeparatedByComma}} which consist of all
     domains defined in ``->set('public_urls', ['https://live.example.com']);`` and separated by comma. Having such
-    marker allows to change active domain in database after import to other instnace as some frameworks keeps domain
+    marker allows to change active domain in database after import to other instance as some frameworks keeps domain
     names in database.
 
 
 |
-
-
 Examples
 --------
 
@@ -187,7 +185,7 @@ Below examples should illustrate how you should build your database configuratio
 Config with one database and database data read from .env file
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Deploy.php file:
+deploy.php file:
 ::
 
    set('db_defaults', [
@@ -198,7 +196,7 @@ Deploy.php file:
 
    server('live', 'my-server.example.com')
          ->user('deploy')
-         ->set('deploy_path', '/var/www/myapplication/')
+         ->set('deploy_path', '/var/www/myapplication')
          ->set('db_databases',
             [
               'database_foo' => [
@@ -222,7 +220,7 @@ Deploy.php file:
 Mind that because the db_* settings for all server will be the same then you can make the 'db_databases' setting global
 and put it out of server configurations. Look for below example where we simplified the config.
 
-Deploy.php file:
+deploy.php file:
 ::
 
    set('db_databases',
@@ -257,7 +255,7 @@ The .env file should look then like:
 Config with two databases and database data read from .env file
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Deploy.php file:
+deploy.php file:
 ::
 
    set('db_databases',
@@ -302,15 +300,27 @@ The .env file should look then like:
 Config with one database and database config read from from different sources
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-In examples we will use:
+In example we will use:
+
 1) array,
-2) get() which returns array,
-3) direct file include (which should return array)
-4) class/method (which should return array)
+   ::
+
+      'ignore_tables_out' => [
+                  'caching_*'
+               ]
+
+2) get() which returns array with database options,
+   ``get('db_default')``
+
+3) direct file include which returns array with database options
+   ``__DIR__ . '/databases/conifg/additional_db_config.php``
+
+4) class/method which returns array with database options
+   ``(new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig()``
 
 Each of this arrays are merged to build final configuration for database synchro.
 
-Deploy.php file:
+deploy.php file:
 ::
 
    set('db_default', [
@@ -343,8 +353,7 @@ Config with one database and database config read from "my framework" file
 
 Its advisable that you create you own special method that will return you framework database data. In below example
 its call to ``\YourVendor\YourPackage\Driver\MyDriver()``. This way you do not need to repeat the data of database
-in .env file.
-
+in .env file. In that case .env file should hold only INSTANCE.
 ::
 
    set('db_databases',
@@ -389,10 +398,10 @@ Real life example for CMS TYPO3:
            'tx_crawler_queue',
            'tx_crawler_process',
        ],
-       'post_sql_in_markers' => 'UPDATE sys_domain SET hidden = 1;
-                                 UPDATE sys_domain SET sorting = sorting + 100;
-                                 UPDATE sys_domain SET sorting = 1, hidden = 0 WHERE domainName IN ({{domainsSeparatedByComma}});
-                                '
+       'post_sql_in_markers' =>
+            'UPDATE sys_domain SET hidden = 1;
+             UPDATE sys_domain SET sorting = sorting + 100;
+             UPDATE sys_domain SET sorting = 1, hidden = 0 WHERE domainName IN ({{domainsSeparatedByComma}});'
    ]);
 
 
@@ -403,31 +412,43 @@ db:copy
 +++++++
 
 This command allows you to copy database between instances.
-In the background it runs several other tasks to accomplish this.
-
-Here is the list of tasks that will be done afer "db:move":
-
-1) First it runs `db:export`_ task on target instance and get the "dumpcode" as return to use it in next commands.
-2) Then it runs `db:download`_ on current instance (with "dumpcode" value from first task).
-3) Then it runs `db:process`_ on current instance (with "dumpcode" value from first task).
-4) Then it runs `db:upload`_ on current instance (with "dumpcode" value from first task).
-5) Then it runs `db:import`_ on target instance (with "dumpcode" value from first task).
-
-
-**Example**
-
-Example call when you are on your local instance can be:
 ::
 
-   dep db:move live dev
+   dep db:copy [source-instance] [target-instance]
 
-If you would be logged to ssh of dev instance then you could just use "dep db:pull live".
+In the background it runs several other tasks to accomplish this. Lets assume we want to copy database from live
+to dev instance. We will run:
+::
+
+   dep db:copy live dev
+
+Here are the tasks that will be run in background:
+
+In below description:
+source instance = live
+target instance = dev
+current instance = local
+
+1) First it runs ``dep db:export --dumpcode=123456`` task on source instance. The dumps from export task are stored
+   in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
+
+2) Then it runs ``db:download live --dumpcode=123456`` on current instance to download dump files from live instance from
+   folder "{{deploy_path}}/.dep/databases/dumps/" to current instance to folder "{{deploy_path}}/.dep/databases/dumps/".
+
+3) Then it runs ``db:process --dumpcode=123456`` on current instance to make some operations directly on SQL dumps files.
+
+4) Then it runs ``db:upload dev --dumpcode=123456`` on current instance. This task takes dump files with code:123456
+   and send it to dev instance and store it in folder "{{deploy_path}}/.dep/databases/dumps/".
+
+5) Finally it runs ``db:import --dumpcode=123456`` on target instance. This task reads dumps with code:123456 from folder
+   "{{deploy_path}}/.dep/databases/dumps/" on dev instance and import it to database.
 
 
 db:download
 +++++++++++
 
-Download database from target instance to current instance.
+Download database dumps with selected dumpcode from folder "{{deploy_path}}/.dep/databases/dumps/" on target instance
+and store it in folder "{{deploy_path}}/.dep/databases/dumps/" on current instance.
 There is required option --dumpcode to be passed.
 
 **Example**
@@ -438,9 +459,10 @@ There is required option --dumpcode to be passed.
 db:export
 +++++++++
 
-Export database to database storage folder on current instance. The database will be stored in two separate files.
-One with tables structure. The second with data only. There is option --dumpcode that can be passed. If there is
-no --dumpcode option then its created and returned as json structure.
+Dump database to folder on current instance located by default in "{{deploy_path}}/.dep/databases/dumps/".
+Dumps will be stored in two separate files. One with tables structure. The second with data only.
+There is option --dumpcode that can be passed. If there is no dumpcode then its created and returned as
+json structure.
 
 **Example**
 
@@ -449,28 +471,29 @@ Example task call:
 
    dep db:export
 
-Example output files:
+Example output files located in folder {{deploy_path}}/.dep/databases/dumps/:
 ::
 
    2017-02-26_14:56:08#server:live#dbcode:database_default#type:data#dumpcode:362d7ca0ff065f489c9b79d0a73720f5.sql
    2017-02-26_14:56:08#server:live#dbcode:database_default#type:structure#dumpcode:362d7ca0ff065f489c9b79d0a73720f5.sql
 
 
-Example task call with dumpcode:
+Example task call with own dumpcode:
 ::
 
-   dep db:export --dumpcode=123456
+   dep db:export --dumpcode=mycode
 
 Example output files:
 ::
 
-   2017-02-26_14:56:08#server:live#dbcode:database_default#type:data#dumpcode:123456.sql
-   2017-02-26_14:56:08#server:live#dbcode:database_default#type:structure#dumpcode:123456.sql
+   2017-02-26_14:56:08#server:live#dbcode:database_default#type:data#dumpcode:mycode.sql
+   2017-02-26_14:56:08#server:live#dbcode:database_default#type:structure#dumpcode:mycode.sql
 
 db:import
 +++++++++
 
-Import database from current instance database storage. There is required option --dumpcode to be passed.
+Import database dump files from current instance folder "{{deploy_path}}/.dep/databases/dumps/" to current database(s).
+There is required option --dumpcode to be passed.
 
 **Example**
 ::
@@ -509,23 +532,28 @@ Here is the list of tasks that will be done afer "db:pull":
 db:truncate
 +++++++++++
 
-This command allows you to truncate database tables defined in database config var "truncate_tables"
+This command allows you to truncate database tables defined in database config var "truncate_tables".
+No dumpcode is needed because it operates directly on database.
 
 **Example**
+Truncate current instance databases tables.
 ::
 
-   dep db:truncate --dumpcode=0772a8d396911951022db5ea385535f6
+   dep db:truncate
+
+Truncate live instance databases tables.
+::
+
+   dep db:truncate live
 
 db:upload
 +++++++++
 
-This command uploads the sql dump file from current instance database storage to target instance
-database storage. There is required option --dumpcode to be passed.
+Upload database dumps with selected dumpcode from folder "{{deploy_path}}/.dep/databases/dumps/" on current instance and
+store it in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
+There is required option --dumpcode to be passed.
 
 **Example**
-
-Take database with dumpcode 0772a8d396911951022db5ea385535f6 from current instance and upload it to
-database storage folder on live instance.
 ::
 
    dep db:upload live --dumpcode=0772a8d396911951022db5ea385535f6
