@@ -27,6 +27,14 @@ task('db:import', function () {
             . '.sql';
         $structureSqlFile = glob($glob);
 
+        set('db_import_source_server', function () use ($structureSqlFile) {
+            foreach (explode('#', reset($structureSqlFile)) as $fileNamePart) {
+                list($key, $value) = explode(':', $fileNamePart);
+                if ($key === 'server') {
+                    return $value;
+                }
+            }
+        });
         if (empty($structureSqlFile)) {
             throw new \RuntimeException('No structure file for $dumpcode: ' . $dumpCode . '. Glob build: ' . $glob
                 . '.  [Error code: 1458494633]');
@@ -108,6 +116,11 @@ task('db:import', function () {
                 $importSql
             ), 0);
             unlink($importSql);
+        }
+        if (isset($databaseConfig['post_command']) && is_array($databaseConfig['post_command'])) {
+            foreach ($databaseConfig['post_command'] as $postCommand) {
+                runLocally($postCommand, 0);
+            }
         }
     }
 })->desc('Import the database with "dumpcode" from current database dumps storage to database.');
