@@ -17,7 +17,10 @@ task('db:import', function () {
     }
     $currentInstanceDatabaseStoragePath = get('db_storage_path_current');
     foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
-        $link = mysqli_connect($databaseConfig['host'], $databaseConfig['user'], $databaseConfig['password'],
+        $link = mysqli_connect(
+            $databaseConfig['host'],
+            $databaseConfig['user'],
+            $databaseConfig['password'],
             $databaseConfig['dbname']);
 
         $glob = $currentInstanceDatabaseStoragePath . DIRECTORY_SEPARATOR
@@ -119,7 +122,7 @@ task('db:import', function () {
         }
         if (isset($databaseConfig['post_command']) && is_array($databaseConfig['post_command'])) {
             foreach ($databaseConfig['post_command'] as $postCommand) {
-                runLocally($postCommand, 0);
+                runLocally($postCommand . ' --dumpcode=' . $dumpCode, 0);
             }
         }
     }
