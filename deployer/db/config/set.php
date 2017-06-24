@@ -6,13 +6,17 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\InstanceUtility;
 
 // deployer settings
-set('default_stage', InstanceUtility::getCurrentInstance());
+set('default_stage', function () {
+    InstanceUtility::getCurrentInstance();
+});
 
 // Return what deployer to download on source server when we use phar deployer.
 set('db_deployer_version', 4);
 
 // Return current instance name. Based on that scripts knows from which server() takes the data to database.
-set('db_instance', InstanceUtility::getCurrentInstance());
+set('db_instance', function () {
+    InstanceUtility::getCurrentInstance();
+});
 
 // Returns current server settings.
 set('db_current_server', function () {
@@ -156,7 +160,7 @@ set('local/bin/deployer', function () {
     if ($_SERVER['_'] == $_SERVER['PHP_SELF']) {
         return $_SERVER['_'];
     } else {
-        return $_SERVER['_']  . ' ' . $_SERVER['PHP_SELF'];
+        return $_SERVER['_'] . ' ' . $_SERVER['PHP_SELF'];
     }
 });
 
