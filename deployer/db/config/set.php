@@ -7,7 +7,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\InstanceUtility;
 
 // deployer settings
 set('default_stage', function () {
-    InstanceUtility::getCurrentInstance();
+    return InstanceUtility::getCurrentInstance();
 });
 
 // Return what deployer to download on source server when we use phar deployer.
@@ -15,7 +15,7 @@ set('db_deployer_version', 4);
 
 // Return current instance name. Based on that scripts knows from which server() takes the data to database.
 set('db_instance', function () {
-    InstanceUtility::getCurrentInstance();
+    return InstanceUtility::getCurrentInstance();
 });
 
 // Returns current server settings.
