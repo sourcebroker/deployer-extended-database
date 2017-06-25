@@ -51,7 +51,7 @@ Installation
 
 4) Create ".env" file in your project root (where you store deploy.php file). The .env file should be out of
    git because you need to store here information about instance name. Additionally put there info about database
-   you want to synchronise. You can move the info about database data to other later but for the tests its better
+   you want to synchronise. You can move the info about database data to other file later but for the tests its better
    to put it in .env file. Remember to protect .env file from downloading with https request.
    ::
 
@@ -65,8 +65,11 @@ Installation
    The INSTANCE must correspond to server() name. You need to put the .env file with proper INSTANCE name and
    database access data on on each of you instances.
 
-5) Define "local" server and set the "db_databases" for it. Use
-   ``(new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()``:
+5) Define "local" server and set the "db_databases" for it. Use following code:
+   ::
+
+      (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
+
    which will read database data from .env file.
    ::
 
@@ -104,6 +107,7 @@ Options
   | Databases to be synchronized. You can define more than one database to be synchronized. See `db_databases`_ for
     options available inside db_databases. Look for `Examples`_ for better understanding of structure.
 
+  |
 - | **db_storage_path_relative**
   | *default value:* .dep/database/dumps
   |
@@ -149,15 +153,15 @@ understanding.
   |
   | Array of tables names that will be truncated with task `db:truncate`_. Usually it should be some caching tables that
     will be truncated while deployment. The value is put between ^ and $ and treated as preg_match. For example
-    you can write "cf_.*" to truncate all tables that starts with "cf_". The final preg_match checked is /^cf_.*$/i
+    you can write "cf\_.*" to truncate all tables that starts with "cf\_". The final preg_match checked is /^cf\_.*$/i
 
   |
 - | **ignore_tables_out**
   | *default value:* null
   |
   | Array of tables names that will be ignored while pulling database from target instance with task `db:pull`_
-    The value is put between ^ and $ and treated as preg_match. For example you can write "cf_.*" to truncate all
-    tables that starts with "cf_". The final preg_match checked is /^cf_.*$/i
+    The value is put between ^ and $ and treated as preg_match. For example you can write "cf\_.*" to truncate all
+    tables that starts with "cf\_". The final preg_match checked is /^cf\_.*$/i
 
   |
 - | **post_sql_in**
@@ -176,7 +180,6 @@ understanding.
     names in database.
 
 
-|
 Examples
 --------
 
@@ -417,7 +420,7 @@ This command allows you to copy database between instances.
    dep db:copy [source-instance] [target-instance]
 
 In the background it runs several other tasks to accomplish this. Lets assume we want to copy database from live
-to dev instance. We will run:
+to dev instance. We will run following command on you local current (in out exmaple local instance):
 ::
 
    dep db:copy live dev
@@ -425,9 +428,9 @@ to dev instance. We will run:
 Here are the tasks that will be run in background:
 
 In below description:
-source instance = live
-target instance = dev
-current instance = local
+* source instance = live
+* target instance = dev
+* current instance = local
 
 1) First it runs ``dep db:export --dumpcode=123456`` task on source instance. The dumps from export task are stored
    in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.

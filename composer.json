@@ -1,6 +1,6 @@
 {
   "name": "sourcebroker/deployer-extended-database",
-  "description": "Database synchronisation between application instances.",
+  "description": "Deployer tasks to manage database synchronisation between application instances.",
   "license": "MIT",
   "keywords": [
     "deployer",
