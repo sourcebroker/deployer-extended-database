@@ -6,9 +6,11 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\InstanceUtility;
 
 // deployer settings
-set('default_stage', function () {
-    return InstanceUtility::getCurrentInstance();
-});
+// Direct call without callable until fix of https://github.com/deployphp/deployer/issues/1278
+set('default_stage', InstanceUtility::getCurrentInstance());
+//set('default_stage', function () {
+//    return InstanceUtility::getCurrentInstance();
+//});
 
 // Return what deployer to download on source server when we use phar deployer.
 set('db_deployer_version', 4);

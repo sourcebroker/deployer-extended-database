@@ -16,7 +16,11 @@ class InstanceUtility
                 $dotenv = new \Dotenv\Dotenv($configDir);
                 $dotenv->load();
             } else {
-                throw new \Exception('Missing file "' . $configDir . '/.env"');
+                // Silent return until this bug will be fixed:
+                // https://github.com/deployphp/deployer/issues/1278
+                // Otherwise we can not overwrite "default_stage" with other packages.
+                return '';
+                //throw new \Exception('Missing file "' . $configDir . '/.env"');
             }
         }
         if (getenv("INSTANCE") === false && getenv("INSTANCE_DEPLOYER") === false) {
