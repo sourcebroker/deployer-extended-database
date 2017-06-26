@@ -31,18 +31,22 @@ task('db:copy', function () {
             "The target instance is not set as second parameter. Move should be run as: dep db:move source target"
         );
     }
-
+    //(Deployer::get()->servers[$targetInstanceName])->run('cat {{deploy_path}}/current/.env');
     $sourceInstance = get('server')['name'];
     $dumpCode = md5(microtime(true) . rand(0, 10000));
-
-    run("cd {{deploy_path}}/current && {{bin/php}} {{bin/deployer}} -q db:export --dumpcode=$dumpCode");
-    runLocally("{{local/bin/deployer}} db:download $sourceInstance --dumpcode=$dumpCode", 0);
+    if($sourceInstance == 'local') {
+        runLocally("cd {{deploy_path}} && {{local/bin/php}} {{local/bin/deployer}} -q db:export --dumpcode=$dumpCode");
+    } else {
+        run("cd {{deploy_path}}/current && {{bin/php}} {{bin/deployer}} -q db:export --dumpcode=$dumpCode");
+        runLocally("{{local/bin/deployer}} db:download $sourceInstance --dumpcode=$dumpCode", 0);
+    }
     runLocally("{{local/bin/deployer}} db:process --dumpcode=$dumpCode", 0);
     if (get('db_instance') == $targetInstanceName) {
         runLocally("{{local/bin/deployer}} db:import --dumpcode=$dumpCode", 0);
     } else {
         runLocally("{{local/bin/deployer}} db:upload $targetInstanceName --dumpcode=$dumpCode", 0);
         run("cd " . $targetInstanceEnv->get('deploy_path') . "/current && " . $targetInstanceEnv->get('bin/php') .
-            " {{bin/deployer}} -q db:import --dumpcode=$dumpCode");
+            $targetInstanceEnv->get('bin/deployer') . " -q db:import --dumpcode=" . $dumpCode);
+
     }
 })->desc('Synchronize database between instances.');
