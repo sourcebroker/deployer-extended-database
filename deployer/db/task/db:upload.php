@@ -27,7 +27,7 @@ task('db:upload', function () {
         "rsync -rz --remove-source-files %s --include=*dumpcode:%s*.sql --exclude=* '%s/' '%s%s:%s/'",
         $sshOptions,
         $dumpCode,
-        get('db_current_server')->get('db_storage_path'),
+        get('db_current_server')->get('db_storage_path_current'),
         $targetInstance->getUser() ? $targetInstance->getUser() . '@' : '',
         $targetInstance->getHost(),
         $targetInstanceDatabaseStoragePath
