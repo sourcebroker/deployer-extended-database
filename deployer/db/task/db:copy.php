@@ -34,7 +34,7 @@ task('db:copy', function () {
     //(Deployer::get()->servers[$targetInstanceName])->run('cat {{deploy_path}}/current/.env');
     $sourceInstance = get('server')['name'];
     $dumpCode = md5(microtime(true) . rand(0, 10000));
-    if($sourceInstance == 'local') {
+    if ($sourceInstance == 'local') {
         runLocally("cd {{deploy_path}} && {{local/bin/php}} {{local/bin/deployer}} -q db:export --dumpcode=$dumpCode");
     } else {
         run("cd {{deploy_path}}/current && {{bin/php}} {{bin/deployer}} -q db:export --dumpcode=$dumpCode");
