@@ -46,6 +46,6 @@ task('db:copy', function () {
     } else {
         runLocally("{{local/bin/deployer}} db:upload $targetInstanceName --dumpcode=$dumpCode", 0);
         run("cd " . $targetInstanceEnv->get('deploy_path') . "/current && " . $targetInstanceEnv->get('bin/php') .
-            $targetInstanceEnv->get('bin/deployer') . " -q db:import --dumpcode=" . $dumpCode);
+           ' ' .  $targetInstanceEnv->get('bin/deployer') . " -q db:import --dumpcode=" . $dumpCode);
     }
 })->desc('Synchronize database between instances.');
