@@ -321,6 +321,9 @@ In example we will use:
 4) class/method which returns array with database options
    ``(new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig()``
 
+5) closure which returns array with database options
+   ``function() { return (new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig()`` }
+
 Each of this arrays are merged to build final configuration for database synchro.
 
 deploy.php file:
@@ -339,6 +342,9 @@ deploy.php file:
                get('db_default'),
                __DIR__ . '/databases/conifg/additional_db_config.php
                (new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig(),
+               function() {
+                  return (new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig()
+               }
             ],
        ]
    );

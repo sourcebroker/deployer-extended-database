@@ -47,6 +47,11 @@ set('db_databases_merged', function () {
                     = ArrayUtility::arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier], $dbConfig);
                 continue;
             }
+            if(is_object($dbConfig) && ($dbConfig instanceof \Closure)) {
+                $mergeArray = call_user_func($dbConfig);
+                $dbConfigsMerged[$dbIdentifier] = ArrayUtility::arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier],
+                    $mergeArray);
+            }
             if (is_string($dbConfig)) {
                 if (file_exists($dbConfig)) {
                     $mergeArray = include($dbConfig);
