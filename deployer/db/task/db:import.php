@@ -88,7 +88,6 @@ task('db:import', function () {
         if (isset($databaseConfig['post_sql_in_markers'])) {
             // Prepare some markers to use in post_sql_in_markers:
             $markersArray = [];
-            // 1. "public_urls" var separated by comma. To use in SQL IN
             if (is_array(get('public_urls'))) {
                 $publicUrlCollected = [];
                 foreach (get('public_urls') as $publicUrl) {
@@ -100,6 +99,8 @@ task('db:import', function () {
                     }
                 }
                 $markersArray['{{domainsSeparatedByComma}}'] = implode(',', $publicUrlCollected);
+                $markersArray['{{firstDomainWithScheme}}'] = get('public_urls')[0];
+                $markersArray['{{firstDomainWithSchemeAndEndingSlash}}'] = rtrim(get('public_urls')[0], '/') . '/';
             }
             $post_sql_in_markers = str_replace(array_keys($markersArray), $markersArray,
                 $databaseConfig['post_sql_in_markers']);
