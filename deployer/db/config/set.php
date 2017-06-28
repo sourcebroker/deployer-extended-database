@@ -142,7 +142,7 @@ set('bin/deployer', function () {
             //Simplified checker if deployer has been downloaded or not. Just check size of file which should be at least 200kB.
             $downloadedFileSizeInBytes = trim(run('wc -c  < ' . $deployerFilenameFullPath)->toString());
             if ($downloadedFileSizeInBytes > $deployerMinimumSizeInBytesForDownloadCheck) {
-                run("cd {{deploy_path}}/shared && chmod 775 {{deployer_filename}}");
+                run("cd {{deploy_path}}/shared && chmod 775 " . $deployerFilename);
             } else {
                 throw new \RuntimeException(parse('Downloaded deployer has size ' . $downloadedFileSizeInBytes . ' bytes. It seems'
                     . ' like the download was unsucessfull. The file downloaded was: "' . $deployerDownloadLink . '".'
