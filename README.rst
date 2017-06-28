@@ -49,6 +49,17 @@ Installation
       require __DIR__ . '/vendor/autoload.php';
       new \SourceBroker\DeployerExtendedDatabase\Loader();
 
+   | IMPORTANT NOTE!
+   | Because there is inclusion of '/vendor/autoload.php' inside deployer realm then sometimes there can be conflict
+     of deployer dependencies with you project dependencies. Quite often its about symfony/console version or
+     monolog/monolog version because they are most common between projects. In that case use deployer installed as
+     composer package and resolve the dependency problems on composer level. Example of error when you run "dep" command
+     and there are dependencies problems:
+
+     ::
+
+      Fatal error: Declaration of Symfony\Component\Console\Input\ArrayInput::hasParameterOption() must be compatible with Symfony\Component\Console\Input\InputInterface::hasParameterOption($values, $onlyParams = false) in /.../vendor/symfony/symfony/src/Symfony/Component/Console/Input/ArrayInput.php on line 190
+
 4) Create ".env" file in your project root (where you store deploy.php file). The .env file should be out of
    git because you need to store here information about instance name. Additionally put there info about database
    you want to synchronise. You can move the info about database data to other file later but for the tests its better
@@ -566,3 +577,4 @@ There is required option --dumpcode to be passed.
 ::
 
    dep db:upload live --dumpcode=0772a8d396911951022db5ea385535f6
+
