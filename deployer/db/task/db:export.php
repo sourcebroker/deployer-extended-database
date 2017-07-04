@@ -33,7 +33,8 @@ task('db:export', function () {
             'port' => escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
             'user' => escapeshellarg($databaseConfig['user']),
             'dbname' => escapeshellarg($databaseConfig['dbname']),
-            'type' => ''
+            'type' => '',
+            'ignore-tables' => ''
         ];
         // dump database structure
         $filenameParts[3] = 'type:structure';
@@ -51,10 +52,8 @@ task('db:export', function () {
                 DatabaseUtility::getTables($databaseConfig)
             );
             if (!empty($ignoreTables)) {
-                $mysqlDumpArgs[] = '--ignore-table=' . $databaseConfig['dbname'] . '.' . implode(' --ignore-table=' . $databaseConfig['dbname'] . '.',
+                $mysqlDumpArgs['ignore-tables'] = '--ignore-table=' . $databaseConfig['dbname'] . '.' . implode(' --ignore-table=' . $databaseConfig['dbname'] . '.',
                         $ignoreTables);
-            } else {
-                $mysqlDumpArgs[] = '';
             }
         }
         $filenameParts[3] = 'type:data';
