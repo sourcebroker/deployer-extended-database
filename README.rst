@@ -582,4 +582,4 @@ There is required option --dumpcode to be passed.
 Changelog
 ---------
 
-See https://github.com/sourcebroker/deployer-extended/blob/master/CHANGELOG.rst
+See https://github.com/sourcebroker/deployer-extended-database/blob/master/CHANGELOG.rst

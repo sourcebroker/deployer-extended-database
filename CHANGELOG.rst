@@ -5,9 +5,11 @@ Changelog
 3.1.0
 ~~~~~
 
-a) db:export refactor:
+a) [TASK] db:export refactor:
    - add possibility to call command on remote instance
    - add "db_export_mysqldump_options_structure" and "db_export_mysqldump_options_data" env
+
+b) [BUGFIX] Fix wrong changlog address in main docs.
 
 
 3.0.0
