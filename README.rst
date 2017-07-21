@@ -578,3 +578,8 @@ There is required option --dumpcode to be passed.
 
    dep db:upload live --dumpcode=0772a8d396911951022db5ea385535f6
 
+
+Changelog
+---------
+
+See https://github.com/sourcebroker/deployer-extended/blob/master/CHANGELOG.rst
