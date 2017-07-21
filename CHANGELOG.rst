@@ -10,7 +10,10 @@ a) [TASK] db:export refactor:
    - add "db_export_mysqldump_options_structure" and "db_export_mysqldump_options_data" env
 
 b) [BUGFIX] Fix wrong changlog address in main docs.
+c) [TASK] db:truncate refactor:
+   - add escapeshellargs
 
+d)
 
 3.0.0
 ~~~~~
