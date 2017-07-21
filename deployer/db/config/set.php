@@ -101,7 +101,7 @@ set('bin/deployer', function () {
                     $deployerVersionToUse = '5.0.3';
                     break;
                 case 4:
-                    $deployerVersionToUse = '4.3.0';
+                    $deployerVersionToUse = '4.3.1';
                     break;
                 case 3:
                     $deployerVersionToUse = '3.3.0';
