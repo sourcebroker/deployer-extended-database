@@ -21,7 +21,7 @@ class RsyncUtility
         $serverConfiguration = $taskContext->getServer()->getConfiguration();
         $sshOptions[] = $serverConfiguration->getPort() ? ' -p' . $serverConfiguration->getPort() : null;
         $sshOptions[] = $serverConfiguration->getPrivateKey() ? ' -i ' . $serverConfiguration->getPrivateKey() : null;
-        if(!empty(array_filter($sshOptions))) {
+        if (!empty(array_filter($sshOptions))) {
             return 'ssh ' . implode(' ', $sshOptions);
         } else {
             return '';

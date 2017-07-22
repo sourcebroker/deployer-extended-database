@@ -1,6 +1,7 @@
 <?php
 
 namespace Deployer;
+
 use Symfony\Component\Console\Output\OutputInterface;
 
 task('db:pull', function () {
@@ -10,13 +11,13 @@ task('db:pull', function () {
     $sourceInstance = get('server')['name'];
     $dumpCode = md5(microtime(true) . rand(0, 10000));
     $verbosity = '';
-    if(output()->getVerbosity() == OutputInterface::VERBOSITY_DEBUG) {
+    if (output()->getVerbosity() == OutputInterface::VERBOSITY_DEBUG) {
         $verbosity = ' -vvv';
     }
-    if(output()->getVerbosity() == OutputInterface::VERBOSITY_VERBOSE) {
+    if (output()->getVerbosity() == OutputInterface::VERBOSITY_VERBOSE) {
         $verbosity = ' -vv';
     }
-    if(output()->getVerbosity() == OutputInterface::VERBOSITY_VERBOSE) {
+    if (output()->getVerbosity() == OutputInterface::VERBOSITY_VERBOSE) {
         $verbosity = ' -v';
     }
 
