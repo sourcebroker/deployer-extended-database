@@ -12,7 +12,6 @@ task('db:import', function () {
     }
     $fileUtility = new FileUtility();
     if (get('db_instance') == get('server')['name']) {
-
         $currentInstanceDatabaseStoragePath = get('db_storage_path_current');
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
             $globStart = $fileUtility->normalizeFolder($currentInstanceDatabaseStoragePath)

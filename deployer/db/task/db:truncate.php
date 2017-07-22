@@ -15,7 +15,7 @@ task('db:truncate', function () {
                     $databaseConfig['truncate_tables'],
                     $databaseUtility->getTables($databaseConfig)
                 );
-                if(!empty($truncateTables)) {
+                if (!empty($truncateTables)) {
                     foreach ($truncateTables as $truncateTable) {
                         runLocally(sprintf(
                             'export MYSQL_PWD=%s && %s -h%s -P%s -u%s -D%s -e %s',

@@ -24,7 +24,8 @@ class RsyncUtility
         return trim(implode(' ', $sshOptions));
     }
 
-    public function getServerWithDbStoragePath(Context $taskContext) {
+    public function getServerWithDbStoragePath(Context $taskContext)
+    {
         $serverEnvironment = $taskContext->getEnvironment();
         $serverConfiguration = $taskContext->getServer()->getConfiguration();
         $serverWithPath =
@@ -33,5 +34,4 @@ class RsyncUtility
             trim('/', $serverEnvironment->get('db_storage_path')) . '/';
         return $serverWithPath;
     }
-
 }
