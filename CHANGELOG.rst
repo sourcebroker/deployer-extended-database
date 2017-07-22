@@ -19,6 +19,8 @@ h) [TASK] Refactor db:import
 i) [TASK] db:import refactor:
    - add possibility to call command on remote instance
 j) [TASK] Enable duplication check for scrutinizer.
+k) [TASK] Pass verbosity to commands run locally in db:pull task.
+
 
 3.0.0
 ~~~~~
