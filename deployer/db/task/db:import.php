@@ -3,6 +3,7 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
+use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 
 task('db:import', function () {
     if (input()->getOption('dumpcode')) {
@@ -133,10 +134,11 @@ task('db:import', function () {
             }
         }
     } else {
+        $verbosity = (new ConsoleUtility())->getVerbosity(output());
         if (test('[ -L {{deploy_path}}/release ]')) {
-            run("cd {{deploy_path}}/release && {{bin/php}} {{bin/deployer}} db:import --dumpcode=" . $dumpCode);
+            run("cd {{deploy_path}}/release && {{bin/php}} {{bin/deployer}} db:import --dumpcode=" . $dumpCode . ' ' . $verbosity);
         } else {
-            run("cd {{deploy_path}}/current && {{bin/php}} {{bin/deployer}} db:import --dumpcode=" . $dumpCode);
+            run("cd {{deploy_path}}/current && {{bin/php}} {{bin/deployer}} db:import --dumpcode=" . $dumpCode . ' ' . $verbosity);
         }
     }
 })->desc('Import the database with "dumpcode" from current database dumps storage to database.');

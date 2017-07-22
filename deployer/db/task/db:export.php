@@ -5,6 +5,7 @@ namespace Deployer;
 use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
+use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 
 task('db:export', function () {
     if (input()->getOption('dumpcode')) {
@@ -73,10 +74,11 @@ task('db:export', function () {
             writeln(json_encode(['dumpCode' => $dumpCode]));
         }
     } else {
+        $verbosity = (new ConsoleUtility())->getVerbosity(output());
         if (test('[ -L {{deploy_path}}/release ]')) {
-            run("cd {{deploy_path}}/release && {{bin/php}} {{bin/deployer}} db:export --dumpcode=" . $dumpCode);
+            run('cd {{deploy_path}}/release && {{bin/php}} {{bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity);
         } else {
-            run("cd {{deploy_path}}/current && {{bin/php}} {{bin/deployer}} db:export --dumpcode=" . $dumpCode);
+            run('cd {{deploy_path}}/current && {{bin/php}} {{bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity);
         }
     }
 })->desc('Export database dump to local database dumps storage.');

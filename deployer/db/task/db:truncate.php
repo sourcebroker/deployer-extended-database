@@ -4,6 +4,7 @@ namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
+use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 
 task('db:truncate', function () {
     $arrayUtility = new ArrayUtility();
@@ -37,10 +38,11 @@ task('db:truncate', function () {
             }
         }
     } else {
+        $verbosity = (new ConsoleUtility())->getVerbosity(output());
         if (test('[ -L {{deploy_path}}/release ]')) {
-            run("cd {{deploy_path}}/release && {{bin/php}} {{bin/deployer}} -q db:truncate");
+            run('cd {{deploy_path}}/release && {{bin/php}} {{bin/deployer}} db:truncate ' . $verbosity);
         } else {
-            run("cd {{deploy_path}}/current && {{bin/php}} {{bin/deployer}} -q db:truncate");
+            run('cd {{deploy_path}}/current && {{bin/php}} {{bin/deployer}} db:truncate ' . $verbosity);
         }
     }
 })->desc('Truncate tables defined in "truncate_tables" variable.');

@@ -2,6 +2,7 @@
 
 namespace Deployer;
 
+use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 use Symfony\Component\Console\Output\OutputInterface;
 
 task('db:pull', function () {
@@ -10,17 +11,8 @@ task('db:pull', function () {
     }
     $sourceInstance = get('server')['name'];
     $dumpCode = md5(microtime(true) . rand(0, 10000));
-    $verbosity = '';
-    if (output()->getVerbosity() == OutputInterface::VERBOSITY_DEBUG) {
-        $verbosity = ' -vvv';
-    }
-    if (output()->getVerbosity() == OutputInterface::VERBOSITY_VERBOSE) {
-        $verbosity = ' -vv';
-    }
-    if (output()->getVerbosity() == OutputInterface::VERBOSITY_VERBOSE) {
-        $verbosity = ' -v';
-    }
 
+    $verbosity = (new ConsoleUtility())->getVerbosity(output());
     runLocally("{{local/bin/deployer}} db:export $sourceInstance --dumpcode=$dumpCode $verbosity");
     runLocally("{{local/bin/deployer}} db:download $sourceInstance --dumpcode=$dumpCode $verbosity", 0);
     runLocally("{{local/bin/deployer}} db:process --dumpcode=$dumpCode $verbosity", 0);
