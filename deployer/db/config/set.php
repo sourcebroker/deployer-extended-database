@@ -26,6 +26,14 @@ set('db_export_mysqldump_options_structure',
 set('db_export_mysqldump_options_data',
     '--opt --skip-lock-tables --single-transaction --no-create-db --default-character-set=utf8');
 
+// mysqldump options for dumping data
+set('db_import_mysql_options_structure',
+    '--default-character-set=utf8');
+
+// mysqldump options for dumping data
+set('db_import_mysql_options_data',
+    '--default-character-set=utf8');
+
 // Returns current server settings.
 set('db_current_server', function () {
     try {
