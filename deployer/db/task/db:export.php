@@ -7,7 +7,6 @@ use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 
 task('db:export', function () {
-    $fileUtility = new FileUtility();
     if (input()->getOption('dumpcode')) {
         $returnDumpCode = false;
         $dumpCode = input()->getOption('dumpcode');
@@ -15,6 +14,7 @@ task('db:export', function () {
         $returnDumpCode = true;
         $dumpCode = md5(microtime(true) . rand(0, 10000));
     }
+    $fileUtility = new FileUtility();
     $arrayUtility = new ArrayUtility();
     $databaseUtility = new DatabaseUtility();
     if (get('db_instance') == get('server')['name']) {
@@ -56,8 +56,8 @@ task('db:export', function () {
                     $databaseUtility->getTables($databaseConfig)
                 );
                 if (!empty($ignoreTables)) {
-                    $mysqlDumpArgs['ignore-tables'] = '--ignore-table=' . $databaseConfig['dbname'] . '.' . implode(' --ignore-table=' . $databaseConfig['dbname'] . '.',
-                            $ignoreTables);
+                    $mysqlDumpArgs['ignore-tables'] = '--ignore-table=' . $databaseConfig['dbname'] . '.' .
+                        implode(' --ignore-table=' . $databaseConfig['dbname'] . '.', $ignoreTables);
                 }
             }
             $filenameParts['type'] = 'type:data';
@@ -70,7 +70,7 @@ task('db:export', function () {
             ), 0);
         }
         if ($returnDumpCode) {
-            echo json_encode(['dumpCode' => $dumpCode]);
+            writeln(json_encode(['dumpCode' => $dumpCode]));
         }
     } else {
         if (test('[ -L {{deploy_path}}/release ]')) {
