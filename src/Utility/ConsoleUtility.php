@@ -4,6 +4,7 @@ namespace SourceBroker\DeployerExtendedDatabase\Utility;
 
 use function Couchbase\defaultDecoder;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputInterface;
 
 /**
  * Class ConsoleUtility
@@ -31,5 +32,14 @@ class ConsoleUtility
                 $verbosity = '';
         }
         return $verbosity;
+    }
+
+    public function optionRequired($requiredOption, InputInterface $input) {
+        if (!empty($input->getOption($requiredOption))) {
+            $requiredOptionValue = $input->getOption($requiredOption);
+        } else {
+            throw new \InvalidArgumentException('No --' . $requiredOption . ' option set.', 1458937128560);
+        }
+        return $requiredOptionValue;
     }
 }

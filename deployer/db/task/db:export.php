@@ -8,7 +8,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 
 task('db:export', function () {
-    if (input()->getOption('dumpcode')) {
+    if (!empty(input()->getOption('dumpcode'))) {
         $returnDumpCode = false;
         $dumpCode = input()->getOption('dumpcode');
     } else {

@@ -2,17 +2,15 @@
 
 namespace Deployer;
 
+use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
+
 task('db:process', function () {
     if (null !== input()->getArgument('stage')) {
         throw new \RuntimeException("You can not set target instance for db:process command. 
         It can only run on current instance.", 1500721553545);
     }
-    if (input()->getOption('dumpcode')) {
-        $dumpCode = input()->getOption('dumpcode');
-    } else {
-        throw new \InvalidArgumentException('No --dumpcode option set.', 1458937128562);
-    }
-
+    $consoleUtility = new ConsoleUtility();
+    $consoleUtility->optionRequired('dumpcode', input());
     $currentInstanceDatabaseStoragePath = get('db_current_server')->get('db_storage_path_current');
 
     // remove "DEFINER" from the dump files to avoid problems with DEFINER views permissions

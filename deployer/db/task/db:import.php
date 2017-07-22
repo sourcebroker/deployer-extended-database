@@ -6,11 +6,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 
 task('db:import', function () {
-    if (input()->getOption('dumpcode')) {
-        $dumpCode = input()->getOption('dumpcode');
-    } else {
-        throw new \RuntimeException('No dumpcode set.', 1458937128560);
-    }
+    $dumpCode = (new ConsoleUtility())->optionRequired('dumpcode', input());
     $fileUtility = new FileUtility();
     if (get('db_instance') == get('server')['name']) {
         $currentInstanceDatabaseStoragePath = get('db_storage_path_current');

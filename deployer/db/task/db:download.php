@@ -2,6 +2,7 @@
 
 namespace Deployer;
 
+use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 
 task('db:download', function () {
@@ -9,11 +10,7 @@ task('db:download', function () {
     if (null === input()->getArgument('stage')) {
         throw new \RuntimeException('The target instance is required for db:download command.', 1488143750580);
     }
-    if (input()->getOption('dumpcode')) {
-        $dumpCode = input()->getOption('dumpcode');
-    } else {
-        throw new \InvalidArgumentException('No --dumpcode option set.', 1458937128561);
-    }
+    $dumpCode = (new ConsoleUtility())->optionRequired('dumpcode', input());
     $currentInstanceDatabaseStoragePath = $fileUtility->normalizeFolder(get('db_current_server')->get('db_storage_path_current'));
     $rsyncUtility = new \SourceBroker\DeployerExtendedDatabase\Utility\RsyncUtility();
     runLocally(sprintf(

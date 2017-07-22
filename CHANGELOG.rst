@@ -22,6 +22,7 @@ j) [TASK] Enable duplication check for scrutinizer.
 k) [TASK] Pass verbosity to commands run locally in db:pull task.
 l) [TASK] Move mysql options from db:import task to variables.
 m) [TASK] Pass verbosity to commands run locally with use of ConsoleUtility.
+n) [TASK] Implement optionRequired() in ConsoleUtility.
 
 3.0.0
 ~~~~~
