@@ -2,11 +2,13 @@
 
 namespace SourceBroker\DeployerExtendedDatabase;
 
+use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
+
 class Loader
 {
     public function __construct()
     {
-        \SourceBroker\DeployerExtendedDatabase\Utility\FileUtility::requireFilesFromDirectoryReqursively(
+        (new FileUtility())->requireFilesFromDirectoryReqursively(
             dirname((new \ReflectionClass('\SourceBroker\DeployerExtendedDatabase\Loader'))->getFileName()) . '/../deployer/'
         );
     }

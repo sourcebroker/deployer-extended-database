@@ -9,8 +9,8 @@ task('db:pull', function () {
     $sourceInstance = get('server')['name'];
     $dumpCode = md5(microtime(true) . rand(0, 10000));
 
-    run("cd {{deploy_path}}/current && {{bin/php}} {{bin/deployer}} -q db:export --dumpcode=$dumpCode");
+    runLocally("{{local/bin/deployer}} db:export $sourceInstance --dumpcode=$dumpCode");
     runLocally("{{local/bin/deployer}} db:download $sourceInstance --dumpcode=$dumpCode", 0);
     runLocally("{{local/bin/deployer}} db:process --dumpcode=$dumpCode", 0);
     runLocally("{{local/bin/deployer}} db:import --dumpcode=$dumpCode", 0);
-})->desc('Synchronize database from remote instance to local instance.');
+})->desc('Synchronize database from remote instance to current instance.');

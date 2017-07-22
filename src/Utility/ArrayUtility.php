@@ -13,7 +13,7 @@ class ArrayUtility
      * @param array $array2
      * @return array|mixed
      */
-    public static function arrayMergeRecursiveDistinct(array &$array1, array &$array2)
+    public function arrayMergeRecursiveDistinct(array &$array1, array &$array2)
     {
         $arrays = [$array1, $array2];
         $base = array_shift($arrays);
@@ -55,7 +55,7 @@ class ArrayUtility
      * @param array $haystack
      * @return array
      */
-    public static function filterWithRegexp(array $patterns, array $haystack)
+    public function filterWithRegexp(array $patterns, array $haystack)
     {
         $foundItems = [];
         foreach ((array)$patterns as $pattern) {

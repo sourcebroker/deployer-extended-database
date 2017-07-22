@@ -12,7 +12,7 @@ class FileUtility
      * @param $filename
      * @return mixed
      */
-    public static function normalizeFilename($filename)
+    public function normalizeFilename($filename)
     {
         return preg_replace("/[^a-zA-Z0-9_]+/", "", $filename);
     }
@@ -21,31 +21,17 @@ class FileUtility
      * @param $folder
      * @return string
      */
-    public static function normalizeFolder($folder)
+    public function normalizeFolder($folder)
     {
-        return rtrim($folder, '/');
+        return rtrim($folder, '/') . '/';
     }
 
-    /**
-     * @param $absolutePath string Absolute path to file
-     * @return string
-     */
-    public static function getUniqueFileName($absolutePath)
-    {
-        $pathParts = pathinfo($absolutePath);
-        $i = 0;
-        while (file_exists($absolutePath) && $i < 100) {
-            $absolutePath = $pathParts['dirname'] . '/' . $pathParts['filename'] . '_' . $i . '.' . $pathParts['extension'];
-            $i++;
-        }
-        return $absolutePath;
-    }
 
     /**
      * @param $absolutePath
      * @param null $excludePattern
      */
-    public static function requireFilesFromDirectoryReqursively($absolutePath, $excludePattern = null)
+    public function requireFilesFromDirectoryReqursively($absolutePath, $excludePattern = null)
     {
         if (is_dir($absolutePath)) {
             $iterator = new \RecursiveIteratorIterator(

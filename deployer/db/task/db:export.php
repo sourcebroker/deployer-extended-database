@@ -7,6 +7,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 
 task('db:export', function () {
+    $fileUtility = new FileUtility();
     if (input()->getOption('dumpcode')) {
         $returnDumpCode = false;
         $dumpCode = input()->getOption('dumpcode');
@@ -14,19 +15,21 @@ task('db:export', function () {
         $returnDumpCode = true;
         $dumpCode = md5(microtime(true) . rand(0, 10000));
     }
+    $arrayUtility = new ArrayUtility();
+    $databaseUtility = new DatabaseUtility();
     if (get('db_instance') == get('server')['name']) {
         $dateTime = date('Y-m-d_H:i:s');
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
             $filenameParts = [
                 'dateTime' => $dateTime,
-                'server' => 'server:' . FileUtility::normalizeFilename(get('server')['name']),
-                'dbcode' => 'dbcode:' . FileUtility::normalizeFilename($databaseCode),
+                'server' => 'server:' . $fileUtility->normalizeFilename(get('server')['name']),
+                'dbcode' => 'dbcode:' . $fileUtility->normalizeFilename($databaseCode),
+                'dumpcode' => 'dumpcode:' . $fileUtility->normalizeFilename($dumpCode),
                 'type' => '',
-                'dumpcode' => 'dumpcode:' . FileUtility::normalizeFilename($dumpCode),
             ];
             $mysqlDumpArgs = [
                 'password' => escapeshellarg($databaseConfig['password']),
-                'bin/mysqldump' => get('bin/mysqldump'),
+                'local/bin/mysqldump' => get('local/bin/mysqldump'),
                 'options' => '',
                 'host' => escapeshellarg($databaseConfig['host']),
                 'port' => escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
@@ -39,7 +42,7 @@ task('db:export', function () {
             // dump database structure
             $filenameParts['type'] = 'type:structure';
             $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_structure', '');
-            $mysqlDumpArgs['type'] = FileUtility::normalizeFolder(get('db_storage_path_current'))
+            $mysqlDumpArgs['type'] = $fileUtility->normalizeFolder(get('db_storage_path_current'))
                 . '/' . implode('#', $filenameParts) . '.sql';
             runLocally(vsprintf(
                 'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r %s',
@@ -48,9 +51,9 @@ task('db:export', function () {
 
             // dump database data
             if (isset($databaseConfig['ignore_tables_out']) && is_array($databaseConfig['ignore_tables_out'])) {
-                $ignoreTables = ArrayUtility::filterWithRegexp(
+                $ignoreTables = $arrayUtility->filterWithRegexp(
                     $databaseConfig['ignore_tables_out'],
-                    DatabaseUtility::getTables($databaseConfig)
+                    $databaseUtility->getTables($databaseConfig)
                 );
                 if (!empty($ignoreTables)) {
                     $mysqlDumpArgs['ignore-tables'] = '--ignore-table=' . $databaseConfig['dbname'] . '.' . implode(' --ignore-table=' . $databaseConfig['dbname'] . '.',
@@ -59,8 +62,8 @@ task('db:export', function () {
             }
             $filenameParts['type'] = 'type:data';
             $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_data', '');
-            $mysqlDumpArgs['type'] = FileUtility::normalizeFolder(get('db_storage_path_current'))
-                . '/' . implode('#', $filenameParts) . '.sql';
+            $mysqlDumpArgs['type'] = $fileUtility->normalizeFolder(get('db_storage_path_current'))
+                . implode('#', $filenameParts) . '.sql';
             runLocally(vsprintf(
                 'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r %s %s',
                 $mysqlDumpArgs

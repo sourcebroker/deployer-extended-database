@@ -6,19 +6,21 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 
 task('db:truncate', function () {
+    $arrayUtility = new ArrayUtility();
+    $databaseUtility = new DatabaseUtility();
     if (get('db_instance') == get('server')['name']) {
         foreach (get('db_databases_merged') as $databaseConfig) {
             if (isset($databaseConfig['truncate_tables']) && is_array($databaseConfig['truncate_tables'])) {
-                $truncateTables = ArrayUtility::filterWithRegexp(
+                $truncateTables = $arrayUtility->filterWithRegexp(
                     $databaseConfig['truncate_tables'],
-                    DatabaseUtility::getTables($databaseConfig)
+                    $databaseUtility->getTables($databaseConfig)
                 );
                 if(!empty($truncateTables)) {
                     foreach ($truncateTables as $truncateTable) {
                         runLocally(sprintf(
                             'export MYSQL_PWD=%s && %s -h%s -P%s -u%s -D%s -e %s',
                             escapeshellarg($databaseConfig['password']),
-                            get('bin/mysql'),
+                            get('local/bin/mysql'),
                             escapeshellarg($databaseConfig['host']),
                             escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                             escapeshellarg($databaseConfig['user']),

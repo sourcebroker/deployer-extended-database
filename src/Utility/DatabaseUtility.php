@@ -13,7 +13,7 @@ class DatabaseUtility
      * @param $dbConf
      * @return array
      */
-    public static function getTables($dbConf)
+    public function getTables($dbConf)
     {
         $link = mysqli_connect($dbConf['host'], $dbConf['user'], $dbConf['password'], $dbConf['dbname']);
         $result = $link->query('SHOW TABLES');

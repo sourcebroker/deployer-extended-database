@@ -2,7 +2,7 @@
 Changelog
 ---------
 
-3.1.0
+4.0.0
 ~~~~~
 
 a) [TASK] db:export refactor:
@@ -13,7 +13,11 @@ b) [BUGFIX] Fix wrong changlog address in main docs.
 c) [TASK] db:truncate refactor:
    - add escapeshellargs
 
-d)
+d) [TASK] Escapeshellargs fro all commands
+e) [TASK/BREAKING] Change static utilities method calls to regular objects method call.
+f) [TASK] Cleanup db:download and db:upload tasks with RsyncUtility
+g) [TASK/BREAKING] Rename var "bin/mysql" to "local/bin/mysql"
+h) [TASK] Refactor db:import
 
 3.0.0
 ~~~~~

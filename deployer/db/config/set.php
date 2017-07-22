@@ -7,7 +7,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\InstanceUtility;
 
 // deployer settings
 set('default_stage', function () {
-    return InstanceUtility::getCurrentInstance();
+    return (new InstanceUtility)->getCurrentInstance();
 });
 
 // Return what deployer to download on source server when we use phar deployer.
@@ -15,7 +15,7 @@ set('db_deployer_version', 4);
 
 // Return current instance name. Based on that scripts knows from which server() takes the data to database.
 set('db_instance', function () {
-    return InstanceUtility::getCurrentInstance();
+    return (new InstanceUtility)->getCurrentInstance();
 });
 
 // mysqldump options for dumping structure
@@ -36,32 +36,33 @@ set('db_current_server', function () {
         foreach (Deployer::get()->environments as $key => $server) {
             $servers .= "\n" . $i++ . '. ' . $key;
         }
-        throw new \RuntimeException("Name of instance \"" . get('db_instance') . "\" is not on the server list:" . $servers
-            . "\nPlease check case sensitive. [Error code: 1458412947]");
+        throw new \RuntimeException('Name of instance "' . get('db_instance') . '" is not on the server list:' .
+            $servers . "\n" . 'Please check case sensitive.', 1500717628491);
     }
     return $currentServer;
 });
 
 // Contains "db_databases" merged for direct use.
 set('db_databases_merged', function () {
+    $arrayUtility = new ArrayUtility();
     $dbConfigsMerged = [];
     foreach (get('db_databases') as $dbIdentifier => $dbConfigs) {
         $dbConfigsMerged[$dbIdentifier] = [];
         foreach ($dbConfigs as $dbConfig) {
             if (is_array($dbConfig)) {
                 $dbConfigsMerged[$dbIdentifier]
-                    = ArrayUtility::arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier], $dbConfig);
+                    = $arrayUtility->arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier], $dbConfig);
                 continue;
             }
             if (is_object($dbConfig) && ($dbConfig instanceof \Closure)) {
                 $mergeArray = call_user_func($dbConfig);
-                $dbConfigsMerged[$dbIdentifier] = ArrayUtility::arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier],
+                $dbConfigsMerged[$dbIdentifier] = $arrayUtility->arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier],
                     $mergeArray);
             }
             if (is_string($dbConfig)) {
                 if (file_exists($dbConfig)) {
                     $mergeArray = include($dbConfig);
-                    $dbConfigsMerged[$dbIdentifier] = ArrayUtility::arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier],
+                    $dbConfigsMerged[$dbIdentifier] = $arrayUtility->arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier],
                         $mergeArray);
                 } else {
                     throw new \RuntimeException('The config file does not exists: ' . $dbConfig);
@@ -76,7 +77,8 @@ set('db_storage_path_current', function () {
     if (get('db_current_server')->get('db_storage_path_relative', false) == false) {
         $dbStoragePathCurrent = get('db_current_server')->get('deploy_path') . '/.dep/database/dumps';
     } else {
-        $dbStoragePathCurrent = get('db_current_server')->get('deploy_path') . '/' . get('db_current_server')->get('db_storage_path_relative');
+        $dbStoragePathCurrent = get('db_current_server')->get('deploy_path') . '/'
+            . get('db_current_server')->get('db_storage_path_relative');
     }
     runLocally("[ -d " . $dbStoragePathCurrent . " ] || mkdir -p " . $dbStoragePathCurrent);
     return $dbStoragePathCurrent;
@@ -93,7 +95,8 @@ set('db_storage_path', function () {
 });
 
 set('bin/deployer', function () {
-    set('active_path', get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current'));
+    set('active_path', get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]')
+            ? 'release' : 'current'));
     //check if there is composer based deployer
     if (test('[ -e \'{{active_path}}/vendor/bin/dep\' ]')) {
         $deployerBin = parse('{{active_path}}/vendor/bin/dep');
@@ -120,7 +123,8 @@ set('bin/deployer', function () {
                 default:
                     throw new \RuntimeException('You requested deployer version "' . $deployerVersionRequestedByUser . '" 
                 but we are not able to determine what exact version is supposed to be chosen. 
-                Please set "db_deployer_version" to full semantic versioning like "' . $deployerVersionRequestedByUser . '.0.1"');
+                Please set "db_deployer_version" to full semantic versioning like "' . $deployerVersionRequestedByUser . '.0.1"',
+                        1500717666998);
             }
         } else {
             if (count(explode('.', $deployerVersionRequestedByUser)) === 3) {
@@ -128,7 +132,7 @@ set('bin/deployer', function () {
             } else {
                 throw new \RuntimeException('Deployer version must be set to just "major" like "4" which means give me most '
                     . 'fresh version for deployer 4 or "major.minor.path" like "4.3.0". The "' . $deployerVersionRequestedByUser
-                    . '" is not supported.');
+                    . '" is not supported.', 1500717685169);
             }
         }
         $deployerFilename = 'deployer-' . $deployerVersionToUse . '.phar';
@@ -152,7 +156,7 @@ set('bin/deployer', function () {
             } else {
                 throw new \RuntimeException(parse('Downloaded deployer has size ' . $downloadedFileSizeInBytes . ' bytes. It seems'
                     . ' like the download was unsucessfull. The file downloaded was: "' . $deployerDownloadLink . '".'
-                    . 'Please check if this link return file. The downloaded content was stored in ' . $deployerFilenameFullPath));
+                    . 'Please check if this link return file. The downloaded content was stored in ' . $deployerFilenameFullPath), 1500717708109);
             }
         }
         //Rebuild symlink of $deployerFilename to "{{active_path}}/deployer.phar"
@@ -177,18 +181,20 @@ set('local/bin/deployer', function () {
     }
 });
 
-set('bin/mysqldump', function () {
+set('local/bin/mysqldump', function () {
     if (runLocally('if hash mysqldump 2>/dev/null; then echo \'true\'; fi')->toBool()) {
         return 'mysqldump';
     } else {
-        throw new \RuntimeException('The mysqldump path on server "' . get('server')['name'] . '" is unknown. You can set it in env var "bin/mysqldump" . [Error code: 1458412747]');
+        throw new \RuntimeException('The mysqldump path on server "' . get('server')['name'] . '" is unknown. 
+        You can set it in env var "local/bin/mysqldump"', 1500717760352);
     }
 });
 
-set('bin/mysql', function () {
+set('local/bin/mysql', function () {
     if (runLocally('if hash mysql 2>/dev/null; then echo \'true\'; fi')->toBool()) {
         return 'mysql';
     } else {
-        throw new \RuntimeException('The mysql path on server "' . get('server')['name'] . '" is unknown. You can set it in env var "bin/mysql" . [Error code: 1458412748]');
+        throw new \RuntimeException('The mysql path on server "' . get('server')['name'] . '" is unknown. 
+        You can set it in env var "local/bin/mysql".', 1500717744659);
     }
 });

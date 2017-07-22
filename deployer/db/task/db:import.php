@@ -2,89 +2,87 @@
 
 namespace Deployer;
 
-use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 
 task('db:import', function () {
     if (null !== input()->getArgument('stage')) {
-        throw new \RuntimeException("You can not set target instance for db:import command. It can only run on current 
-        instance. [Error code: 1488143716512]");
+        throw new \RuntimeException('You can not set target instance for db:import command. It can only run on current 
+        instance.', 1488143716512);
     }
     if (input()->getOption('dumpcode')) {
         $dumpCode = input()->getOption('dumpcode');
     } else {
-        throw new \RuntimeException('No dumpcode set. [Error code: 1458937128560]');
+        throw new \RuntimeException('No dumpcode set.', 1458937128560);
     }
+    $fileUtility = new FileUtility();
     $currentInstanceDatabaseStoragePath = get('db_storage_path_current');
     foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
-        $link = mysqli_connect(
-            $databaseConfig['host'],
-            $databaseConfig['user'],
-            $databaseConfig['password'],
-            $databaseConfig['dbname']);
+        $globStart = $fileUtility->normalizeFolder($currentInstanceDatabaseStoragePath)
+            . '*dbcode:' . $fileUtility->normalizeFilename($databaseCode)
+            . '*dumpcode:' . $dumpCode;
 
-        $glob = $currentInstanceDatabaseStoragePath . DIRECTORY_SEPARATOR
-            . '*dbcode:' . FileUtility::normalizeFilename($databaseCode)
-            . '*type:structure'
-            . '*dumpcode:' . $dumpCode
-            . '.sql';
-        $structureSqlFile = glob($glob);
-
-        set('db_import_source_server', function () use ($structureSqlFile) {
-            foreach (explode('#', reset($structureSqlFile)) as $fileNamePart) {
-                list($key, $value) = explode(':', $fileNamePart);
-                if ($key === 'server') {
-                    return $value;
-                }
-            }
-        });
+        $structureSqlFile = glob($globStart . '*type:structure.sql');
         if (empty($structureSqlFile)) {
-            throw new \RuntimeException('No structure file for $dumpcode: ' . $dumpCode . '. Glob build: ' . $glob
-                . '.  [Error code: 1458494633]');
+            throw new \RuntimeException('No structure file for --dumpcode=' . $dumpCode . '. Glob build: ' .
+                $globStart . '*type:structure.sql',
+                1500718221204);
         }
-
-        $dataSqlFile = glob($currentInstanceDatabaseStoragePath . DIRECTORY_SEPARATOR
-            . '*dbcode:' . FileUtility::normalizeFilename($databaseCode)
-            . '*type:data'
-            . '*dumpcode:' . $dumpCode
-            . '.sql');
-
+        if (count($structureSqlFile) > 1) {
+            throw new \RuntimeException('There are more than two structure file for --dumpcode=' . $dumpCode .
+                '. Glob build: ' . $globStart . '*type:structure.sql. ' .
+                "\n" . ' Files founded: ' . "\n" . implode("\n", $structureSqlFile), 1500722088929);
+        }
+        $dataSqlFile = glob($globStart . '*type:data.sql');
         if (empty($dataSqlFile)) {
-            throw new \RuntimeException('No structure file for $dumpcode: ' . $dumpCode . '  [Error code: 1458494633]');
+            throw new \RuntimeException('No data file for --dumpcode=' . $dumpCode . '. Glob built: ' .
+                $globStart . '*type:data.sql',
+                1500722093334);
         }
-
-        // drop all tables before import of database
-        $allTables = DatabaseUtility::getTables($databaseConfig);
-        $link->query('SET FOREIGN_KEY_CHECKS = 0');
-        foreach ($allTables as $table) {
-            $link->query(/** @lang MySQL */
-                'DROP TABLE ' . $table);
+        if (count($dataSqlFile) > 1) {
+            throw new \RuntimeException('There are more than two data files for --dumpcode=' . $dumpCode . '. Glob built: ' .
+                $globStart . '*type:data.sql. ' .
+                "\n" . ' Files founded: ' . "\n" . implode("\n", $dataSqlFile),
+                1500722095323);
         }
-        $link->query('SET FOREIGN_KEY_CHECKS = 1');
-
+        // Drop all tables.
+        runLocally(sprintf(
+            'export MYSQL_PWD=%s && %s -h%s -P%s -u%s -D%s --add-drop-table --no-data | ' .
+            'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s -h%s -P%s -u%s -D%s',
+            escapeshellarg($databaseConfig['password']),
+            get('local/bin/mysqldump'),
+            escapeshellarg($databaseConfig['host']),
+            escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
+            escapeshellarg($databaseConfig['user']),
+            escapeshellarg($databaseConfig['dbname']),
+            get('local/bin/mysql'),
+            escapeshellarg($databaseConfig['host']),
+            escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
+            escapeshellarg($databaseConfig['user']),
+            escapeshellarg($databaseConfig['dbname'])
+        ), 0);
+        // Import dump with database structure.
         runLocally(sprintf(
             'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e "SOURCE %s" ',
             escapeshellarg($databaseConfig['password']),
-            get('bin/mysql'),
-            $databaseConfig['host'],
-            (isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306,
-            $databaseConfig['user'],
-            $databaseConfig['dbname'],
-            $structureSqlFile[0]
+            get('local/bin/mysql'),
+            escapeshellarg($databaseConfig['host']),
+            escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
+            escapeshellarg($databaseConfig['user']),
+            escapeshellarg($databaseConfig['dbname']),
+            escapeshellarg($structureSqlFile[0])
         ), 0);
-
+        // Import dump with data.
         runLocally(sprintf(
             'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e "SOURCE %s" ',
             escapeshellarg($databaseConfig['password']),
-            get('bin/mysql'),
-            $databaseConfig['host'],
-            (isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306,
-            $databaseConfig['user'],
-            $databaseConfig['dbname'],
-            $dataSqlFile[0]
+            get('local/bin/mysql'),
+            escapeshellarg($databaseConfig['host']),
+            escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
+            escapeshellarg($databaseConfig['user']),
+            escapeshellarg($databaseConfig['dbname']),
+            escapeshellarg($dataSqlFile[0])
         ), 0);
-
-        $post_sql_in_markers = '';
+        $postSqlInCollected = [];
         if (isset($databaseConfig['post_sql_in_markers'])) {
             // Prepare some markers to use in post_sql_in_markers:
             $markersArray = [];
@@ -92,34 +90,42 @@ task('db:import', function () {
                 $publicUrlCollected = [];
                 foreach (get('public_urls') as $publicUrl) {
                     if (parse_url($publicUrl, PHP_URL_SCHEME) && parse_url($publicUrl, PHP_URL_HOST)) {
-                        $publicUrlCollected[] = "'" . parse_url($publicUrl, PHP_URL_HOST) . "'";
+                        $publicUrlCollected[] = parse_url($publicUrl, PHP_URL_HOST);
                     } else {
                         throw new \RuntimeException('The configuration setting "public_urls" should have full url like 
-                        "https://www.example.com" but the value is only "' . $publicUrl . '" . [Error code: 1491384103020]');
+                        "https://www.example.com" but the value is only "' . $publicUrl . '"', 1491384103020);
                     }
                 }
-                $markersArray['{{domainsSeparatedByComma}}'] = implode(',', $publicUrlCollected);
+                $markersArray['{{domainsSeparatedByComma}}'] = implode(
+                    ',',
+                    array_map( 'mysql_real_escape_string', $publicUrlCollected)
+                );
                 $markersArray['{{firstDomainWithScheme}}'] = get('public_urls')[0];
                 $markersArray['{{firstDomainWithSchemeAndEndingSlash}}'] = rtrim(get('public_urls')[0], '/') . '/';
             }
-            $post_sql_in_markers = str_replace(array_keys($markersArray), $markersArray,
-                $databaseConfig['post_sql_in_markers']);
+            $postSqlInCollected[] = str_replace(
+                array_keys($markersArray),
+                $markersArray,
+                $databaseConfig['post_sql_in_markers']
+            );
         }
         if (isset($databaseConfig['post_sql_in'])) {
-            $importSql = $currentInstanceDatabaseStoragePath . DIRECTORY_SEPARATOR . $dumpCode . '.sql';
-            file_put_contents($importSql,
-                str_replace("\n", ' ', $databaseConfig['post_sql_in'] . ' ' . $post_sql_in_markers));
+            $postSqlInCollected[] = $databaseConfig['post_sql_in'];
+        }
+        if (!empty($postSqlInCollected)) {
+            $importSqlFile = $fileUtility->normalizeFolder($currentInstanceDatabaseStoragePath) . $dumpCode . '.sql';
+            file_put_contents($importSqlFile, implode(' ', $postSqlInCollected));
             runLocally(sprintf(
                 'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e "SOURCE %s" ',
                 escapeshellarg($databaseConfig['password']),
-                get('bin/mysql'),
-                $databaseConfig['host'],
-                (isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306,
-                $databaseConfig['user'],
-                $databaseConfig['dbname'],
-                $importSql
+                get('local/bin/mysql'),
+                escapeshellarg($databaseConfig['host']),
+                escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
+                escapeshellarg($databaseConfig['user']),
+                escapeshellarg($databaseConfig['dbname']),
+                escapeshellarg($importSqlFile)
             ), 0);
-            unlink($importSql);
+            unlink($importSqlFile);
         }
         if (isset($databaseConfig['post_command']) && is_array($databaseConfig['post_command'])) {
             foreach ($databaseConfig['post_command'] as $postCommand) {
