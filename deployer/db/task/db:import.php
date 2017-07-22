@@ -43,7 +43,7 @@ task('db:import', function () {
             }
             // Drop all tables.
             runLocally(sprintf(
-                'export MYSQL_PWD=%s && %s -h%s -P%s -u%s -D%s --add-drop-table --no-data | ' .
+                'export MYSQL_PWD=%s && %s -h%s -P%s -u%s %s --add-drop-table --no-data | ' .
                 'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s -h%s -P%s -u%s -D%s',
                 escapeshellarg($databaseConfig['password']),
                 get('local/bin/mysqldump'),
@@ -59,25 +59,25 @@ task('db:import', function () {
             ), 0);
             // Import dump with database structure.
             runLocally(sprintf(
-                'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e "SOURCE %s" ',
+                'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e%s',
                 escapeshellarg($databaseConfig['password']),
                 get('local/bin/mysql'),
                 escapeshellarg($databaseConfig['host']),
                 escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                 escapeshellarg($databaseConfig['user']),
                 escapeshellarg($databaseConfig['dbname']),
-                escapeshellarg($structureSqlFile[0])
+                escapeshellarg('SOURCE ' . $structureSqlFile[0])
             ), 0);
             // Import dump with data.
             runLocally(sprintf(
-                'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e "SOURCE %s" ',
+                'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e%s',
                 escapeshellarg($databaseConfig['password']),
                 get('local/bin/mysql'),
                 escapeshellarg($databaseConfig['host']),
                 escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                 escapeshellarg($databaseConfig['user']),
                 escapeshellarg($databaseConfig['dbname']),
-                escapeshellarg($dataSqlFile[0])
+                escapeshellarg('SOURCE ' . $dataSqlFile[0])
             ), 0);
             $postSqlInCollected = [];
             if (isset($databaseConfig['post_sql_in_markers'])) {
@@ -93,10 +93,10 @@ task('db:import', function () {
                         "https://www.example.com" but the value is only "' . $publicUrl . '"', 1491384103020);
                         }
                     }
-                    $markersArray['{{domainsSeparatedByComma}}'] = implode(
-                        ',',
-                        array_map('mysql_real_escape_string', $publicUrlCollected)
-                    );
+                    $markersArray['{{domainsSeparatedByComma}}'] = '"' . implode(
+                            ',"',
+                            $publicUrlCollected
+                        ) . '"';
                     $markersArray['{{firstDomainWithScheme}}'] = get('public_urls')[0];
                     $markersArray['{{firstDomainWithSchemeAndEndingSlash}}'] = rtrim(get('public_urls')[0], '/') . '/';
                 }
@@ -113,14 +113,14 @@ task('db:import', function () {
                 $importSqlFile = $fileUtility->normalizeFolder($currentInstanceDatabaseStoragePath) . $dumpCode . '.sql';
                 file_put_contents($importSqlFile, implode(' ', $postSqlInCollected));
                 runLocally(sprintf(
-                    'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e "SOURCE %s" ',
+                    'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e%s',
                     escapeshellarg($databaseConfig['password']),
                     get('local/bin/mysql'),
                     escapeshellarg($databaseConfig['host']),
                     escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                     escapeshellarg($databaseConfig['user']),
                     escapeshellarg($databaseConfig['dbname']),
-                    escapeshellarg($importSqlFile)
+                    escapeshellarg('SOURCE ' . $importSqlFile)
                 ), 0);
                 unlink($importSqlFile);
             }

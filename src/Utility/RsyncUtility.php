@@ -21,7 +21,11 @@ class RsyncUtility
         $serverConfiguration = $taskContext->getServer()->getConfiguration();
         $sshOptions[] = $serverConfiguration->getPort() ? ' -p' . $serverConfiguration->getPort() : null;
         $sshOptions[] = $serverConfiguration->getPrivateKey() ? ' -i ' . $serverConfiguration->getPrivateKey() : null;
-        return trim(implode(' ', $sshOptions));
+        if(!empty(array_filter($sshOptions))) {
+            return 'ssh ' . implode(' ', $sshOptions);
+        } else {
+            return '';
+        }
     }
 
     public function getServerWithDbStoragePath(Context $taskContext)
@@ -31,7 +35,7 @@ class RsyncUtility
         $serverWithPath =
             ($serverConfiguration->getUser() ? $serverConfiguration->getUser() . '@' : '') .
             $serverConfiguration->getHost() .
-            trim($serverEnvironment->get('db_storage_path'), '/') . '/';
+            ':/' . trim($serverEnvironment->get('db_storage_path'), '/') . '/';
         return $serverWithPath;
     }
 }
