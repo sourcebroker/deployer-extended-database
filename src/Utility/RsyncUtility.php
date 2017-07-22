@@ -31,7 +31,7 @@ class RsyncUtility
         $serverWithPath =
             ($serverConfiguration->getUser() ? $serverConfiguration->getUser() . '@' : '') .
             $serverConfiguration->getHost() .
-            trim('/', $serverEnvironment->get('db_storage_path')) . '/';
+            trim($serverEnvironment->get('db_storage_path'), '/') . '/';
         return $serverWithPath;
     }
 }
