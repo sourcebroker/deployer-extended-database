@@ -46,7 +46,7 @@ task('db:export', function () {
             $filenameParts['type'] = 'type:structure';
             $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_structure', '');
             $mysqlDumpArgs['type'] = $fileUtility->normalizeFolder(get('db_storage_path_current'))
-                . '/' . implode('#', $filenameParts) . '.sql';
+                . implode('#', $filenameParts) . '.sql';
             runLocally(vsprintf(
                 'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r %s',
                 $mysqlDumpArgs
