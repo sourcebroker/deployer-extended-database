@@ -34,6 +34,14 @@ set('db_import_mysql_options_structure',
 set('db_import_mysql_options_data',
     '--default-character-set=utf8');
 
+// Return commands for direct processing of sql file. can be used before mysql import.
+set('db_process_commands', [
+    // @see http://stackoverflow.com/a/38595160/1588346
+    'remove_definer' => 'sed --version >/dev/null 2>&1 ' .
+        '&& sed -i -- \'s/DEFINER=[^*]*\*/\*/g\' {{databaseStoragePath}}/*dumpcode:{{dumpCode}}*.sql ' .
+        '|| sed -i \'\' \'s/DEFINER=[^*]*\*/\*/g\' {{databaseStoragePath}}/*dumpcode:{{dumpCode}}*.sql'
+]);
+
 // Returns current server configuration.
 set('db_current_server', function () {
     try {
@@ -166,7 +174,8 @@ set('bin/deployer', function () {
             } else {
                 throw new \RuntimeException(parse('Downloaded deployer has size ' . $downloadedFileSizeInBytes . ' bytes. It seems'
                     . ' like the download was unsucessfull. The file downloaded was: "' . $deployerDownloadLink . '".'
-                    . 'Please check if this link return file. The downloaded content was stored in ' . $deployerFilenameFullPath), 1500717708109);
+                    . 'Please check if this link return file. The downloaded content was stored in ' . $deployerFilenameFullPath),
+                    1500717708109);
             }
         }
         //Rebuild symlink of $deployerFilename to "{{active_path}}/deployer.phar"

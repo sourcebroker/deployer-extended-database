@@ -8,14 +8,22 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
  * @see https://github.com/sourcebroker/deployer-extended-database#db-process
  */
 task('db:process', function () {
-    if (null !== input()->getArgument('stage')) {
-        throw new \RuntimeException('You can not set target instance for db:process command. 
-        It can only run on current instance.', 1500721553545);
-    }
     $dumpCode = (new ConsoleUtility())->optionRequired('dumpcode', input());
-    $currentInstanceDatabaseStoragePath = get('db_current_server')->get('db_storage_path_current');
-
-    // remove "DEFINER" from the dump files to avoid problems with DEFINER views permissions
-    // use hack for set multiple OS support (OSX/Linux) @see http://stackoverflow.com/a/38595160/1588346
-    runLocally('sed --version >/dev/null 2>&1 && sed -i -- "s/DEFINER=[^*]*\*/\*/g" ' . $currentInstanceDatabaseStoragePath . '/*dumpcode:' . $dumpCode . '*.sql || sed -i \'\' \'s/DEFINER=[^*]*\*/\*/g\' ' . $currentInstanceDatabaseStoragePath . '/*dumpcode:' . $dumpCode . '*.sql');
-})->desc('Run DEFINER replace on local databases defined by "dumpcode".');
+    if (get('db_instance') == get('server')['name']) {
+        $markersArray['{{databaseStorageAbsolutePath}}'] = get('db_current_server')->get('db_storage_path_current');
+        $markersArray['{{dumpcode}}'] = $dumpCode;
+        if (get('db_process_commands', false) !== false) {
+            foreach (get('db_process_commands') as $dbProcessCommand) {
+                runLocally(str_replace(
+                    array_keys($markersArray),
+                    $markersArray,
+                    $dbProcessCommand
+                ), 0);
+            }
+        }
+    } else {
+        $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
+        $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
+        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:process --dumpcode=' . $dumpCode . ' ' . $verbosity);
+    }
+})->desc('Run commands that process mysql dump file directly.');
