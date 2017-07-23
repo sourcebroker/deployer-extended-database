@@ -45,10 +45,10 @@ task('db:export', function () {
             // dump database structure
             $filenameParts['type'] = 'type:structure';
             $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_structure', '');
-            $mysqlDumpArgs['type'] = $fileUtility->normalizeFolder(get('db_storage_path_current'))
-                . implode('#', $filenameParts) . '.sql';
+            $mysqlDumpArgs['type'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))
+                . implode('#', $filenameParts) . '.sql');
             runLocally(vsprintf(
-                'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r %s',
+                'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r%s',
                 $mysqlDumpArgs
             ), 0);
 
@@ -65,10 +65,10 @@ task('db:export', function () {
             }
             $filenameParts['type'] = 'type:data';
             $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_data', '');
-            $mysqlDumpArgs['type'] = $fileUtility->normalizeFolder(get('db_storage_path_current'))
-                . implode('#', $filenameParts) . '.sql';
+            $mysqlDumpArgs['type'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))
+                . implode('#', $filenameParts) . '.sql');
             runLocally(vsprintf(
-                'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r %s %s',
+                'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r%s %s',
                 $mysqlDumpArgs
             ), 0);
         }
