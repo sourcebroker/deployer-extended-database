@@ -10,6 +10,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 task('db:process', function () {
     $dumpCode = (new ConsoleUtility())->optionRequired('dumpcode', input());
     if (get('db_instance') == get('server')['name']) {
+        $markersArray = [];
         $markersArray['{{databaseStorageAbsolutePath}}'] = get('db_current_server')->get('db_storage_path_current');
         $markersArray['{{dumpcode}}'] = $dumpCode;
         if (get('db_process_commands', false) !== false) {
