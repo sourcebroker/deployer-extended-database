@@ -74,11 +74,8 @@ task('db:export', function () {
         }
     } else {
         $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
-        if (test('[ -L {{deploy_path}}/release ]')) {
-            run('cd {{deploy_path}}/release && {{bin/php}} {{bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity);
-        } else {
-            run('cd {{deploy_path}}/current && {{bin/php}} {{bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity);
-        }
+        $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
+        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity);
     }
     if ($returnDumpCode) {
         writeln(json_encode(['dumpCode' => $dumpCode]));
