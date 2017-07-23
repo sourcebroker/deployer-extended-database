@@ -47,7 +47,8 @@ class ConsoleUtility
      * @param InputInterface $input
      * @return mixed
      */
-    public function optionRequired($requiredOption, InputInterface $input) {
+    public function optionRequired($requiredOption, InputInterface $input)
+    {
         if (!empty($input->getOption($requiredOption))) {
             $requiredOptionValue = $input->getOption($requiredOption);
         } else {
