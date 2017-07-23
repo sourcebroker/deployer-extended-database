@@ -113,11 +113,11 @@ set('db_storage_path', function () {
 });
 
 set('bin/deployer', function () {
-    set('active_path', get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]')
-            ? 'release' : 'current'));
+    $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]')
+            ? 'release' : 'current');
     //check if there is composer based deployer
-    if (test('[ -e \'{{active_path}}/vendor/bin/dep\' ]')) {
-        $deployerBin = parse('{{active_path}}/vendor/bin/dep');
+    if (test('[ -e ' . escapeshellarg($activePath . '/vendor/bin/dep') . ' ]')) {
+        $deployerBin = $activePath . '/vendor/bin/dep';
     } else {
         $deployerMinimumSizeInBytesForDownloadCheck = 100000;
         // Figure out what version is expected to be used. "db_deployer_version" can be either integer "4"
@@ -178,12 +178,12 @@ set('bin/deployer', function () {
                     1500717708109);
             }
         }
-        //Rebuild symlink of $deployerFilename to "{{active_path}}/deployer.phar"
-        run('rm -f {{active_path}}/deployer.phar && cd {{active_path}} && {{bin/symlink}} ' . $deployerFilenameFullPath . ' {{active_path}}/deployer.phar');
-        if (test('[ -f {{active_path}}/deployer.phar ]')) {
-            $deployerBin = parse('{{active_path}}/deployer.phar');
+        //Rebuild symlink of $deployerFilename to $active_path/deployer.phar
+        run('rm -f ' . $activePath . '/deployer.phar && cd ' . $activePath . ' && {{bin/symlink}} ' . $deployerFilenameFullPath . $activePath . '/deployer.phar');
+        if (test('[ -f ' . $activePath . '/deployer.phar ]')) {
+            $deployerBin = $activePath . '/deployer.phar';
         } else {
-            throw new \RuntimeException(parse('Can not create symlink from ' . $deployerFilenameFullPath . ' to {{active_path}}/deployer.phar'));
+            throw new \RuntimeException(parse('Can not create symlink from ' . $deployerFilenameFullPath . ' to ' . $activePath . '/deployer.phar'));
         }
     }
     return $deployerBin;
