@@ -69,9 +69,6 @@ task('db:export', function () {
                 $mysqlDumpArgs
             ), 0);
         }
-        if ($returnDumpCode) {
-            writeln(json_encode(['dumpCode' => $dumpCode]));
-        }
     } else {
         $verbosity = (new ConsoleUtility())->getVerbosity(output());
         if (test('[ -L {{deploy_path}}/release ]')) {
@@ -79,5 +76,8 @@ task('db:export', function () {
         } else {
             run('cd {{deploy_path}}/current && {{bin/php}} {{bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity);
         }
+    }
+    if ($returnDumpCode) {
+        writeln(json_encode(['dumpCode' => $dumpCode]));
     }
 })->desc('Export database dump to local database dumps storage.');
