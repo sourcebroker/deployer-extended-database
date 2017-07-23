@@ -445,9 +445,9 @@ to dev instance. We will run following command on you local current (in out exma
 Here are the tasks that will be run in background:
 
 In below description:
-* source instance = live
-* target instance = dev
-* current instance = local
+   * source instance = live
+   * target instance = dev
+   * current instance = local
 
 1) First it runs ``dep db:export --dumpcode=123456`` task on source instance. The dumps from export task are stored
    in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
