@@ -39,10 +39,10 @@ task('db:copy', function () {
     $sourceInstance = get('server')['name'];
     $dumpCode = md5(microtime(true) . rand(0, 10000));
     if (get('db_instance') == get('server')['name']) {
-        runLocally('cd {{deploy_path}}/current &&  {{local/bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity,
+        runLocally('{{local/bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity,
             0);
     } else {
-        runLocally('cd {{deploy_path}}/current && {{local/bin/deployer}} db:export ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity);
+        runLocally('{{local/bin/deployer}} db:export ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity);
         runLocally('{{local/bin/deployer}} db:download ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity,
             0);
     }
