@@ -11,7 +11,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 task('db:download', function () {
     $fileUtility = new FileUtility();
     if (null === input()->getArgument('stage')) {
-        throw new \RuntimeException('The target instance is required for db:download command.', 1488143750580);
+        throw new \RuntimeException('The source instance is required for db:download command.', 1488143750580);
     }
     $dumpCode = (new ConsoleUtility())->optionRequired('dumpcode', input());
     $currentInstanceDatabaseStoragePath = $fileUtility->normalizeFolder(get('db_current_server')->get('db_storage_path_current'));
