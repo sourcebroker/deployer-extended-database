@@ -38,8 +38,8 @@ set('db_import_mysql_options_data',
 set('db_process_commands', [
     // @see http://stackoverflow.com/a/38595160/1588346
     'remove_definer' => 'sed --version >/dev/null 2>&1 ' .
-        '&& sed -i -- \'s/DEFINER=[^*]*\*/\*/g\' {{databaseStoragePath}}/*dumpcode:{{dumpCode}}*.sql ' .
-        '|| sed -i \'\' \'s/DEFINER=[^*]*\*/\*/g\' {{databaseStoragePath}}/*dumpcode:{{dumpCode}}*.sql'
+        '&& sed -i -- \'s/DEFINER=[^*]*\*/\*/g\' {{databaseStorageAbsolutePath}}/*dumpcode:{{dumpcode}}*.sql ' .
+        '|| sed -i \'\' \'s/DEFINER=[^*]*\*/\*/g\' {{databaseStorageAbsolutePath}}/*dumpcode:{{dumpcode}}*.sql'
 ]);
 
 // Returns current server configuration.
