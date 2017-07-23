@@ -4,6 +4,9 @@ namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 
+/*
+ * @see https://github.com/sourcebroker/deployer-extended-database#db-copy
+ */
 task('db:copy', function () {
     if (null === input()->getArgument('stage')) {
         throw new \RuntimeException("The source instance is required for db:move command.");
