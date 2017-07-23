@@ -20,7 +20,7 @@ task('db:download', function () {
         'rsync -rz --remove-source-files %s --include=*dumpcode:%s*.sql --exclude=* %s %s',
         $rsyncUtility->getSshOptions(Task\Context::get()) ? '-e ' . escapeshellarg($rsyncUtility->getSshOptions(Task\Context::get())) : '',
         $dumpCode,
-        escapeshellarg($rsyncUtility->getServerWithDbStoragePath(Task\Context::get())),
+        escapeshellarg($rsyncUtility->getHostWithDbStoragePath(Task\Context::get())),
         escapeshellarg($currentInstanceDatabaseStoragePath)
     ), 0);
 })->desc('Download the database dumps with dumpcode from target database dumps storage.');

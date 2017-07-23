@@ -28,7 +28,7 @@ class RsyncUtility
         }
     }
 
-    public function getServerWithDbStoragePath(Context $taskContext)
+    public function getHostWithDbStoragePath(Context $taskContext)
     {
         $serverEnvironment = $taskContext->getEnvironment();
         $serverConfiguration = $taskContext->getServer()->getConfiguration();

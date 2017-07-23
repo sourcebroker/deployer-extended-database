@@ -20,6 +20,6 @@ task('db:upload', function () {
             . escapeshellarg($rsyncUtility->getSshOptions(Task\Context::get())) : '',
         escapeshellarg('*dumpcode:' . $dumpCode . '*.sql'),
         escapeshellarg(get('db_current_server')->get('db_storage_path_current')),
-        escapeshellarg($rsyncUtility->getServerWithDbStoragePath(Task\Context::get()))
+        escapeshellarg($rsyncUtility->getHostWithDbStoragePath(Task\Context::get()))
     ), 0);
 })->desc('Upload the latest database dump from target database dumps storage.');
