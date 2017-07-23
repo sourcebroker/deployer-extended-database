@@ -12,8 +12,7 @@ task('db:process', function () {
         throw new \RuntimeException('You can not set target instance for db:process command. 
         It can only run on current instance.', 1500721553545);
     }
-    $consoleUtility = new ConsoleUtility();
-    $consoleUtility->optionRequired('dumpcode', input());
+    $dumpCode = (new ConsoleUtility())->optionRequired('dumpcode', input());
     $currentInstanceDatabaseStoragePath = get('db_current_server')->get('db_storage_path_current');
 
     // remove "DEFINER" from the dump files to avoid problems with DEFINER views permissions
