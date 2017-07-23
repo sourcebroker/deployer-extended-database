@@ -2,13 +2,14 @@
 
 namespace Deployer;
 
+use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
+
 task('db:copy', function () {
     if (null === input()->getArgument('stage')) {
         throw new \RuntimeException("The source instance is required for db:move command.");
     }
     if (input()->getArgument('targetStage')) {
         $targetInstanceName = input()->getArgument('targetStage');
-        $targetInstanceEnv = Deployer::get()->environments[$targetInstanceName];
         if ($targetInstanceName == null) {
             throw new \RuntimeException(
                 "You must set the target instance the database will be copied to as second parameter."
@@ -31,21 +32,24 @@ task('db:copy', function () {
             "The target instance is not set as second parameter. Move should be run as: dep db:move source target"
         );
     }
-    //(Deployer::get()->servers[$targetInstanceName])->run('cat {{deploy_path}}/current/.env');
+    $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
     $sourceInstance = get('server')['name'];
     $dumpCode = md5(microtime(true) . rand(0, 10000));
-    if ($sourceInstance == 'local') {
-        runLocally("cd {{deploy_path}} && {{local/bin/php}} {{local/bin/deployer}} -q db:export --dumpcode=$dumpCode");
+    if (get('db_instance') == get('server')['name']) {
+        runLocally('cd {{deploy_path}}/current &&  {{local/bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity,
+            0);
     } else {
-        run("cd {{deploy_path}}/current && {{bin/php}} {{bin/deployer}} -q db:export --dumpcode=$dumpCode");
-        runLocally("{{local/bin/deployer}} db:download $sourceInstance --dumpcode=$dumpCode", 0);
+        runLocally('cd {{deploy_path}}/current && {{local/bin/deployer}} db:export ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity);
+        runLocally('{{local/bin/deployer}} db:download ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity,
+            0);
     }
-    runLocally("{{local/bin/deployer}} db:process --dumpcode=$dumpCode", 0);
+    runLocally('{{local/bin/deployer}} db:process --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     if (get('db_instance') == $targetInstanceName) {
-        runLocally("{{local/bin/deployer}} db:import --dumpcode=$dumpCode", 0);
+        runLocally('{{local/bin/deployer}} db:import --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     } else {
-        runLocally("{{local/bin/deployer}} db:upload $targetInstanceName --dumpcode=$dumpCode", 0);
-        run("cd " . $targetInstanceEnv->get('deploy_path') . "/current && " . $targetInstanceEnv->get('bin/php') .
-           ' ' .  $targetInstanceEnv->get('bin/deployer') . " -q db:import --dumpcode=" . $dumpCode);
+        runLocally('{{local/bin/deployer}} db:upload ' . $targetInstanceName . ' --dumpcode=' . $dumpCode . ' ' . $verbosity,
+            0);
+        runLocally('{{local/bin/deployer}} db:import ' . $targetInstanceName . ' --dumpcode=' . $dumpCode . ' ' . $verbosity,
+            0);
     }
 })->desc('Synchronize database between instances.');
