@@ -2,17 +2,23 @@
 
 namespace SourceBroker\DeployerExtendedDatabase\Utility;
 
-use function Couchbase\defaultDecoder;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
 
 /**
  * Class ConsoleUtility
+ *
  * @package SourceBroker\DeployerExtendedDatabase\Utility
  */
 class ConsoleUtility
 {
-    public function getVerbosity(OutputInterface $output)
+    /**
+     * Returns OutputInterface verbosity as parameter that can be used in cli command
+     *
+     * @param OutputInterface $output
+     * @return string
+     */
+    public function getVerbosityAsParameter(OutputInterface $output)
     {
         switch ($output->getVerbosity()) {
             case OutputInterface::VERBOSITY_DEBUG:
@@ -34,6 +40,13 @@ class ConsoleUtility
         return $verbosity;
     }
 
+    /**
+     * Check if option is present and return it. If not throw exception.
+     *
+     * @param string $requiredOption
+     * @param InputInterface $input
+     * @return mixed
+     */
     public function optionRequired($requiredOption, InputInterface $input) {
         if (!empty($input->getOption($requiredOption))) {
             $requiredOptionValue = $input->getOption($requiredOption);

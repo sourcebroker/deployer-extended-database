@@ -5,6 +5,9 @@ namespace Deployer;
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 
+/*
+ * @see https://github.com/sourcebroker/deployer-extended-database#db-download
+ */
 task('db:download', function () {
     $fileUtility = new FileUtility();
     if (null === input()->getArgument('stage')) {
@@ -14,7 +17,7 @@ task('db:download', function () {
     $currentInstanceDatabaseStoragePath = $fileUtility->normalizeFolder(get('db_current_server')->get('db_storage_path_current'));
     $rsyncUtility = new \SourceBroker\DeployerExtendedDatabase\Utility\RsyncUtility();
     runLocally(sprintf(
-        "rsync -rz --remove-source-files %s --include=*dumpcode:%s*.sql --exclude=* %s %s",
+        'rsync -rz --remove-source-files %s --include=*dumpcode:%s*.sql --exclude=* %s %s',
         $rsyncUtility->getSshOptions(Task\Context::get()) ? '-e ' . escapeshellarg($rsyncUtility->getSshOptions(Task\Context::get())) : '',
         $dumpCode,
         escapeshellarg($rsyncUtility->getServerWithDbStoragePath(Task\Context::get())),

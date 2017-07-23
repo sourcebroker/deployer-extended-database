@@ -18,23 +18,23 @@ set('db_instance', function () {
     return (new InstanceUtility)->getCurrentInstance();
 });
 
-// mysqldump options for dumping structure
+// mysqldump options for dumping structure.
 set('db_export_mysqldump_options_structure',
     '--no-data=true --default-character-set=utf8');
 
-// mysqldump options for dumping data
+// mysqldump options for dumping data.
 set('db_export_mysqldump_options_data',
     '--opt --skip-lock-tables --single-transaction --no-create-db --default-character-set=utf8');
 
-// mysqldump options for dumping data
+// mysql options for dumping structure.
 set('db_import_mysql_options_structure',
     '--default-character-set=utf8');
 
-// mysqldump options for dumping data
+// mysql options for dumping data.
 set('db_import_mysql_options_data',
     '--default-character-set=utf8');
 
-// Returns current server settings.
+// Returns current server configuration.
 set('db_current_server', function () {
     try {
         $currentServer = Deployer::get()->environments[get('db_instance')];
@@ -50,7 +50,7 @@ set('db_current_server', function () {
     return $currentServer;
 });
 
-// Contains "db_databases" merged for direct use.
+// Returns "db_databases" merged for direct use.
 set('db_databases_merged', function () {
     $arrayUtility = new ArrayUtility();
     $dbConfigsMerged = [];
@@ -81,6 +81,7 @@ set('db_databases_merged', function () {
     return $dbConfigsMerged;
 });
 
+// Returns path to store database dumps on current instance.
 set('db_storage_path_current', function () {
     if (get('db_current_server')->get('db_storage_path_relative', false) == false) {
         $dbStoragePathCurrent = get('db_current_server')->get('deploy_path') . '/.dep/database/dumps';
@@ -88,17 +89,18 @@ set('db_storage_path_current', function () {
         $dbStoragePathCurrent = get('db_current_server')->get('deploy_path') . '/'
             . get('db_current_server')->get('db_storage_path_relative');
     }
-    runLocally("[ -d " . $dbStoragePathCurrent . " ] || mkdir -p " . $dbStoragePathCurrent);
+    runLocally('[ -d ' . $dbStoragePathCurrent . ' ] || mkdir -p ' . $dbStoragePathCurrent);
     return $dbStoragePathCurrent;
 });
 
+// Returns path to store database dumps on remote instance.
 set('db_storage_path', function () {
     if (get('db_storage_path_relative', false) == false) {
         $dbStoragePath = get('deploy_path') . '/.dep/database/dumps';
     } else {
         $dbStoragePath = get('deploy_path') . '/' . get('db_storage_path_relative');
     }
-    run("[ -d " . $dbStoragePath . " ] || mkdir -p " . $dbStoragePath);
+    run('[ -d ' . $dbStoragePath . ' ] || mkdir -p ' . $dbStoragePath);
     return $dbStoragePath;
 });
 

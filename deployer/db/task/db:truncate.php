@@ -6,6 +6,9 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 
+/*
+ * @see https://github.com/sourcebroker/deployer-extended-database#db-truncate
+ */
 task('db:truncate', function () {
     $arrayUtility = new ArrayUtility();
     $databaseUtility = new DatabaseUtility();
@@ -38,7 +41,7 @@ task('db:truncate', function () {
             }
         }
     } else {
-        $verbosity = (new ConsoleUtility())->getVerbosity(output());
+        $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
         if (test('[ -L {{deploy_path}}/release ]')) {
             run('cd {{deploy_path}}/release && {{bin/php}} {{bin/deployer}} db:truncate ' . $verbosity);
         } else {

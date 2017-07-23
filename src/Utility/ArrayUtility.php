@@ -63,8 +63,8 @@ class ArrayUtility
 
             set_error_handler(function () {
             }, E_WARNING);
-            $isValidPattern = preg_match($pattern, "") !== false;
-            $isValidPatternDelimiters = preg_match('/^' . $pattern . '$/', "") !== false;
+            $isValidPattern = preg_match($pattern, '') !== false;
+            $isValidPatternDelimiters = preg_match('/^' . $pattern . '$/', '') !== false;
             restore_error_handler();
 
             if (preg_match('/^[\/\#\+\%\~]/', $pattern) && $isValidPattern) {

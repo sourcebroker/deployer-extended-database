@@ -4,10 +4,13 @@ namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 
+/*
+ * @see https://github.com/sourcebroker/deployer-extended-database#db-process
+ */
 task('db:process', function () {
     if (null !== input()->getArgument('stage')) {
-        throw new \RuntimeException("You can not set target instance for db:process command. 
-        It can only run on current instance.", 1500721553545);
+        throw new \RuntimeException('You can not set target instance for db:process command. 
+        It can only run on current instance.', 1500721553545);
     }
     $consoleUtility = new ConsoleUtility();
     $consoleUtility->optionRequired('dumpcode', input());
