@@ -2,6 +2,21 @@
 Changelog
 ---------
 
+4.0.3
+~~~~~
+
+a) [TASK] Make "bin/deployer" use of vendor/bin/dep from deployer-dist
+
+4.0.2
+~~~~~
+
+a) [BUGFIX] Fix rebulding symlink to deployer.phar
+
+4.0.1
+~~~~~
+
+a) [BUGFIX] Fix wrong path set for db:copy
+
 4.0.0
 ~~~~~
 
