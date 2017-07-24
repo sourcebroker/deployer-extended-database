@@ -15,7 +15,8 @@
     }
   ],
   "require": {
-    "vlucas/phpdotenv": "^2.0"
+    "vlucas/phpdotenv": "^2.0",
+    "deployer/dist": "^4.3.1"
   },
   "autoload": {
     "psr-4": {
