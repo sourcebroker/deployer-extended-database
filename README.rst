@@ -7,7 +7,7 @@ deployer-extended-database
 .. image:: https://scrutinizer-ci.com/g/sourcebroker/deployer-extended-database/badges/quality-score.png?b=master
    :target: https://scrutinizer-ci.com/g/sourcebroker/deployer-extended-database/?branch=master
 
-.. image:: http://img.shields.io/packagist/v/sourcebroker/deployer-extended-database.svg?style=flat
+.. image:: https://poser.pugx.org/sourcebroker/deployer-extended-database/v/stable
    :target: https://packagist.org/packages/sourcebroker/deployer-extended-database
 
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat
