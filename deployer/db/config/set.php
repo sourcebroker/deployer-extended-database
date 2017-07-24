@@ -179,7 +179,7 @@ set('bin/deployer', function () {
             }
         }
         //Rebuild symlink of $deployerFilename to $active_path/deployer.phar
-        run('rm -f ' . $activePath . '/deployer.phar && cd ' . $activePath . ' && {{bin/symlink}} ' . $deployerFilenameFullPath . $activePath . '/deployer.phar');
+        run('rm -f ' . $activePath . '/deployer.phar && cd ' . $activePath . ' && {{bin/symlink}} ' . $deployerFilenameFullPath . ' ' . $activePath . '/deployer.phar');
         if (test('[ -f ' . $activePath . '/deployer.phar ]')) {
             $deployerBin = $activePath . '/deployer.phar';
         } else {
