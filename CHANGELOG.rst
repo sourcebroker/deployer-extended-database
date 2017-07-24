@@ -2,10 +2,15 @@
 Changelog
 ---------
 
+4.0.4
+~~~~~
+
+a) [TASK] Make dependency to deployer/deployer-dist.
+
 4.0.3
 ~~~~~
 
-a) [TASK] Make "bin/deployer" use of vendor/bin/dep from deployer-dist
+a) [TASK] Make "bin/deployer" use of vendor/bin/dep from deployer-dist.
 
 4.0.2
 ~~~~~
