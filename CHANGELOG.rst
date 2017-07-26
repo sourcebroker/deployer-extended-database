@@ -2,49 +2,54 @@
 Changelog
 ---------
 
+4.0.5
+~~~~~
+
+1) [BUGFIX] Fix wrongly prepared marker domainsSeparatedByComma when more than one domain
+
 4.0.4
 ~~~~~
 
-a) [TASK] Make dependency to deployer/deployer-dist.
+1) [TASK] Make dependency to deployer/deployer-dist.
 
 4.0.3
 ~~~~~
 
-a) [TASK] Make "bin/deployer" use of vendor/bin/dep from deployer-dist.
+1) [TASK] Make "bin/deployer" use of vendor/bin/dep from deployer-dist.
 
 4.0.2
 ~~~~~
 
-a) [BUGFIX] Fix rebulding symlink to deployer.phar
+1) [BUGFIX] Fix rebulding symlink to deployer.phar
 
 4.0.1
 ~~~~~
 
-a) [BUGFIX] Fix wrong path set for db:copy
+1) [BUGFIX] Fix wrong path set for db:copy
 
 4.0.0
 ~~~~~
 
-a) [TASK] db:export refactor:
+1) [TASK] db:export refactor:
    - add possibility to call command on remote instance
    - add "db_export_mysqldump_options_structure" and "db_export_mysqldump_options_data" env
-b) [BUGFIX] Fix wrong changlog address in main docs.
-c) [TASK] db:truncate refactor:
+2) [BUGFIX] Fix wrong changlog address in main docs.
+3) [TASK] db:truncate refactor:
    - add escapeshellargs
-d) [TASK] Escapeshellargs for all commands
-e) [TASK][BREAKING] Change static utilities method calls to regular objects method call.
-f) [TASK] Cleanup db:download and db:upload tasks with RsyncUtility
-g) [TASK][BREAKING] Rename var "bin/mysql" to "local/bin/mysql"
-h) [TASK] Refactor db:import
-i) [TASK] db:import refactor:
+4) [TASK] Escapeshellargs for all commands
+5) [TASK][BREAKING] Change static utilities method calls to regular objects method call.
+6) [TASK] Cleanup db:download and db:upload tasks with RsyncUtility
+8) [TASK][BREAKING] Rename var "bin/mysql" to "local/bin/mysql"
+9) [TASK] Refactor db:import
+10) [TASK] db:import refactor:
    - add possibility to call command on remote instance
-j) [TASK] Enable duplication check for scrutinizer.
-k) [TASK] Pass verbosity to commands run locally in db:pull task.
-l) [TASK] Move mysql options from db:import task to variables.
-m) [TASK] Pass verbosity to commands run locally with use of ConsoleUtility.
-n) [TASK] Implement optionRequired() in ConsoleUtility.
+11) [TASK] Enable duplication check for scrutinizer.
+12) [TASK] Pass verbosity to commands run locally in db:pull task.
+13) [TASK] Move mysql options from db:import task to variables.
+14) [TASK] Pass verbosity to commands run locally with use of ConsoleUtility.
+15) [TASK] Implement optionRequired() in ConsoleUtility.
 
 3.0.0
 ~~~~~
 
-a) Set "default_stage" as callable. This way "default_stage" can be now overwritten in higher level packages.
+1) Set "default_stage" as callable. This way "default_stage" can be now overwritten in higher level packages.

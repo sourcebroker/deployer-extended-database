@@ -96,7 +96,7 @@ task('db:import', function () {
                         }
                     }
                     $markersArray['{{domainsSeparatedByComma}}'] = '"' . implode(
-                            ',"',
+                            '","',
                             $publicUrlCollected
                         ) . '"';
                     $markersArray['{{firstDomainWithScheme}}'] = get('public_urls')[0];
