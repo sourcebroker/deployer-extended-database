@@ -2,6 +2,12 @@
 Changelog
 ---------
 
+
+5.0.1
+~~~~~
+
+a) [BUGFIX] Add missing dependency to sourcebroker/deployer-loader
+
 5.0.0
 ~~~~~
 
