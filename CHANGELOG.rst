@@ -2,6 +2,14 @@
 Changelog
 ---------
 
+5.0.0
+~~~~~
+
+a) [TASK] Add dependency to sourcebroker/deployer-loader
+b) [TASK][!!!BREAKING] Remove SourceBroker\DeployerExtendedDatabase\Loader.php in favour of using sourcebroker/deployer-loader
+c) [TASK][!!!BREAKING] Remove SourceBroker\DeployerExtendedDatabase\Utility\FileUtility->requireFilesFromDirectoryReqursively
+   because it was used only in SourceBroker\DeployerExtendedDatabase\Loader.php
+
 4.0.5
 ~~~~~
 

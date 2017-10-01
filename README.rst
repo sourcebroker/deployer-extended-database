@@ -28,7 +28,7 @@ Most useful are two tasks:
 
 2. task "`db:copy`_ [source-instance] [target-instance]" which allows to copy database between instances.
 
-**NOTE! Its tested only with Deployer 4.3.0!**
+**NOTE! Its tested only with Deployer 4.3.1!**
 
 Installation
 ------------
@@ -41,24 +41,17 @@ Installation
 2) If you are using deployer as composer package then just put following line in your deploy.php:
    ::
 
-      new \SourceBroker\DeployerExtendedDatabase\Loader();
+      new \SourceBroker\DeployerLoader\Load([['path' => 'vendor/sourcebroker/deployer-extended-database/deployer']]);
 
 3) If you are using deployer as phar then put following lines in your deploy.php:
    ::
 
-      require __DIR__ . '/vendor/autoload.php';
-      new \SourceBroker\DeployerExtendedDatabase\Loader();
+      require_once(__DIR__ . '/vendor/sourcebroker/deployer-loader/autoload.php');
+      new \SourceBroker\DeployerLoader\Load([['path' => 'vendor/sourcebroker/deployer-extended-database/deployer']]);
 
    | IMPORTANT NOTE!
-   | Because there is inclusion of '/vendor/autoload.php' inside deployer realm then sometimes there can be conflict
-     of deployer dependencies with you project dependencies. Quite often its about symfony/console version or
-     monolog/monolog version because they are most common between projects. In that case use deployer installed as
-     composer package and resolve the dependency problems on composer level. Example of error when you run "dep" command
-     and there are dependencies problems:
-
-     ::
-
-      Fatal error: Declaration of Symfony\Component\Console\Input\ArrayInput::hasParameterOption() must be compatible with Symfony\Component\Console\Input\InputInterface::hasParameterOption($values, $onlyParams = false) in /.../vendor/symfony/symfony/src/Symfony/Component/Console/Input/ArrayInput.php on line 190
+   | Do not put ``require('/vendor/autoload.php')`` inside your deploy.php because you can have dependency problems.
+     Use ``require_once(__DIR__ . '/vendor/sourcebroker/deployer-loader/autoload.php');`` instead as suggested.
 
 4) Create ".env" file in your project root (where you store deploy.php file). The .env file should be out of
    git because you need to store here information about instance name. Additionally put there info about database
