@@ -2,6 +2,12 @@
 Changelog
 ---------
 
+5.0.2
+~~~~~
+
+a) [BUGFIX] Remove not needeed exeption throws as the truncate_tables value can be
+    not set or return empty value from regexp.
+
 
 5.0.1
 ~~~~~
