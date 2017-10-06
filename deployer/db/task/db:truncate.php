@@ -33,11 +33,7 @@ task('db:truncate', function () {
                         ), 0);
                     }
                     writeln('<info>Truncated tables: ' . implode(',', $truncateTables) . '</info>');
-                } else {
-                    throw new \Exception('Regexp filters for "truncate_tables" variable returned empty value.');
                 }
-            } else {
-                throw new \Exception('Variable "truncate_tables" is empty.');
             }
         }
     } else {
