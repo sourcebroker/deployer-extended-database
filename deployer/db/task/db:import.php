@@ -85,7 +85,7 @@ task('db:import', function () {
             if (isset($databaseConfig['post_sql_in_markers'])) {
                 // Prepare some markers to use in post_sql_in_markers:
                 $markersArray = [];
-                if (is_array(get('public_urls'))) {
+                if (!empty(get('public_urls',[]))) {
                     $publicUrlCollected = [];
                     foreach (get('public_urls') as $publicUrl) {
                         if (parse_url($publicUrl, PHP_URL_SCHEME) && parse_url($publicUrl, PHP_URL_HOST)) {

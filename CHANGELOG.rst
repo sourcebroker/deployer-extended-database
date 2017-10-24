@@ -2,12 +2,16 @@
 Changelog
 ---------
 
+5.0.3
+~~~~~
+
+a) [BUGFIX] Do not show error on database pull if "public_urls" are not set.
+
 5.0.2
 ~~~~~
 
 a) [BUGFIX] Remove not needeed exeption throws as the truncate_tables value can be
     not set or return empty value from regexp.
-
 
 5.0.1
 ~~~~~
