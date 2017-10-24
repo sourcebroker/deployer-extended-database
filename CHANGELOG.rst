@@ -2,6 +2,12 @@
 Changelog
 ---------
 
+5.0.4
+~~~~~
+
+a) [BUGFIX] Fix styles ci.
+
+
 5.0.3
 ~~~~~
 
