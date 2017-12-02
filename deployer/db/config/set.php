@@ -40,11 +40,11 @@ set('db_compress_suffix', '.gz');
 
 // Return commands for compressing sql file.
 set('db_compress_command', [
-    '{{local/bin/gzip}} {{databaseStorageAbsolutePath}}/*dumpcode:{{dumpcode}}*.sql --suffix ' . get('db_compress_suffix')
+    '{{local/bin/gzip}} --force --name {{databaseStorageAbsolutePath}}/*dumpcode:{{dumpcode}}*.sql --suffix ' . get('db_compress_suffix')
 ]);
 // Return commands for compressing sql file.
 set('db_decompress_command', [
-    '{{local/bin/gzip}} -d ' . ' --suffix ' . get('db_compress_suffix') . ' {{databaseStorageAbsolutePath}}/*dumpcode:{{dumpcode}}*' . get('db_compress_suffix')
+    '{{local/bin/gzip}} --force --name --uncompress ' . ' --suffix ' . get('db_compress_suffix') . ' {{databaseStorageAbsolutePath}}/*dumpcode:{{dumpcode}}*' . get('db_compress_suffix')
 ]);
 
 // Returns current server configuration.
