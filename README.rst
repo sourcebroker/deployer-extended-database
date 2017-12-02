@@ -471,6 +471,8 @@ In below description:
 5) Finally it runs ``db:import --dumpcode=123456`` on target instance. This task reads dumps with code:123456 from folder
    "{{deploy_path}}/.dep/databases/dumps/" on dev instance and import it to database.
 
+6) At the very end it removes dumps it just imported in step 5 with command ``db:rmdump --dumpcode=123456``
+
 db:decompress
 +++++++++++
 

@@ -13,6 +13,7 @@ Changelog
 6) [TASK] Cleanup for db:upload, db:download tasks.
 7) [FEATURE] Compress local dumps after importing them with 'db:pull [instance]'.
 8) [FEATURE] Add db:rmdump task and documentation.
+9) [FEATURE] Add db:rmdump task at the end of "db:copy [source] [target]" task.
 
 
 5.0.4

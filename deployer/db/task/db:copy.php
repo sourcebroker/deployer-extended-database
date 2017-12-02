@@ -38,21 +38,20 @@ task('db:copy', function () {
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
     $sourceInstance = get('server')['name'];
     $dumpCode = md5(microtime(true) . rand(0, 10000));
+    $dl = get('local/bin/deployer');
     if (get('db_instance') == get('server')['name']) {
-        runLocally('{{local/bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity,
-            0);
+        runLocally($dl . ' db:export --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     } else {
-        runLocally('{{local/bin/deployer}} db:export ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity);
-        runLocally('{{local/bin/deployer}} db:download ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity,
-            0);
+        runLocally($dl . ' db:export ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:download ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     }
-    runLocally('{{local/bin/deployer}} db:process --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+    runLocally($dl . ' db:process --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     if (get('db_instance') == $targetInstanceName) {
-        runLocally('{{local/bin/deployer}} db:import --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:import --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:rmdump --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     } else {
-        runLocally('{{local/bin/deployer}} db:upload ' . $targetInstanceName . ' --dumpcode=' . $dumpCode . ' ' . $verbosity,
-            0);
-        runLocally('{{local/bin/deployer}} db:import ' . $targetInstanceName . ' --dumpcode=' . $dumpCode . ' ' . $verbosity,
-            0);
+        runLocally($dl . ' db:upload ' . $targetInstanceName . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:import ' . $targetInstanceName . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:rmdump ' . $targetInstanceName . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     }
 })->desc('Synchronize database between instances.');
