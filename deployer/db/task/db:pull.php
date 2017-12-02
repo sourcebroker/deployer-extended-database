@@ -21,4 +21,4 @@ task('db:pull', function () {
         . ' ' . $verbosity, 0);
     runLocally('{{local/bin/deployer}} db:process --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     runLocally('{{local/bin/deployer}} db:import --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
-})->desc('Synchronize database from remote instance to current instance.');
+})->desc('Synchronize database from target instance to current instance.');
