@@ -10,29 +10,23 @@ set('default_stage', function () {
     return (new InstanceUtility)->getCurrentInstance();
 });
 
-// Return what deployer to download on source server when we use phar deployer.
-set('db_deployer_version', 4);
-
 // Return current instance name. Based on that scripts knows from which server() takes the data to database.
 set('db_instance', function () {
     return (new InstanceUtility)->getCurrentInstance();
 });
 
 // mysqldump options for dumping structure.
-set('db_export_mysqldump_options_structure',
-    '--no-data=true --default-character-set=utf8');
+set('db_export_mysqldump_options_structure', '--no-data=true --default-character-set=utf8');
 
 // mysqldump options for dumping data.
 set('db_export_mysqldump_options_data',
     '--opt --skip-lock-tables --single-transaction --no-create-db --default-character-set=utf8');
 
-// mysql options for dumping structure.
-set('db_import_mysql_options_structure',
-    '--default-character-set=utf8');
+// mysql options for importing structure.
+set('db_import_mysql_options_structure', '--default-character-set=utf8');
 
-// mysql options for dumping data.
-set('db_import_mysql_options_data',
-    '--default-character-set=utf8');
+// mysql options for importing data.
+set('db_import_mysql_options_data', '--default-character-set=utf8');
 
 // Return commands for direct processing of sql file. can be used before mysql import.
 set('db_process_commands', [

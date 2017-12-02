@@ -2,34 +2,41 @@
 Changelog
 ---------
 
+6.0.0
+~~~~~
+
+1) [BREAKING] Remove 'db_deployer_version' config var as its not needed for deployer/distribution based version now.
+2) [DOCS] Change to number ordered list on CHANGELOG.rst
+
+
 5.0.4
 ~~~~~
 
-a) [BUGFIX] Fix styles ci.
+1) [BUGFIX] Fix styles ci.
 
 
 5.0.3
 ~~~~~
 
-a) [BUGFIX] Do not show error on database pull if "public_urls" are not set.
+1) [BUGFIX] Do not show error on database pull if "public_urls" are not set.
 
 5.0.2
 ~~~~~
 
-a) [BUGFIX] Remove not needeed exeption throws as the truncate_tables value can be
+1) [BUGFIX] Remove not needeed exeption throws as the truncate_tables value can be
     not set or return empty value from regexp.
 
 5.0.1
 ~~~~~
 
-a) [BUGFIX] Add missing dependency to sourcebroker/deployer-loader
+1) [BUGFIX] Add missing dependency to sourcebroker/deployer-loader
 
 5.0.0
 ~~~~~
 
-a) [TASK] Add dependency to sourcebroker/deployer-loader
-b) [TASK][!!!BREAKING] Remove SourceBroker\DeployerExtendedDatabase\Loader.php in favour of using sourcebroker/deployer-loader
-c) [TASK][!!!BREAKING] Remove SourceBroker\DeployerExtendedDatabase\Utility\FileUtility->requireFilesFromDirectoryReqursively
+1) [TASK] Add dependency to sourcebroker/deployer-loader
+2) [TASK][!!!BREAKING] Remove SourceBroker\DeployerExtendedDatabase\Loader.php in favour of using sourcebroker/deployer-loader
+3) [TASK][!!!BREAKING] Remove SourceBroker\DeployerExtendedDatabase\Utility\FileUtility->requireFilesFromDirectoryReqursively
    because it was used only in SourceBroker\DeployerExtendedDatabase\Loader.php
 
 4.0.5
