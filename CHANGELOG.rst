@@ -9,6 +9,7 @@ Changelog
 2) [DOCS] Change to number ordered list on CHANGELOG.rst.
 3) [TASK] Rename 'type' to 'absolutePath' in $mysqlDumpArgs of db:export so it have more meaning.
 4) [TASK] Improve tasks descriptions.
+5) [FEATURE] Add db:compress and db:decompress tasks and extend docs.
 
 5.0.4
 ~~~~~

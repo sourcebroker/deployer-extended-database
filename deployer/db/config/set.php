@@ -28,12 +28,23 @@ set('db_import_mysql_options_structure', '--default-character-set=utf8');
 // mysql options for importing data.
 set('db_import_mysql_options_data', '--default-character-set=utf8');
 
-// Return commands for direct processing of sql file. can be used before mysql import.
+// Return commands for direct processing of sql file. Can be used before mysql import.
 set('db_process_commands', [
     // @see http://stackoverflow.com/a/38595160/1588346
     'remove_definer' => 'sed --version >/dev/null 2>&1 ' .
         '&& sed -i -- \'s/DEFINER=[^*]*\*/\*/g\' {{databaseStorageAbsolutePath}}/*dumpcode:{{dumpcode}}*.sql ' .
         '|| sed -i \'\' \'s/DEFINER=[^*]*\*/\*/g\' {{databaseStorageAbsolutePath}}/*dumpcode:{{dumpcode}}*.sql'
+]);
+
+set('db_compress_suffix', '.gz');
+
+// Return commands for compressing sql file.
+set('db_compress_command', [
+    '{{local/bin/gzip}} {{databaseStorageAbsolutePath}}/*dumpcode:{{dumpcode}}*.sql --suffix ' . get('db_compress_suffix')
+]);
+// Return commands for compressing sql file.
+set('db_decompress_command', [
+    '{{local/bin/gzip}} -d ' . ' --suffix ' . get('db_compress_suffix') . ' {{databaseStorageAbsolutePath}}/*dumpcode:{{dumpcode}}*' . get('db_compress_suffix')
 ]);
 
 // Returns current server configuration.
@@ -140,5 +151,14 @@ set('local/bin/mysql', function () {
     } else {
         throw new \RuntimeException('The mysql path on server "' . get('server')['name'] . '" is unknown. 
         You can set it in env var "local/bin/mysql".', 1500717744659);
+    }
+});
+
+set('local/bin/gzip', function () {
+    if (runLocally('if hash gzip 2>/dev/null; then echo \'true\'; fi')->toBool()) {
+        return 'gzip';
+    } else {
+        throw new \RuntimeException('The gzip path on server "' . get('server')['name'] . '" is unknown. 
+        You can set it in env var "local/bin/gzip"', 1512217259381);
     }
 });

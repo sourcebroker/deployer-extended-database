@@ -421,6 +421,21 @@ Real life example for CMS TYPO3:
 Tasks
 -----
 
+db:compress
++++++++++++
+
+Compress dumps with given dumpcode stored in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
+If no target is given the it will compress dumps on current instance. There is required option --dumpcode to be passed.
+
+Look for config vars 'db_compress_suffix', 'db_compress_command', 'db_uncompress_command' for possible ways to overwrite
+standard gzip compression with your own.
+
+**Example**
+::
+
+   dep db:compress live --dumpcode=0772a8d396911951022db5ea385535f6
+
+
 db:copy
 +++++++
 
@@ -456,6 +471,19 @@ In below description:
 5) Finally it runs ``db:import --dumpcode=123456`` on target instance. This task reads dumps with code:123456 from folder
    "{{deploy_path}}/.dep/databases/dumps/" on dev instance and import it to database.
 
+db:decompress
++++++++++++
+
+Decompress dumps with given dumpcode stored in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
+If no target is given the it will compress dumps on current instance. There is required option --dumpcode to be passed.
+
+Look for config vars 'db_compress_suffix', 'db_compress_command', 'db_uncompress_command' for possible ways to overwrite
+standard gzip compression with your own.
+
+**Example**
+::
+
+   dep db:decompress live --dumpcode=0772a8d396911951022db5ea385535f6
 
 db:download
 +++++++++++
