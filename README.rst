@@ -570,6 +570,17 @@ Here is the list of tasks that will be done afer "db:pull":
 
    dep db:pull live
 
+db:rmdump
++++++++++
+
+This command will remove all dumps with given dumpcode (compressed and uncompressed).
+There is required option --dumpcode to be passed.
+
+**Example**
+::
+
+   dep db:rmdump live --dumpcode=0772a8d396911951022db5ea385535f66
+
 db:truncate
 +++++++++++
 

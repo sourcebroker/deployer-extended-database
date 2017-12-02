@@ -12,6 +12,7 @@ Changelog
 5) [FEATURE] Add db:compress and db:decompress tasks and extend docs.
 6) [TASK] Cleanup for db:upload, db:download tasks.
 7) [FEATURE] Compress local dumps after importing them with 'db:pull [instance]'.
+8) [FEATURE] Add db:rmdump task and documentation.
 
 
 5.0.4
