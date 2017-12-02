@@ -10,6 +10,8 @@ Changelog
 3) [TASK] Rename 'type' to 'absolutePath' in $mysqlDumpArgs of db:export so it have more meaning.
 4) [TASK] Improve tasks descriptions.
 5) [FEATURE] Add db:compress and db:decompress tasks and extend docs.
+6) [TASK] Cleanup for db:upload, db:download tasks.
+
 
 5.0.4
 ~~~~~
