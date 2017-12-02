@@ -14,11 +14,11 @@ task('db:pull', function () {
     $sourceInstance = get('server')['name'];
     $dumpCode = md5(microtime(true) . rand(0, 10000));
 
+    $dl = get('local/bin/deployer');
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
-    runLocally('{{local/bin/deployer}} db:export ' . $sourceInstance . ' --dumpcode=' . $dumpCode
-        . ' ' . $verbosity, 0);
-    runLocally('{{local/bin/deployer}} db:download ' . $sourceInstance . ' --dumpcode=' . $dumpCode
-        . ' ' . $verbosity, 0);
-    runLocally('{{local/bin/deployer}} db:process --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
-    runLocally('{{local/bin/deployer}} db:import --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+    runLocally($dl . ' db:export ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+    runLocally($dl . ' db:download ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+    runLocally($dl . ' db:process --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+    runLocally($dl . ' db:import --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+    runLocally($dl . ' db:compress --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
 })->desc('Synchronize database from target instance to current instance.');
