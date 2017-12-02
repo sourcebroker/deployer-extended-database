@@ -6,8 +6,8 @@ Changelog
 ~~~~~
 
 1) [BREAKING] Remove 'db_deployer_version' config var as its not needed for deployer/distribution based version now.
-2) [DOCS] Change to number ordered list on CHANGELOG.rst
-
+2) [DOCS] Change to number ordered list on CHANGELOG.rst.
+3) [TASK] Rename 'type' to 'absolutePath' in $mysqlDumpArgs of db:export so it have more meaning.
 
 5.0.4
 ~~~~~

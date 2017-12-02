@@ -38,14 +38,14 @@ task('db:export', function () {
                 'port' => escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                 'user' => escapeshellarg($databaseConfig['user']),
                 'dbname' => escapeshellarg($databaseConfig['dbname']),
-                'type' => '',
+                'absolutePath' => '',
                 'ignore-tables' => ''
             ];
 
             // dump database structure
             $filenameParts['type'] = 'type:structure';
             $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_structure', '');
-            $mysqlDumpArgs['type'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))
+            $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))
                 . implode('#', $filenameParts) . '.sql');
             runLocally(vsprintf(
                 'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r%s',
@@ -65,7 +65,7 @@ task('db:export', function () {
             }
             $filenameParts['type'] = 'type:data';
             $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_data', '');
-            $mysqlDumpArgs['type'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))
+            $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))
                 . implode('#', $filenameParts) . '.sql');
             runLocally(vsprintf(
                 'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r%s %s',
