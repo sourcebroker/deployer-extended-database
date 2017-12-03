@@ -421,6 +421,22 @@ Real life example for CMS TYPO3:
 Tasks
 -----
 
+db:backup
++++++++++
+
+Backup database. In background, on target instance, two tasks are executed 'db:export' and 'db:compress'. Results are
+stored in "{{deploy_path}}/.dep/databases/dumps/". If no target is given the it will be done on current instance.
+
+If releases folder will be detected then it adds info about release in dumpcode name like in this example:
+``2017-12-04_00:20:22#server:live#dbcode:database_default#dumpcode:backup_for_release_160_ec77cb6bc0e941b0ac92e2109ad7b04e#type:structure.sql.gz``
+
+**Example**
+::
+
+   dep db:backup
+   dep db:backup live
+   dep db:backup live --dumpcode=mycode
+
 db:compress
 +++++++++++
 
