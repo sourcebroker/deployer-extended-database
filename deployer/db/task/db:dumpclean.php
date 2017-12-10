@@ -37,7 +37,8 @@ task('db:dumpclean', function () {
                 $dbDumpCleanKeep = !empty($dbDumpCleanKeep[$instance]) ? $dbDumpCleanKeep[$instance] : !empty($dbDumpCleanKeep['*']) ? $dbDumpCleanKeep['*'] : 5;
             }
             if (count($instanceDumps) > $dbDumpCleanKeep) {
-                for ($i = $dbDumpCleanKeep; $i < count($instanceDumps); $i++) {
+                $instanceDumpsCount = count($instanceDumps);
+                for ($i = $dbDumpCleanKeep; $i < $instanceDumpsCount; $i++) {
                     writeln('Removing old dump with code: ' . $instanceDumps[$i]);
                     runLocally('cd ' . escapeshellarg(get('db_current_server')->get('db_storage_path_current'))
                         . ' && rm ' . '*dumpcode:' . $instanceDumps[$i] . '*');

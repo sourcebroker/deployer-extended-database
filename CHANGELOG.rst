@@ -2,6 +2,11 @@
 Changelog
 ---------
 
+6.1.1
+~~~~~
+
+1) [BUGFIX] Move count() out of for so its not calculated each time.
+
 6.1.0
 ~~~~~
 
