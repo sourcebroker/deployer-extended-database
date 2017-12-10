@@ -34,7 +34,7 @@ task('db:dumpclean', function () {
         foreach ($dumpsStorage as $instance => $instanceDumps) {
             $instanceDumps = array_values($instanceDumps);
             if (is_array($dbDumpCleanKeep)) {
-                $dbDumpCleanKeep = !empty($dbDumpCleanKeep[$instance]) ? $dbDumpCleanKeep[$instance] : !empty($dbDumpCleanKeep['*']) ? $dbDumpCleanKeep['*'] : 5;
+                $dbDumpCleanKeep = !empty($dbDumpCleanKeep[$instance]) ? $dbDumpCleanKeep[$instance] : (!empty($dbDumpCleanKeep['*']) ? $dbDumpCleanKeep['*'] : 5);
             }
             if (count($instanceDumps) > $dbDumpCleanKeep) {
                 $instanceDumpsCount = count($instanceDumps);

@@ -2,6 +2,11 @@
 Changelog
 ---------
 
+6.1.2
+~~~~~
+
+1) [BUGFIX] Fix $dbDumpCleanKeep calculation in db:dumpclean.
+
 6.1.1
 ~~~~~
 
