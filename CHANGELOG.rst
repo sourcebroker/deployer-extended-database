@@ -2,6 +2,11 @@
 Changelog
 ---------
 
+6.1.0
+~~~~~
+
+1) [FEATURE] Add 'db:dumpclean' task. Add 'db:dumpclean' as last task to 'db:backup' and 'db:pull'. Add docs.
+
 6.0.0
 ~~~~~
 

@@ -37,11 +37,14 @@ task('db:backup', function () {
     if (get('db_instance') == get('server')['name']) {
         runLocally('{{local/bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
         runLocally('{{local/bin/deployer}} db:compress --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally('{{local/bin/deployer}} db:dumpclean' . $verbosity, 0);
     } else {
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
         run('cd ' . $activePath .
             ' && {{bin/php}} {{bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity);
         run('cd ' . $activePath .
             ' && {{bin/php}} {{bin/deployer}} db:compress --dumpcode=' . $dumpCode . ' ' . $verbosity);
+        run('cd ' . $activePath .
+            ' && {{bin/php}} {{bin/deployer}} db:dumpclean' . $verbosity);
     }
 })->desc('Do backup of database (export and compress).');

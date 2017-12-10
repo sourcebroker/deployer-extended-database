@@ -21,4 +21,5 @@ task('db:pull', function () {
     runLocally($dl . ' db:process --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     runLocally($dl . ' db:import --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     runLocally($dl . ' db:compress --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+    runLocally($dl . ' db:dumpclean' . $verbosity, 0);
 })->desc('Synchronize database from target instance to current instance.');

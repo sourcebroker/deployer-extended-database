@@ -490,7 +490,7 @@ In below description:
 6) At the very end it removes dumps it just imported in step 5 with command ``db:rmdump --dumpcode=123456``
 
 db:decompress
-+++++++++++
++++++++++++++
 
 Decompress dumps with given dumpcode stored in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
 If no target is given the it will compress dumps on current instance. There is required option --dumpcode to be passed.
@@ -514,6 +514,25 @@ There is required option --dumpcode to be passed.
 ::
 
    dep db:download live --dumpcode=0772a8d396911951022db5ea385535f6
+
+db:dumpclean
+++++++++++++
+
+Clean database dump storage on target instance (or on current instance if target instance is not set). By default it
+removes all dumps except last five but you can set your values and also change the values depending on instance.
+
+**Example**
+::
+
+   set('db_dumpclean_keep', 10); // keep last 10 dumps for all instances
+
+   set('db_dumpclean_keep', [
+      'live' => 10 // keep last 10 dumps for live instance dumps
+      'dev' => 5   // keep last 5 dumps for dev instance dumps
+      '*' => 2     // keep last 5 dumps for all other instances dumps
+   ]);
+
+   dep db:dumpclean live
 
 db:export
 +++++++++
