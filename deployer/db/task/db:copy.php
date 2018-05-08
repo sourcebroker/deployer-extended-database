@@ -12,6 +12,10 @@ task('db:copy', function () {
         throw new \RuntimeException("The source instance is required for db:move command.");
     }
     if (input()->getArgument('targetStage')) {
+	if(!askConfirmation(sprintf("Do you really want to copy database from instance %s to instance %s", input()->getArgument('stage'), input()->getArgument('targetStage')))) {
+	    die('Process aborted');
+        }
+        
         $targetInstanceName = input()->getArgument('targetStage');
         if ($targetInstanceName == null) {
             throw new \RuntimeException(
