@@ -2,6 +2,13 @@
 Changelog
 ---------
 
+6.2.0
+~~~~~
+
+1) [FEATURE] Add confirmation for command db:copy (tnx to Michał Jankiewicz)
+2) [FEATURE] Add default option to confirmation for command db:copy so it can be used also with -q option for
+   unattended.
+
 6.1.2
 ~~~~~
 

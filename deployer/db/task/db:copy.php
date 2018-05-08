@@ -14,7 +14,7 @@ task('db:copy', function () {
     if (input()->getArgument('targetStage')) {
         if (!askConfirmation(sprintf("Do you really want to copy database from instance %s to instance %s",
           input()->getArgument('stage'),
-          input()->getArgument('targetStage')))) {
+          input()->getArgument('targetStage')), true)) {
             die('Process aborted');
         }
 
