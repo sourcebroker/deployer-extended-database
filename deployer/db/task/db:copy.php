@@ -12,27 +12,33 @@ task('db:copy', function () {
         throw new \RuntimeException("The source instance is required for db:move command.");
     }
     if (input()->getArgument('targetStage')) {
+        if (!askConfirmation(sprintf("Do you really want to copy database from instance %s to instance %s",
+          input()->getArgument('stage'),
+          input()->getArgument('targetStage')))) {
+            die('Process aborted');
+        }
+
         $targetInstanceName = input()->getArgument('targetStage');
         if ($targetInstanceName == null) {
             throw new \RuntimeException(
-                "You must set the target instance the database will be copied to as second parameter."
+              "You must set the target instance the database will be copied to as second parameter."
             );
         }
         // TODO - instance name hardcoded
         if ($targetInstanceName == 'live') {
             throw new \RuntimeException(
-                "FORBIDDEN: For security its forbidden to move database to live instance!"
+              "FORBIDDEN: For security its forbidden to move database to live instance!"
             );
         }
         // TODO - instance name hardcoded
         if ($targetInstanceName == 'local') {
             throw new \RuntimeException(
-                "FORBIDDEN: For synchro local database use: \ndep db:pull live"
+              "FORBIDDEN: For synchro local database use: \ndep db:pull live"
             );
         }
     } else {
         throw new \RuntimeException(
-            "The target instance is not set as second parameter. Move should be run as: dep db:move source target"
+          "The target instance is not set as second parameter. Move should be run as: dep db:move source target"
         );
     }
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
