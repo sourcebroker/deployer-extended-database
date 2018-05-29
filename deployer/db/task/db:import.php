@@ -89,7 +89,11 @@ task('db:import', function () {
                     $publicUrlCollected = [];
                     foreach (get('public_urls') as $publicUrl) {
                         if (parse_url($publicUrl, PHP_URL_SCHEME) && parse_url($publicUrl, PHP_URL_HOST)) {
-                            $publicUrlCollected[] = parse_url($publicUrl, PHP_URL_HOST);
+                            $port = '';
+                            if (parse_url($publicUrl, PHP_URL_PORT)) {
+                                $port = ':' . parse_url($publicUrl, PHP_URL_PORT);
+                            }
+                            $publicUrlCollected[] = parse_url($publicUrl, PHP_URL_HOST) . $port;
                         } else {
                             throw new \RuntimeException('The configuration setting "public_urls" should have full url like 
                         "https://www.example.com" but the value is only "' . $publicUrl . '"', 1491384103020);

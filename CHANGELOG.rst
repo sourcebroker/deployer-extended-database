@@ -2,6 +2,11 @@
 Changelog
 ---------
 
+6.2.1
+~~~~~
+
+1) [BUGFIX] If publicUrl is with port then this port should be also used for post_sql_in_markers.
+
 6.2.0
 ~~~~~
 
