@@ -129,11 +129,7 @@ set('bin/deployer', function () {
 });
 
 set('local/bin/deployer', function () {
-    if ($_SERVER['_'] == $_SERVER['PHP_SELF']) {
-        return $_SERVER['_'];
-    } else {
-        return $_SERVER['_'] . ' ' . $_SERVER['PHP_SELF'];
-    }
+    return './vendor/bin/dep';
 });
 
 set('local/bin/mysqldump', function () {
