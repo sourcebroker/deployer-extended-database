@@ -25,7 +25,7 @@ task('db:dumpclean', function () {
             }
             if (empty($instance) || empty($dumpcode)) {
                 throw new \Exception(
-                    'server: or dumpcode: can not be detected for file dump: "'
+                    'server= or dumpcode= can not be detected for file dump: "'
                     . (new FileUtility())->normalizeFolder(get('db_current_server')->get('db_storage_path_current')) . $file . '');
             }
             $dumpsStorage[$instance][$dumpcode] = $dumpcode;

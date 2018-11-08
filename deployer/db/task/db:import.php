@@ -18,26 +18,26 @@ task('db:import', function () {
                 . '*dbcode=' . $fileUtility->normalizeFilename($databaseCode)
                 . '*dumpcode=' . $dumpCode;
 
-            $structureSqlFile = glob($globStart . '*type:structure.sql');
+            $structureSqlFile = glob($globStart . '*type=structure.sql');
             if (empty($structureSqlFile)) {
                 throw new \RuntimeException('No structure file for --dumpcode=' . $dumpCode . '. Glob build: ' .
-                    $globStart . '*type:structure.sql',
+                    $globStart . '*type=structure.sql',
                     1500718221204);
             }
             if (count($structureSqlFile) > 1) {
                 throw new \RuntimeException('There are more than two structure file for --dumpcode=' . $dumpCode .
-                    '. Glob build: ' . $globStart . '*type:structure.sql. ' .
+                    '. Glob build: ' . $globStart . '*type=structure.sql. ' .
                     "\n" . ' Files founded: ' . "\n" . implode("\n", $structureSqlFile), 1500722088929);
             }
-            $dataSqlFile = glob($globStart . '*type:data.sql');
+            $dataSqlFile = glob($globStart . '*type=data.sql');
             if (empty($dataSqlFile)) {
                 throw new \RuntimeException('No data file for --dumpcode=' . $dumpCode . '. Glob built: ' .
-                    $globStart . '*type:data.sql',
+                    $globStart . '*type=data.sql',
                     1500722093334);
             }
             if (count($dataSqlFile) > 1) {
                 throw new \RuntimeException('There are more than two data files for --dumpcode=' . $dumpCode . '. Glob built: ' .
-                    $globStart . '*type:data.sql. ' .
+                    $globStart . '*type=data.sql. ' .
                     "\n" . ' Files founded: ' . "\n" . implode("\n", $dataSqlFile),
                     1500722095323);
             }
