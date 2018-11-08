@@ -17,16 +17,21 @@ task('db:dumpclean', function () {
             $dumpcode = $instance = null;
             foreach (explode('#', $file) as $metaPart) {
                 if (strpos($metaPart, 'server') === 0) {
-                    $instance = explode('=', $metaPart)[1];
+                    $instanceParts = explode('=', $metaPart);
+                    $instance = isset($instanceParts[1]) ? $instanceParts[1] : null;
                 }
                 if (strpos($metaPart, 'dumpcode') === 0) {
-                    $dumpcode = explode('=', $metaPart)[1];
+                    $dumpcodeParts = explode('=', $metaPart);
+                    $dumpcode = isset($dumpcodeParts[1]) ? $dumpcodeParts[1] : null;
                 }
             }
             if (empty($instance) || empty($dumpcode)) {
-                throw new \Exception(
-                    'server= or dumpcode= can not be detected for file dump: "'
-                    . (new FileUtility())->normalizeFolder(get('db_current_server')->get('db_storage_path_current')) . $file . '');
+                writeln('Note: "server" or "dumpcode" can not be detected for file dump: "'
+                    . (new FileUtility())->normalizeFolder(get('db_current_server')->get('db_storage_path_current'))
+                    . $file . '');
+                writeln('Seems like this file was not created by deployer-extended-database or was created by previous version of deployer-extended-database. Please remove this file manually to get rid of this notice.');
+                writeln('');
+                continue;
             }
             $dumpsStorage[$instance][$dumpcode] = $dumpcode;
         }
