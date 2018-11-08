@@ -25,9 +25,9 @@ task('db:export', function () {
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
             $filenameParts = [
                 'dateTime' => date('Y-m-d_H:i:s'),
-                'server' => 'server:' . $fileUtility->normalizeFilename(get('server')['name']),
-                'dbcode' => 'dbcode:' . $fileUtility->normalizeFilename($databaseCode),
-                'dumpcode' => 'dumpcode:' . $fileUtility->normalizeFilename($dumpCode),
+                'server' => 'server=' . $fileUtility->normalizeFilename(get('server')['name']),
+                'dbcode' => 'dbcode=' . $fileUtility->normalizeFilename($databaseCode),
+                'dumpcode' => 'dumpcode=' . $fileUtility->normalizeFilename($dumpCode),
                 'type' => '',
             ];
             $mysqlDumpArgs = [
@@ -43,7 +43,7 @@ task('db:export', function () {
             ];
 
             // dump database structure
-            $filenameParts['type'] = 'type:structure';
+            $filenameParts['type'] = 'type=structure';
             $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_structure', '');
             $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))
                 . implode('#', $filenameParts) . '.sql');
@@ -63,7 +63,7 @@ task('db:export', function () {
                         implode(' --ignore-table=' . $databaseConfig['dbname'] . '.', $ignoreTables);
                 }
             }
-            $filenameParts['type'] = 'type:data';
+            $filenameParts['type'] = 'type=data';
             $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_data', '');
             $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))
                 . implode('#', $filenameParts) . '.sql');

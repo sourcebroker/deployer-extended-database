@@ -2,6 +2,11 @@
 Changelog
 ---------
 
+master
+~~~~~
+
+1) [BUGFIX] Replace ":" with "=" becase Windows compatibility.
+
 7.0.0
 ~~~~~
 

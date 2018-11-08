@@ -17,10 +17,10 @@ task('db:dumpclean', function () {
             $dumpcode = $instance = null;
             foreach (explode('#', $file) as $metaPart) {
                 if (strpos($metaPart, 'server') === 0) {
-                    $instance = explode(':', $metaPart)[1];
+                    $instance = explode('=', $metaPart)[1];
                 }
                 if (strpos($metaPart, 'dumpcode') === 0) {
-                    $dumpcode = explode(':', $metaPart)[1];
+                    $dumpcode = explode('=', $metaPart)[1];
                 }
             }
             if (empty($instance) || empty($dumpcode)) {
