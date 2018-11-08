@@ -32,19 +32,19 @@ set('db_import_mysql_options_data', '--default-character-set=utf8');
 set('db_process_commands', [
     // @see http://stackoverflow.com/a/38595160/1588346
     'remove_definer' => 'sed --version >/dev/null 2>&1 ' .
-        '&& sed -i -- \'s/DEFINER=[^*]*\*/\*/g\' {{databaseStorageAbsolutePath}}/*dumpcode:{{dumpcode}}*.sql ' .
-        '|| sed -i \'\' \'s/DEFINER=[^*]*\*/\*/g\' {{databaseStorageAbsolutePath}}/*dumpcode:{{dumpcode}}*.sql'
+        '&& sed -i -- \'s/DEFINER=[^*]*\*/\*/g\' {{databaseStorageAbsolutePath}}/*dumpcode={{dumpcode}}*.sql ' .
+        '|| sed -i \'\' \'s/DEFINER=[^*]*\*/\*/g\' {{databaseStorageAbsolutePath}}/*dumpcode={{dumpcode}}*.sql'
 ]);
 
 set('db_compress_suffix', '.gz');
 
 // Return commands for compressing sql file.
 set('db_compress_command', [
-    '{{local/bin/gzip}} --force --name {{databaseStorageAbsolutePath}}/*dumpcode:{{dumpcode}}*.sql --suffix ' . get('db_compress_suffix')
+    '{{local/bin/gzip}} --force --name {{databaseStorageAbsolutePath}}/*dumpcode={{dumpcode}}*.sql --suffix ' . get('db_compress_suffix')
 ]);
 // Return commands for compressing sql file.
 set('db_decompress_command', [
-    '{{local/bin/gzip}} --force --name --uncompress ' . ' --suffix ' . get('db_compress_suffix') . ' {{databaseStorageAbsolutePath}}/*dumpcode:{{dumpcode}}*' . get('db_compress_suffix')
+    '{{local/bin/gzip}} --force --name --uncompress ' . ' --suffix ' . get('db_compress_suffix') . ' {{databaseStorageAbsolutePath}}/*dumpcode={{dumpcode}}*' . get('db_compress_suffix')
 ]);
 
 // Returns current server configuration.
