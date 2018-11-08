@@ -15,8 +15,8 @@ task('db:import', function () {
         $currentInstanceDatabaseStoragePath = get('db_storage_path_current');
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
             $globStart = $fileUtility->normalizeFolder($currentInstanceDatabaseStoragePath)
-                . '*dbcode:' . $fileUtility->normalizeFilename($databaseCode)
-                . '*dumpcode:' . $dumpCode;
+                . '*dbcode=' . $fileUtility->normalizeFilename($databaseCode)
+                . '*dumpcode=' . $dumpCode;
 
             $structureSqlFile = glob($globStart . '*type:structure.sql');
             if (empty($structureSqlFile)) {

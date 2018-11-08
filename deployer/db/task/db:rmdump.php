@@ -11,7 +11,7 @@ task('db:rmdump', function () {
     $dumpCode = (new ConsoleUtility())->optionRequired('dumpcode', input());
     if (get('db_instance') == get('server')['name']) {
         runLocally('cd ' . get('db_current_server')->get('db_storage_path_current') .
-            ' && rm -f *dumpcode:' . $dumpCode . '*', 0);
+            ' && rm -f *dumpcode=' . $dumpCode . '*', 0);
     } else {
         $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');

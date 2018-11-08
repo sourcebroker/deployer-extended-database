@@ -20,7 +20,7 @@ task('db:upload', function () {
         'rsync -rz --remove-source-files %s --include=%s --exclude=* %s %s',
         $rsyncUtility->getSshOptions(Task\Context::get()) ? '-e '
             . escapeshellarg($rsyncUtility->getSshOptions(Task\Context::get())) : '',
-        escapeshellarg('*dumpcode:' . $dumpCode . '*'),
+        escapeshellarg('*dumpcode=' . $dumpCode . '*'),
         escapeshellarg($fileUtility->normalizeFolder(get('db_current_server')->get('db_storage_path_current'))),
         escapeshellarg($rsyncUtility->getHostWithDbStoragePath(Task\Context::get()))
     ), 0);

@@ -41,7 +41,7 @@ task('db:dumpclean', function () {
                 for ($i = $dbDumpCleanKeep; $i < $instanceDumpsCount; $i++) {
                     writeln('Removing old dump with code: ' . $instanceDumps[$i]);
                     runLocally('cd ' . escapeshellarg(get('db_current_server')->get('db_storage_path_current'))
-                        . ' && rm ' . '*dumpcode:' . $instanceDumps[$i] . '*');
+                        . ' && rm ' . '*dumpcode=' . $instanceDumps[$i] . '*');
                 }
             }
         }
