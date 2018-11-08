@@ -428,7 +428,7 @@ Backup database. In background, on target instance, two tasks are executed 'db:e
 stored in "{{deploy_path}}/.dep/databases/dumps/". If no target is given the it will be done on current instance.
 
 If releases folder will be detected then it adds info about release in dumpcode name like in this example:
-``2017-12-04_00:20:22#server:live#dbcode:database_default#dumpcode:backup_for_release_160_ec77cb6bc0e941b0ac92e2109ad7b04e#type:structure.sql.gz``
+``2017-12-04_00:20:22#server=live#dbcode=database_default#dumpcode=backup_for_release_160_ec77cb6bc0e941b0ac92e2109ad7b04e#type=structure.sql.gz``
 
 **Example**
 ::
@@ -552,11 +552,11 @@ Example task call:
 Example output files located in folder {{deploy_path}}/.dep/databases/dumps/:
 ::
 
-   2017-02-26_14:56:08#server:live#dbcode:database_default#type:data#dumpcode:362d7ca0ff065f489c9b79d0a73720f5.sql
-   2017-02-26_14:56:08#server:live#dbcode:database_default#type:structure#dumpcode:362d7ca0ff065f489c9b79d0a73720f5.sql
+   2017-02-26_14:56:08#server=live#dbcode=database_default#type=data#dumpcode=362d7ca0ff065f489c9b79d0a73720f5.sql
+   2017-02-26_14:56:08#server=live#dbcode=database_default#type=structure#dumpcode=362d7ca0ff065f489c9b79d0a73720f5.sql
 
 
-Example task call with own dumpcode:
+Example task call with own dumpcode=
 ::
 
    dep db:export --dumpcode=mycode
@@ -564,8 +564,8 @@ Example task call with own dumpcode:
 Example output files:
 ::
 
-   2017-02-26_14:56:08#server:live#dbcode:database_default#type:data#dumpcode:mycode.sql
-   2017-02-26_14:56:08#server:live#dbcode:database_default#type:structure#dumpcode:mycode.sql
+   2017-02-26_14:56:08#server=live#dbcode=database_default#type=data#dumpcode=mycode.sql
+   2017-02-26_14:56:08#server=live#dbcode=database_default#type=structure#dumpcode=mycode.sql
 
 db:import
 +++++++++
