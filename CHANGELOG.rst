@@ -2,10 +2,10 @@
 Changelog
 ---------
 
-master
+7.0.1
 ~~~~~
 
-1) [BUGFIX] Replace ":" with "=" becase Windows compatibility.
+1) [BUGFIX] Replace ":" with "=" because Windows compatibility.
 
 7.0.0
 ~~~~~
