@@ -24,7 +24,7 @@ task('db:export', function () {
     if (get('db_instance') == get('server')['name']) {
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
             $filenameParts = [
-                'dateTime' => date('Y-m-d_H:i:s'),
+                'dateTime' => date('Y-m-d_H-i-s'),
                 'server' => 'server=' . $fileUtility->normalizeFilename(get('server')['name']),
                 'dbcode' => 'dbcode=' . $fileUtility->normalizeFilename($databaseCode),
                 'dumpcode' => 'dumpcode=' . $fileUtility->normalizeFilename($dumpCode),
