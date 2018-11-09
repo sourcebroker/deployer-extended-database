@@ -2,6 +2,11 @@
 Changelog
 ---------
 
+7.0.2
+~~~~~
+
+1) [BUGFIX] Replace ":" with "=" because Windows compatibility - date separated by ":".
+
 7.0.1
 ~~~~~
 
