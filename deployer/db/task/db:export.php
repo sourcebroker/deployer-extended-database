@@ -42,17 +42,6 @@ task('db:export', function () {
                 'ignore-tables' => ''
             ];
 
-            // dump database structure
-            $filenameParts['type'] = 'type=structure';
-            $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_structure', '');
-            $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))
-                . implode('#', $filenameParts) . '.sql');
-            runLocally(vsprintf(
-                'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r%s',
-                $mysqlDumpArgs
-            ), 0);
-
-            // dump database data
             if (isset($databaseConfig['ignore_tables_out']) && is_array($databaseConfig['ignore_tables_out'])) {
                 $ignoreTables = $arrayUtility->filterWithRegexp(
                     $databaseConfig['ignore_tables_out'],
@@ -63,6 +52,19 @@ task('db:export', function () {
                         implode(' --ignore-table=' . $databaseConfig['dbname'] . '.', $ignoreTables);
                 }
             }
+            // dump database structure
+            $filenameParts['type'] = 'type=structure';
+            $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_structure', '');
+            $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))
+                . implode('#', $filenameParts) . '.sql');
+            runLocally(vsprintf(
+                'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r%s'
+                . ((new ConsoleUtility())->getOptionFromDboptions('exportTaskAddIgnoreTablesToStructureDump',
+                    input()) ? ' %s' : ''),
+                $mysqlDumpArgs
+            ), 0);
+
+            // dump database data
             $filenameParts['type'] = 'type=data';
             $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_data', '');
             $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))

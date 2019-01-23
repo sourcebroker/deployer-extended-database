@@ -42,21 +42,24 @@ task('db:import', function () {
                     1500722095323);
             }
             // Drop all tables.
-            runLocally(sprintf(
-                'export MYSQL_PWD=%s && %s -h%s -P%s -u%s %s --add-drop-table --no-data | ' .
-                'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s -h%s -P%s -u%s -D%s',
-                escapeshellarg($databaseConfig['password']),
-                get('local/bin/mysqldump'),
-                escapeshellarg($databaseConfig['host']),
-                escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
-                escapeshellarg($databaseConfig['user']),
-                escapeshellarg($databaseConfig['dbname']),
-                get('local/bin/mysql'),
-                escapeshellarg($databaseConfig['host']),
-                escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
-                escapeshellarg($databaseConfig['user']),
-                escapeshellarg($databaseConfig['dbname'])
-            ), 0);
+            if (empty((new ConsoleUtility())->getOptionFromDboptions('importTaskDoNotDropAllTablesBeforeImport',
+                input()))) {
+                runLocally(sprintf(
+                    'export MYSQL_PWD=%s && %s -h%s -P%s -u%s %s --add-drop-table --no-data | ' .
+                    'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s -h%s -P%s -u%s -D%s',
+                    escapeshellarg($databaseConfig['password']),
+                    get('local/bin/mysqldump'),
+                    escapeshellarg($databaseConfig['host']),
+                    escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
+                    escapeshellarg($databaseConfig['user']),
+                    escapeshellarg($databaseConfig['dbname']),
+                    get('local/bin/mysql'),
+                    escapeshellarg($databaseConfig['host']),
+                    escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
+                    escapeshellarg($databaseConfig['user']),
+                    escapeshellarg($databaseConfig['dbname'])
+                ), 0);
+            }
             // Import dump with database structure.
             runLocally(sprintf(
                 'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s -D%s -e%s',

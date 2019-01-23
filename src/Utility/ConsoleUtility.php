@@ -56,4 +56,36 @@ class ConsoleUtility
         }
         return $requiredOptionValue;
     }
+
+
+    /**
+     * Check if option is present and return it. If not throw exception.
+     *
+     * @param $option
+     * @param InputInterface $input
+     * @return mixed
+     */
+    public function getOptionFromDboptions($option, InputInterface $input)
+    {
+        $dbOptionReturnValue = null;
+        if (!empty($input->getOption('dboptions'))) {
+            $dbOptions = explode(',', $input->getOption('dboptions'));
+            if (is_array($dbOptions)) {
+                foreach ($dbOptions as $dbOption) {
+                    $dbOptionParts = explode(':', $dbOption);
+                    if (!empty($dbOptionParts[1])) {
+                        $dbOptionValue = $dbOptionParts[1];
+                    }
+                    if ($option === $dbOptionParts[0]) {
+                        if (!empty($dbOptionValue)) {
+                            $dbOptionReturnValue = $dbOptionValue;
+                        } else {
+                            $dbOptionReturnValue = true;
+                        }
+                    }
+                }
+            }
+        }
+        return $dbOptionReturnValue;
+    }
 }
