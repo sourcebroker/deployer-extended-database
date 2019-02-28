@@ -3,16 +3,16 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
-use SourceBroker\DeployerExtendedDatabase\Utility\InstanceUtility;
+use SourceBroker\DeployerExtended\Utility\Instance;
 
 // Deployer standard settings. By setting 'default_stage' you can do 'dep db:backup' instead of 'dep db:backup local'
 set('default_stage', function () {
-    return (new InstanceUtility)->getCurrentInstance();
+    return (new Instance)->getCurrentInstance();
 });
 
 // Return current instance name. Based on that scripts knows from which server() takes the data to database operations.
 set('db_instance', function () {
-    return (new InstanceUtility)->getCurrentInstance();
+    return (new Instance)->getCurrentInstance();
 });
 
 // mysqldump options for dumping structure.
