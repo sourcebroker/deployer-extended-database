@@ -21,11 +21,11 @@ task('db:export', function () {
     $fileUtility = new FileUtility();
     $arrayUtility = new ArrayUtility();
     $databaseUtility = new DatabaseUtility();
-    if (get('current_instance') == get('source_instance')) {
+    if (get('current_stage') == get('target_stage')) {
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
             $filenameParts = [
                 'dateTime' => date('Y-m-d_H-i-s'),
-                'server' => 'server=' . $fileUtility->normalizeFilename(get('source_instance')),
+                'server' => 'server=' . $fileUtility->normalizeFilename(get('target_stage')),
                 'dbcode' => 'dbcode=' . $fileUtility->normalizeFilename($databaseCode),
                 'dumpcode' => 'dumpcode=' . $fileUtility->normalizeFilename($dumpCode),
                 'type' => '',
