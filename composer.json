@@ -15,9 +15,9 @@
     }
   ],
   "require": {
-    "vlucas/phpdotenv": "^2.0",
     "deployer/dist": "^4.3.1",
-    "sourcebroker/deployer-loader": "^1.0.0"
+    "sourcebroker/deployer-loader": "^1.0.0",
+    "sourcebroker/deployer-instance": "dev-master"
   },
   "autoload": {
     "psr-4": {

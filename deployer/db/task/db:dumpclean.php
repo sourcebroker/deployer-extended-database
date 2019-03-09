@@ -9,7 +9,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
  * @see https://github.com/sourcebroker/deployer-extended-database#db-dumpclean
  */
 task('db:dumpclean', function () {
-    if (get('db_instance') == get('server')['name']) {
+    if (get('current_instance') == get('default_stage')) {
         $files = runLocally('ls -1t ' . get('db_current_server')->get('db_storage_path_current'))->toArray();
         $dumpsStorage = [];
         natsort($files);

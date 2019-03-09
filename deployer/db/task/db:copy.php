@@ -42,17 +42,17 @@ task('db:copy', function () {
         );
     }
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
-    $sourceInstance = get('server')['name'];
+    $sourceInstance = get('default_stage');
     $dumpCode = md5(microtime(true) . rand(0, 10000));
     $dl = get('local/bin/deployer');
-    if (get('db_instance') == get('server')['name']) {
+    if (get('current_instance') == get('default_stage')) {
         runLocally($dl . ' db:export --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     } else {
         runLocally($dl . ' db:export ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
         runLocally($dl . ' db:download ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     }
     runLocally($dl . ' db:process --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
-    if (get('db_instance') == $targetInstanceName) {
+    if (get('current_instance') == $targetInstanceName) {
         runLocally($dl . ' db:import --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
         runLocally($dl . ' db:rmdump --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     } else {
