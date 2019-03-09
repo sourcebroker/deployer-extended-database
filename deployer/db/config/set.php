@@ -42,6 +42,10 @@ set('current_server', function () {
     return Configuration::getServer(get('current_stage'));
 });
 
+set('current_environment', function () {
+    return Configuration::getEnvironment(get('current_stage'));
+});
+
 // Returns target stage server configuration.
 set('target_server', function () {
     return Configuration::getServer(get('target_stage'));
@@ -80,11 +84,11 @@ set('db_databases_merged', function () {
 
 // Returns path to store database dumps on current instance.
 set('db_storage_path_current', function () {
-    if (get('current_server')->get('db_storage_path_relative', false) == false) {
-        $dbStoragePathCurrent = get('current_server')->get('deploy_path') . '/.dep/database/dumps';
+    if (get('current_environment')->get('db_storage_path_relative', false) == false) {
+        $dbStoragePathCurrent = get('current_environment')->get('deploy_path') . '/.dep/database/dumps';
     } else {
-        $dbStoragePathCurrent = get('current_server')->get('deploy_path') . '/'
-            . get('current_server')->get('db_storage_path_relative');
+        $dbStoragePathCurrent = get('current_environment')->get('deploy_path') . '/'
+            . get('current_environment')->get('db_storage_path_relative');
     }
     runLocally('[ -d ' . $dbStoragePathCurrent . ' ] || mkdir -p ' . $dbStoragePathCurrent);
     return $dbStoragePathCurrent;
