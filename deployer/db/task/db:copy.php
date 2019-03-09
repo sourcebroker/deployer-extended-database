@@ -42,10 +42,10 @@ task('db:copy', function () {
         );
     }
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
-    $sourceInstance = get('default_stage');
+    $sourceInstance = get('source_instance');
     $dumpCode = md5(microtime(true) . rand(0, 10000));
     $dl = get('local/bin/deployer');
-    if (get('current_instance') == get('default_stage')) {
+    if (get('current_instance') == get('source_instance')) {
         runLocally($dl . ' db:export --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     } else {
         runLocally($dl . ' db:export ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);

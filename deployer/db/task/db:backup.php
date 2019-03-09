@@ -13,7 +13,7 @@ task('db:backup', function () {
     if (!empty(input()->getOption('dumpcode'))) {
         $dumpCode = input()->getOption('dumpcode');
     } else {
-        if (get('current_instance') == get('default_stage')) {
+        if (get('current_instance') == get('source_instance')) {
             $list = [];
             if (testLocally('[ -e {{deploy_path}}/releases ]')) {
                 $list = runLocally('cd releases && ls -t -1 -d */')->toArray();
@@ -34,7 +34,7 @@ task('db:backup', function () {
         }
         $dumpCode = 'backup' . $dumpCodeRealese . '_' . md5(microtime(true) . rand(0, 10000));
     }
-    if (get('current_instance') == get('default_stage')) {
+    if (get('current_instance') == get('source_instance')) {
         runLocally('{{local/bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
         runLocally('{{local/bin/deployer}} db:compress --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
         runLocally('{{local/bin/deployer}} db:dumpclean' . $verbosity, 0);

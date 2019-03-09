@@ -9,7 +9,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
  */
 task('db:compress', function () {
     $dumpCode = (new ConsoleUtility())->optionRequired('dumpcode', input());
-    if (get('current_instance') == get('default_stage')) {
+    if (get('current_instance') == get('source_instance')) {
         $markersArray = [];
         $markersArray['{{databaseStorageAbsolutePath}}'] = get('db_current_server')->get('db_storage_path_current');
         $markersArray['{{dumpcode}}'] = $dumpCode;
