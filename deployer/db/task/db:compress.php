@@ -11,7 +11,7 @@ task('db:compress', function () {
     $dumpCode = (new ConsoleUtility())->optionRequired('dumpcode', input());
     if (get('current_stage') == get('target_stage')) {
         $markersArray = [];
-        $markersArray['{{databaseStorageAbsolutePath}}'] = get('db_current_server')->get('db_storage_path_current');
+        $markersArray['{{databaseStorageAbsolutePath}}'] = get('db_storage_path_current');
         $markersArray['{{dumpcode}}'] = $dumpCode;
         if (get('db_compress_command', false) !== false) {
             foreach (get('db_compress_command') as $dbProcessCommand) {

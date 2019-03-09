@@ -21,7 +21,7 @@ task('db:upload', function () {
         $rsyncUtility->getSshOptions(Task\Context::get()) ? '-e '
             . escapeshellarg($rsyncUtility->getSshOptions(Task\Context::get())) : '',
         escapeshellarg('*dumpcode=' . $dumpCode . '*'),
-        escapeshellarg($fileUtility->normalizeFolder(get('db_current_server')->get('db_storage_path_current'))),
+        escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))),
         escapeshellarg($rsyncUtility->getHostWithDbStoragePath(Task\Context::get()))
     ), 0);
 })->desc('Upload the database dumps for given dumpcode from current to target database dumps storage.');

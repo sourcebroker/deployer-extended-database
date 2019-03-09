@@ -3,6 +3,7 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
+use SourceBroker\DeployerInstance\Configuration;
 
 // mysqldump options for dumping structure.
 set('db_export_mysqldump_options_structure', '--no-data=true --default-character-set=utf8');
@@ -37,19 +38,13 @@ set('db_decompress_command', [
 ]);
 
 // Returns current server configuration.
-set('db_current_server', function () {
-    try {
-        $currentServer = Deployer::get()->environments[get('current_stage')];
-    } catch (\RuntimeException $e) {
-        $servers = '';
-        $i = 1;
-        foreach (Deployer::get()->environments as $key => $server) {
-            $servers .= "\n" . $i++ . '. ' . $key;
-        }
-        throw new \RuntimeException('Name of instance "' . get('current_stage') . '" is not on the server list:' .
-            $servers . "\n" . 'Please check case sensitive.', 1500717628491);
-    }
-    return $currentServer;
+set('current_server', function () {
+    return Configuration::getServer(get('current_stage'));
+});
+
+// Returns target stage server configuration.
+set('target_server', function () {
+    return Configuration::getServer(get('target_stage'));
 });
 
 // Returns "db_databases" merged for direct use.
@@ -85,17 +80,17 @@ set('db_databases_merged', function () {
 
 // Returns path to store database dumps on current instance.
 set('db_storage_path_current', function () {
-    if (get('db_current_server')->get('db_storage_path_relative', false) == false) {
-        $dbStoragePathCurrent = get('db_current_server')->get('deploy_path') . '/.dep/database/dumps';
+    if (get('current_server')->get('db_storage_path_relative', false) == false) {
+        $dbStoragePathCurrent = get('current_server')->get('deploy_path') . '/.dep/database/dumps';
     } else {
-        $dbStoragePathCurrent = get('db_current_server')->get('deploy_path') . '/'
-            . get('db_current_server')->get('db_storage_path_relative');
+        $dbStoragePathCurrent = get('current_server')->get('deploy_path') . '/'
+            . get('current_server')->get('db_storage_path_relative');
     }
     runLocally('[ -d ' . $dbStoragePathCurrent . ' ] || mkdir -p ' . $dbStoragePathCurrent);
     return $dbStoragePathCurrent;
 });
 
-// Returns path to store database dumps on remote instance.
+// Returns path to store database dumps on target stage instance.
 set('db_storage_path', function () {
     if (get('db_storage_path_relative', false) == false) {
         $dbStoragePath = get('deploy_path') . '/.dep/database/dumps';
