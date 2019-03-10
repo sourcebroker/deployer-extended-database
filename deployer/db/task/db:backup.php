@@ -9,7 +9,6 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
  */
 task('db:backup', function () {
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
-    input()->getOption('dumpcode');
     if (!empty(input()->getOption('dumpcode'))) {
         $dumpCode = input()->getOption('dumpcode');
     } else {
@@ -34,17 +33,15 @@ task('db:backup', function () {
         }
         $dumpCode = 'backup' . $dumpCodeRealese . '_' . md5(microtime(true) . rand(0, 10000));
     }
+    $dumpoCodeAndVerbosity = '--dumpcode=' . $dumpCode . ' ' . $verbosity;
     if (get('current_stage') == get('target_stage')) {
-        runLocally('{{local/bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
-        runLocally('{{local/bin/deployer}} db:compress --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally('{{local/bin/deployer}} db:export ' . $dumpoCodeAndVerbosity, 0);
+        runLocally('{{local/bin/deployer}} db:compress ' . $dumpoCodeAndVerbosity, 0);
         runLocally('{{local/bin/deployer}} db:dumpclean' . $verbosity, 0);
     } else {
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
-        run('cd ' . $activePath .
-            ' && {{bin/php}} {{bin/deployer}} db:export --dumpcode=' . $dumpCode . ' ' . $verbosity);
-        run('cd ' . $activePath .
-            ' && {{bin/php}} {{bin/deployer}} db:compress --dumpcode=' . $dumpCode . ' ' . $verbosity);
-        run('cd ' . $activePath .
-            ' && {{bin/php}} {{bin/deployer}} db:dumpclean' . $verbosity);
+        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:export ' . $dumpoCodeAndVerbosity);
+        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:compress ' . $dumpoCodeAndVerbosity);
+        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:dumpclean' . $verbosity);
     }
 })->desc('Do backup of database (export and compress).');
