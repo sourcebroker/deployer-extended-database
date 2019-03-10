@@ -3,6 +3,7 @@
 namespace SourceBroker\DeployerExtendedDatabase\Utility;
 
 use Deployer\Task\Context;
+use SourceBroker\DeployerInstance\Configuration;
 
 /**
  * Class RsyncUtility
@@ -15,10 +16,10 @@ class RsyncUtility
      * @param Context $taskContext
      * @return string
      */
-    public function getSshOptions(Context $taskContext)
+    public function getSshOptions($targetStageName)
     {
         $sshOptions = [];
-        $serverConfiguration = $taskContext->getServer()->getConfiguration();
+        $serverConfiguration = Configuration::getServer($targetStageName);
         $sshOptions[] = $serverConfiguration->getPort() ? ' -p' . $serverConfiguration->getPort() : null;
         $sshOptions[] = $serverConfiguration->getPrivateKey() ? ' -i ' . $serverConfiguration->getPrivateKey() : null;
         if (!empty(array_filter($sshOptions))) {
@@ -28,10 +29,10 @@ class RsyncUtility
         }
     }
 
-    public function getHostWithDbStoragePath(Context $taskContext)
+    public function getHostWithDbStoragePath($targetStageName)
     {
-        $serverEnvironment = $taskContext->getEnvironment();
-        $serverConfiguration = $taskContext->getServer()->getConfiguration();
+        $serverEnvironment = Configuration::getEnvironment($targetStageName);
+        $serverConfiguration = Configuration::getServer($targetStageName);
         $serverWithPath =
             ($serverConfiguration->getUser() ? $serverConfiguration->getUser() . '@' : '') .
             $serverConfiguration->getHost() .

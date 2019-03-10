@@ -38,7 +38,7 @@ task('db:copy', function () {
         }
     } else {
         throw new \RuntimeException(
-          "The target instance is not set as second parameter. Move should be run as: dep db:move source target"
+          "The target instance is not set as second parameter. Copy should be run as: dep db:copy source target"
         );
     }
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
