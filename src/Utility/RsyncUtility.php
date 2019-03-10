@@ -19,7 +19,7 @@ class RsyncUtility
     public function getSshOptions($targetStageName)
     {
         $sshOptions = [];
-        $serverConfiguration = Configuration::getServer($targetStageName);
+        $serverConfiguration = Configuration::getServer($targetStageName)->getConfiguration();
         $sshOptions[] = $serverConfiguration->getPort() ? ' -p' . $serverConfiguration->getPort() : null;
         $sshOptions[] = $serverConfiguration->getPrivateKey() ? ' -i ' . $serverConfiguration->getPrivateKey() : null;
         if (!empty(array_filter($sshOptions))) {
@@ -32,7 +32,7 @@ class RsyncUtility
     public function getHostWithDbStoragePath($targetStageName)
     {
         $serverEnvironment = Configuration::getEnvironment($targetStageName);
-        $serverConfiguration = Configuration::getServer($targetStageName);
+        $serverConfiguration = Configuration::getServer($targetStageName)->getConfiguration();
         $serverWithPath =
             ($serverConfiguration->getUser() ? $serverConfiguration->getUser() . '@' : '') .
             $serverConfiguration->getHost() .
