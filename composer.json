@@ -18,7 +18,8 @@
     "vlucas/phpdotenv": "^2.0",
     "deployer/dist": "^4.3.1",
     "sourcebroker/deployer-loader": "^1.0.0",
-    "sourcebroker/deployer-extended": "^9.0.0"
+    "sourcebroker/deployer-extended": "^9.0.0",
+    "sourcebroker/deployer-instance": "^0.1.5"
   },
   "autoload": {
     "psr-4": {

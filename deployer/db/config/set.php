@@ -3,7 +3,7 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
-use SourceBroker\DeployerExtended\Utility\Instance;
+use SourceBroker\DeployerInstance\Instance;
 
 // Deployer standard settings. By setting 'default_stage' you can do 'dep db:backup' instead of 'dep db:backup local'
 set('default_stage', function () {
