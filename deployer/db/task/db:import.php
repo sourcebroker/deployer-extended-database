@@ -11,7 +11,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 task('db:import', function () {
     $dumpCode = (new ConsoleUtility())->optionRequired('dumpcode', input());
     $fileUtility = new FileUtility();
-    if (get('db_instance') == get('server')['name']) {
+    if (get('current_stage') == get('target_stage')) {
         $currentInstanceDatabaseStoragePath = get('db_storage_path_current');
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
             $globStart = $fileUtility->normalizeFolder($currentInstanceDatabaseStoragePath)

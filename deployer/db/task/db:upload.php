@@ -18,10 +18,10 @@ task('db:upload', function () {
     $fileUtility = new FileUtility();
     runLocally(sprintf(
         'rsync -rz --remove-source-files %s --include=%s --exclude=* %s %s',
-        $rsyncUtility->getSshOptions(Task\Context::get()) ? '-e '
-            . escapeshellarg($rsyncUtility->getSshOptions(Task\Context::get())) : '',
+        $rsyncUtility->getSshOptions(get('target_stage')) ? '-e '
+            . escapeshellarg($rsyncUtility->getSshOptions(get('target_stage'))) : '',
         escapeshellarg('*dumpcode=' . $dumpCode . '*'),
-        escapeshellarg($fileUtility->normalizeFolder(get('db_current_server')->get('db_storage_path_current'))),
-        escapeshellarg($rsyncUtility->getHostWithDbStoragePath(Task\Context::get()))
+        escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))),
+        escapeshellarg($rsyncUtility->getHostWithDbStoragePath(get('target_stage')))
     ), 0);
 })->desc('Upload the database dumps for given dumpcode from current to target database dumps storage.');

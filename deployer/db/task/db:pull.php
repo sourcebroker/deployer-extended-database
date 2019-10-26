@@ -11,7 +11,7 @@ task('db:pull', function () {
     if (null === input()->getArgument('stage')) {
         throw new \RuntimeException('The target instance is required for db:pull command.');
     }
-    $sourceInstance = get('server')['name'];
+    $sourceInstance = get('target_stage');
     $dumpCode = md5(microtime(true) . rand(0, 10000));
 
     $dl = get('local/bin/deployer');

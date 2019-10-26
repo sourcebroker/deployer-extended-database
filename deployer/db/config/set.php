@@ -3,17 +3,7 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
-use SourceBroker\DeployerExtendedDatabase\Utility\InstanceUtility;
-
-// Deployer standard settings. By setting 'default_stage' you can do 'dep db:backup' instead of 'dep db:backup local'
-set('default_stage', function () {
-    return (new InstanceUtility)->getCurrentInstance();
-});
-
-// Return current instance name. Based on that scripts knows from which server() takes the data to database operations.
-set('db_instance', function () {
-    return (new InstanceUtility)->getCurrentInstance();
-});
+use SourceBroker\DeployerInstance\Configuration;
 
 // mysqldump options for dumping structure.
 set('db_export_mysqldump_options_structure', '--no-data=true --default-character-set=utf8');
@@ -48,19 +38,17 @@ set('db_decompress_command', [
 ]);
 
 // Returns current server configuration.
-set('db_current_server', function () {
-    try {
-        $currentServer = Deployer::get()->environments[get('db_instance')];
-    } catch (\RuntimeException $e) {
-        $servers = '';
-        $i = 1;
-        foreach (Deployer::get()->environments as $key => $server) {
-            $servers .= "\n" . $i++ . '. ' . $key;
-        }
-        throw new \RuntimeException('Name of instance "' . get('db_instance') . '" is not on the server list:' .
-            $servers . "\n" . 'Please check case sensitive.', 1500717628491);
-    }
-    return $currentServer;
+set('current_server', function () {
+    return Configuration::getServer(get('current_stage'));
+});
+
+set('current_environment', function () {
+    return Configuration::getEnvironment(get('current_stage'));
+});
+
+// Returns target stage server configuration.
+set('target_server', function () {
+    return Configuration::getServer(get('target_stage'));
 });
 
 // Returns "db_databases" merged for direct use.
@@ -96,17 +84,17 @@ set('db_databases_merged', function () {
 
 // Returns path to store database dumps on current instance.
 set('db_storage_path_current', function () {
-    if (get('db_current_server')->get('db_storage_path_relative', false) == false) {
-        $dbStoragePathCurrent = get('db_current_server')->get('deploy_path') . '/.dep/database/dumps';
+    if (get('current_environment')->get('db_storage_path_relative', false) == false) {
+        $dbStoragePathCurrent = get('current_environment')->get('deploy_path') . '/.dep/database/dumps';
     } else {
-        $dbStoragePathCurrent = get('db_current_server')->get('deploy_path') . '/'
-            . get('db_current_server')->get('db_storage_path_relative');
+        $dbStoragePathCurrent = get('current_environment')->get('deploy_path') . '/'
+            . get('current_environment')->get('db_storage_path_relative');
     }
     runLocally('[ -d ' . $dbStoragePathCurrent . ' ] || mkdir -p ' . $dbStoragePathCurrent);
     return $dbStoragePathCurrent;
 });
 
-// Returns path to store database dumps on remote instance.
+// Returns path to store database dumps on target stage instance.
 set('db_storage_path', function () {
     if (get('db_storage_path_relative', false) == false) {
         $dbStoragePath = get('deploy_path') . '/.dep/database/dumps';
@@ -136,7 +124,7 @@ set('local/bin/mysqldump', function () {
     if (runLocally('if hash mysqldump 2>/dev/null; then echo \'true\'; fi')->toBool()) {
         return 'mysqldump';
     } else {
-        throw new \RuntimeException('The mysqldump path on server "' . get('server')['name'] . '" is unknown. 
+        throw new \RuntimeException('The mysqldump path on server "' . get('target_stage') . '" is unknown. 
         You can set it in env var "local/bin/mysqldump"', 1500717760352);
     }
 });
@@ -145,7 +133,7 @@ set('local/bin/mysql', function () {
     if (runLocally('if hash mysql 2>/dev/null; then echo \'true\'; fi')->toBool()) {
         return 'mysql';
     } else {
-        throw new \RuntimeException('The mysql path on server "' . get('server')['name'] . '" is unknown. 
+        throw new \RuntimeException('The mysql path on server "' . get('target_stage') . '" is unknown. 
         You can set it in env var "local/bin/mysql".', 1500717744659);
     }
 });
@@ -154,7 +142,7 @@ set('local/bin/gzip', function () {
     if (runLocally('if hash gzip 2>/dev/null; then echo \'true\'; fi')->toBool()) {
         return 'gzip';
     } else {
-        throw new \RuntimeException('The gzip path on server "' . get('server')['name'] . '" is unknown. 
+        throw new \RuntimeException('The gzip path on server "' . get('target_stage') . '" is unknown. 
         You can set it in env var "local/bin/gzip"', 1512217259381);
     }
 });

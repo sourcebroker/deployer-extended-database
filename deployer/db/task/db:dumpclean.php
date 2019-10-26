@@ -9,8 +9,8 @@ use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
  * @see https://github.com/sourcebroker/deployer-extended-database#db-dumpclean
  */
 task('db:dumpclean', function () {
-    if (get('db_instance') == get('server')['name']) {
-        $files = runLocally('ls -1t ' . get('db_current_server')->get('db_storage_path_current'))->toArray();
+    if (get('current_stage') == get('target_stage')) {
+        $files = runLocally('ls -1t ' . get('db_storage_path_current'))->toArray();
         $dumpsStorage = [];
         natsort($files);
         foreach (array_reverse($files) as $file) {
@@ -27,7 +27,7 @@ task('db:dumpclean', function () {
             }
             if (empty($instance) || empty($dumpcode)) {
                 writeln('Note: "server" or "dumpcode" can not be detected for file dump: "'
-                    . (new FileUtility())->normalizeFolder(get('db_current_server')->get('db_storage_path_current'))
+                    . (new FileUtility())->normalizeFolder(get('db_storage_path_current'))
                     . $file . '');
                 writeln('Seems like this file was not created by deployer-extended-database or was created by previous version of deployer-extended-database. Please remove this file manually to get rid of this notice.');
                 writeln('');
@@ -45,7 +45,7 @@ task('db:dumpclean', function () {
                 $instanceDumpsCount = count($instanceDumps);
                 for ($i = $dbDumpCleanKeep; $i < $instanceDumpsCount; $i++) {
                     writeln('Removing old dump with code: ' . $instanceDumps[$i]);
-                    runLocally('cd ' . escapeshellarg(get('db_current_server')->get('db_storage_path_current'))
+                    runLocally('cd ' . escapeshellarg(get('db_storage_path_current'))
                         . ' && rm ' . '*dumpcode=' . $instanceDumps[$i] . '*');
                 }
             }

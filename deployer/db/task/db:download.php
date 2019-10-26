@@ -11,17 +11,17 @@ use SourceBroker\DeployerExtendedDatabase\Utility\RsyncUtility;
  */
 task('db:download', function () {
     if (null === input()->getArgument('stage')) {
-        throw new \RuntimeException('The source instance is required for db:download command.', 1488143750580);
+        throw new \RuntimeException('The target instance is required for db:download command.', 1488143750580);
     }
     $dumpCode = (new ConsoleUtility())->optionRequired('dumpcode', input());
     $rsyncUtility = new RsyncUtility();
     $fileUtility = new FileUtility();
     runLocally(sprintf(
         'rsync -rz --remove-source-files %s --include=%s --exclude=* %s %s',
-        $rsyncUtility->getSshOptions(Task\Context::get()) ? '-e '
-            . escapeshellarg($rsyncUtility->getSshOptions(Task\Context::get())) : '',
+        $rsyncUtility->getSshOptions(get('target_stage')) ? '-e '
+            . escapeshellarg($rsyncUtility->getSshOptions(get('target_stage'))) : '',
         escapeshellarg('*dumpcode=' . $dumpCode . '*'),
-        escapeshellarg($rsyncUtility->getHostWithDbStoragePath(Task\Context::get())),
-        escapeshellarg($fileUtility->normalizeFolder(get('db_current_server')->get('db_storage_path_current')))
+        escapeshellarg($rsyncUtility->getHostWithDbStoragePath(get('target_stage'))),
+        escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current')))
     ), 0);
 })->desc('Download the database dumps with given dumpcode from target to current database dumps storage.');
