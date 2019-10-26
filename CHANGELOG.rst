@@ -7,6 +7,7 @@ master
 
 1) [FEATURE] Add option exportTaskAddIgnoreTablesToStructureDump to allow to add ignore tables when exporting structure.
 2) [FEATURE] Add option importTaskDoNotDropAllTablesBeforeImport to prevent dropping all tables before import.
+3) [TASK] Add vendor and composer.lock to .gitignore.
 
 7.0.2
 ~~~~~
