@@ -11,6 +11,7 @@ master
 4) [FEATURE][BREAKING] Implement sourcebroker/deployer-instance for instance management.
 5) [BUGFIX] Remove colon from file names because if Windows compatibility.
 6) [TASK] Replace RuntimeException with GracefulShutdownException.
+7) [TASK] Increase version of sourcebroker/deployer-instance.
 
 7.0.2
 ~~~~~
