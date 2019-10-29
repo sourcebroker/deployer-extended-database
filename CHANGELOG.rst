@@ -12,6 +12,7 @@ master
 5) [BUGFIX] Remove colon from file names because if Windows compatibility.
 6) [TASK] Replace RuntimeException with GracefulShutdownException.
 7) [TASK] Increase version of sourcebroker/deployer-instance.
+8) [TASK] Replace hardcoded instance name with var.
 
 7.0.2
 ~~~~~

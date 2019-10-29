@@ -25,14 +25,12 @@ task('db:copy', function () {
               "You must set the target instance the database will be copied to as second parameter."
             );
         }
-        // TODO - instance name hardcoded
-        if ($targetInstanceName == 'live') {
+        if ($targetInstanceName == get('instance_live_name', 'live')) {
             throw new GracefulShutdownException(
               "FORBIDDEN: For security its forbidden to move database to live instance!"
             );
         }
-        // TODO - instance name hardcoded
-        if ($targetInstanceName == 'local') {
+        if ($targetInstanceName == get('instance_local_name', 'local')) {
             throw new GracefulShutdownException(
               "FORBIDDEN: For synchro local database use: \ndep db:pull live"
             );
