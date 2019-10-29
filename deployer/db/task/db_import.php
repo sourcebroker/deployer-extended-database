@@ -4,6 +4,7 @@ namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
+use Deployer\Exception\GracefulShutdownException;
 
 /*
  * @see https://github.com/sourcebroker/deployer-extended-database#db-import
@@ -20,23 +21,23 @@ task('db:import', function () {
 
             $structureSqlFile = glob($globStart . '*type=structure.sql');
             if (empty($structureSqlFile)) {
-                throw new \RuntimeException('No structure file for --dumpcode=' . $dumpCode . '. Glob build: ' .
+                throw new GracefulShutdownException('No structure file for --dumpcode=' . $dumpCode . '. Glob build: ' .
                     $globStart . '*type=structure.sql',
                     1500718221204);
             }
             if (count($structureSqlFile) > 1) {
-                throw new \RuntimeException('There are more than two structure file for --dumpcode=' . $dumpCode .
+                throw new GracefulShutdownException('There are more than two structure file for --dumpcode=' . $dumpCode .
                     '. Glob build: ' . $globStart . '*type=structure.sql. ' .
                     "\n" . ' Files founded: ' . "\n" . implode("\n", $structureSqlFile), 1500722088929);
             }
             $dataSqlFile = glob($globStart . '*type=data.sql');
             if (empty($dataSqlFile)) {
-                throw new \RuntimeException('No data file for --dumpcode=' . $dumpCode . '. Glob built: ' .
+                throw new GracefulShutdownException('No data file for --dumpcode=' . $dumpCode . '. Glob built: ' .
                     $globStart . '*type=data.sql',
                     1500722093334);
             }
             if (count($dataSqlFile) > 1) {
-                throw new \RuntimeException('There are more than two data files for --dumpcode=' . $dumpCode . '. Glob built: ' .
+                throw new GracefulShutdownException('There are more than two data files for --dumpcode=' . $dumpCode . '. Glob built: ' .
                     $globStart . '*type=data.sql. ' .
                     "\n" . ' Files founded: ' . "\n" . implode("\n", $dataSqlFile),
                     1500722095323);
@@ -98,7 +99,7 @@ task('db:import', function () {
                             }
                             $publicUrlCollected[] = parse_url($publicUrl, PHP_URL_HOST) . $port;
                         } else {
-                            throw new \RuntimeException('The configuration setting "public_urls" should have full url like 
+                            throw new GracefulShutdownException('The configuration setting "public_urls" should have full url like 
                         "https://www.example.com" but the value is only "' . $publicUrl . '"', 1491384103020);
                         }
                     }

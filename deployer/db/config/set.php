@@ -4,6 +4,7 @@ namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
 use SourceBroker\DeployerInstance\Configuration;
+use Deployer\Exception\GracefulShutdownException;
 
 // mysqldump options for dumping structure.
 set('db_export_mysqldump_options_structure', '--no-data=true --default-character-set=utf8');
@@ -74,7 +75,7 @@ set('db_databases_merged', function () {
                     $dbConfigsMerged[$dbIdentifier] = $arrayUtility->arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier],
                         $mergeArray);
                 } else {
-                    throw new \RuntimeException('The config file does not exists: ' . $dbConfig);
+                    throw new ConfigurationException('The config file does not exists: ' . $dbConfig);
                 }
             }
         }
@@ -111,7 +112,7 @@ set('bin/deployer', function () {
     if (test('[ -e ' . escapeshellarg($activePath . '/vendor/bin/dep') . ' ]')) {
         $deployerBin = $activePath . '/vendor/bin/dep';
     } else {
-        throw new \RuntimeException('There must be ' . $activePath . '/vendor/bin/dep phar file, but it could not be found.');
+        throw new GracefulShutdownException('There must be ' . $activePath . '/vendor/bin/dep phar file, but it could not be found.');
     }
     return $deployerBin;
 });
@@ -124,7 +125,7 @@ set('local/bin/mysqldump', function () {
     if (runLocally('if hash mysqldump 2>/dev/null; then echo \'true\'; fi')->toBool()) {
         return 'mysqldump';
     } else {
-        throw new \RuntimeException('The mysqldump path on server "' . get('target_stage') . '" is unknown. 
+        throw new GracefulShutdownException('The mysqldump path on server "' . get('target_stage') . '" is unknown. 
         You can set it in env var "local/bin/mysqldump"', 1500717760352);
     }
 });
@@ -133,7 +134,7 @@ set('local/bin/mysql', function () {
     if (runLocally('if hash mysql 2>/dev/null; then echo \'true\'; fi')->toBool()) {
         return 'mysql';
     } else {
-        throw new \RuntimeException('The mysql path on server "' . get('target_stage') . '" is unknown. 
+        throw new GracefulShutdownException('The mysql path on server "' . get('target_stage') . '" is unknown. 
         You can set it in env var "local/bin/mysql".', 1500717744659);
     }
 });
@@ -142,7 +143,7 @@ set('local/bin/gzip', function () {
     if (runLocally('if hash gzip 2>/dev/null; then echo \'true\'; fi')->toBool()) {
         return 'gzip';
     } else {
-        throw new \RuntimeException('The gzip path on server "' . get('target_stage') . '" is unknown. 
+        throw new GracefulShutdownException('The gzip path on server "' . get('target_stage') . '" is unknown. 
         You can set it in env var "local/bin/gzip"', 1512217259381);
     }
 });

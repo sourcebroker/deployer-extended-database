@@ -3,13 +3,14 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
+use Deployer\Exception\GracefulShutdownException;
 
 /*
  * @see https://github.com/sourcebroker/deployer-extended-database#db-copy
  */
 task('db:copy', function () {
     if (null === input()->getArgument('stage')) {
-        throw new \RuntimeException("The source instance is required for db:move command.");
+        throw new GracefulShutdownException("The source instance is required for db:move command.");
     }
     if (input()->getArgument('targetStage')) {
         if (!askConfirmation(sprintf("Do you really want to copy database from instance %s to instance %s",
@@ -20,24 +21,24 @@ task('db:copy', function () {
 
         $targetInstanceName = input()->getArgument('targetStage');
         if ($targetInstanceName == null) {
-            throw new \RuntimeException(
+            throw new GracefulShutdownException(
               "You must set the target instance the database will be copied to as second parameter."
             );
         }
         // TODO - instance name hardcoded
         if ($targetInstanceName == 'live') {
-            throw new \RuntimeException(
+            throw new GracefulShutdownException(
               "FORBIDDEN: For security its forbidden to move database to live instance!"
             );
         }
         // TODO - instance name hardcoded
         if ($targetInstanceName == 'local') {
-            throw new \RuntimeException(
+            throw new GracefulShutdownException(
               "FORBIDDEN: For synchro local database use: \ndep db:pull live"
             );
         }
     } else {
-        throw new \RuntimeException(
+        throw new GracefulShutdownException(
           "The target instance is not set as second parameter. Copy should be run as: dep db:copy source target"
         );
     }

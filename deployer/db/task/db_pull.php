@@ -3,13 +3,14 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
+use Deployer\Exception\GracefulShutdownException;
 
 /*
  * @see https://github.com/sourcebroker/deployer-extended-database#db-pull
  */
 task('db:pull', function () {
     if (null === input()->getArgument('stage')) {
-        throw new \RuntimeException('The target instance is required for db:pull command.');
+        throw new GracefulShutdownException('The target instance is required for db:pull command.');
     }
     $sourceInstance = get('target_stage');
     $dumpCode = md5(microtime(true) . rand(0, 10000));
