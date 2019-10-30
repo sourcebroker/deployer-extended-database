@@ -17,4 +17,4 @@ task('db:rmdump', function () {
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
         run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:rmdump --dumpcode=' . $dumpCode . ' ' . $verbosity);
     }
-})->desc('Remove all dumps with given dumpcode. (compressed and uncompressed)');
+})->desc('Remove all dumps with given dumpcode (compressed and uncompressed)');

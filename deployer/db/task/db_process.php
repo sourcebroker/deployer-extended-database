@@ -27,4 +27,4 @@ task('db:process', function () {
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
         run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:process --dumpcode=' . $dumpCode . ' ' . $verbosity);
     }
-})->desc('Run commands that process mysql dump file directly.');
+})->desc('Run commands that process mysql dump file directly');

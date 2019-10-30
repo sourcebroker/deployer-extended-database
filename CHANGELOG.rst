@@ -13,6 +13,7 @@ master
 6) [TASK] Replace RuntimeException with GracefulShutdownException.
 7) [TASK] Increase version of sourcebroker/deployer-instance.
 8) [TASK] Replace hardcoded instance name with var.
+9) [TASK] Normalize use of dots at the end of task description.
 
 7.0.2
 ~~~~~

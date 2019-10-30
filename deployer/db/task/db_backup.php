@@ -44,4 +44,4 @@ task('db:backup', function () {
         run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:compress ' . $dumpoCodeAndVerbosity);
         run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:dumpclean' . $verbosity);
     }
-})->desc('Do backup of database (export and compress).');
+})->desc('Do backup of database (export and compress)');

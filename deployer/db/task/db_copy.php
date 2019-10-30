@@ -59,4 +59,4 @@ task('db:copy', function () {
         runLocally($dl . ' db:import ' . $targetInstanceName . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
         runLocally($dl . ' db:rmdump ' . $targetInstanceName . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     }
-})->desc('Synchronize database between instances.');
+})->desc('Synchronize database between instances');

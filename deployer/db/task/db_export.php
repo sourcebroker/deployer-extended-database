@@ -82,4 +82,4 @@ task('db:export', function () {
     if ($returnDumpCode) {
         writeln(json_encode(['dumpCode' => $dumpCode]));
     }
-})->desc('Export database dumps to current database dumps storage.');
+})->desc('Export database dumps to current database dumps storage');

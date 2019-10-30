@@ -145,4 +145,4 @@ task('db:import', function () {
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
         run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:import ' . (input()->getOption('dboptions') ? '--dboptions=' . input()->getOption('dboptions') : '') . ' --dumpcode=' . $dumpCode . ' ' . $verbosity);
     }
-})->desc('Import dumps with given dumpcode from current database dumps storage to database.');
+})->desc('Import dumps with given dumpcode from current database dumps storage to database');

@@ -27,4 +27,4 @@ task('db:compress', function () {
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
         run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:compress --dumpcode=' . $dumpCode . ' ' . $verbosity);
     }
-})->desc('Compress dumps with given dumpcode.');
+})->desc('Compress dumps with given dumpcode');

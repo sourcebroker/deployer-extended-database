@@ -25,4 +25,4 @@ task('db:upload', function () {
         escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))),
         escapeshellarg($rsyncUtility->getHostWithDbStoragePath(get('target_stage')))
     ), 0);
-})->desc('Upload the database dumps for given dumpcode from current to target database dumps storage.');
+})->desc('Upload the database dumps for given dumpcode from current to target database dumps storage');

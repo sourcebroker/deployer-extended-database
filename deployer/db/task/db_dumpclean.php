@@ -55,4 +55,4 @@ task('db:dumpclean', function () {
         run('cd ' . $activePath .
             ' && {{bin/php}} {{bin/deployer}} db:dumpclean ' . (new ConsoleUtility())->getVerbosityAsParameter(output()));
     }
-})->desc('Cleans the database dump storage.');
+})->desc('Cleans the database dump storage');
