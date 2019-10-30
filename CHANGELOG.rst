@@ -2,8 +2,8 @@
 Changelog
 ---------
 
-master
-~~~~~~
+8.0.0
+~~~~~
 
 1) [FEATURE] Add option exportTaskAddIgnoreTablesToStructureDump to allow to add ignore tables when exporting structure.
 2) [FEATURE] Add option importTaskDoNotDropAllTablesBeforeImport to prevent dropping all tables before import.
