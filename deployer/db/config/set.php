@@ -122,7 +122,7 @@ set('local/bin/deployer', function () {
 });
 
 set('local/bin/mysqldump', function () {
-    if (runLocally('if hash mysqldump 2>/dev/null; then echo \'true\'; fi')->toBool()) {
+    if (testLocally('hash mysqldump 2>/dev/null')) {
         return 'mysqldump';
     } else {
         throw new GracefulShutdownException('The mysqldump path on server "' . get('target_stage') . '" is unknown. 
@@ -131,16 +131,16 @@ set('local/bin/mysqldump', function () {
 });
 
 set('local/bin/mysql', function () {
-    if (runLocally('if hash mysql 2>/dev/null; then echo \'true\'; fi')->toBool()) {
+    if (testLocally('hash mysql 2>/dev/null')) {
         return 'mysql';
     } else {
-        throw new GracefulShutdownException('The mysql path on server "' . get('target_stage') . '" is unknown. 
+        throw new GracefulShutdownException('The mysql path on server "' . get('target_stage') . '" is unknown.
         You can set it in env var "local/bin/mysql".', 1500717744659);
     }
 });
 
 set('local/bin/gzip', function () {
-    if (runLocally('if hash gzip 2>/dev/null; then echo \'true\'; fi')->toBool()) {
+    if (testLocally('hash gzip 2>/dev/null')) {
         return 'gzip';
     } else {
         throw new GracefulShutdownException('The gzip path on server "' . get('target_stage') . '" is unknown. 
