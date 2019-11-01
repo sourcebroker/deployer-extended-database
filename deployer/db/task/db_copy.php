@@ -12,14 +12,14 @@ task('db:copy', function () {
     if (null === input()->getArgument('stage')) {
         throw new GracefulShutdownException("The source instance is required for db:move command.");
     }
-    if (input()->getOption('dbtarget')) {
+    if (input()->getOption('db-target')) {
         if (!askConfirmation(sprintf("Do you really want to copy database from instance %s to instance %s",
             input()->getArgument('stage'),
-            input()->getOption('dbtarget')), true)) {
+            input()->getOption('db-target')), true)) {
             die('Process aborted');
         }
 
-        $targetInstanceName = input()->getOption('dbtarget');
+        $targetInstanceName = input()->getOption('db-target');
         if ($targetInstanceName == null) {
             throw new GracefulShutdownException(
                 "You must set the target instance the database will be copied to as second parameter."
@@ -45,18 +45,18 @@ task('db:copy', function () {
     $dumpCode = md5(microtime(true) . rand(0, 10000));
     $dl = get('local/bin/deployer');
     if (get('current_stage') == get('target_stage')) {
-        runLocally($dl . ' db:export --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:export --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     } else {
-        runLocally($dl . ' db:export ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
-        runLocally($dl . ' db:download ' . $sourceInstance . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:export ' . $sourceInstance . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:download ' . $sourceInstance . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     }
-    runLocally($dl . ' db:process --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+    runLocally($dl . ' db:process --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     if (get('current_stage') == $targetInstanceName) {
-        runLocally($dl . ' db:import --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
-        runLocally($dl . ' db:rmdump --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:import --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:rmdump --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     } else {
-        runLocally($dl . ' db:upload ' . $targetInstanceName . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
-        runLocally($dl . ' db:import ' . $targetInstanceName . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
-        runLocally($dl . ' db:rmdump ' . $targetInstanceName . ' --dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:upload ' . $targetInstanceName . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:import ' . $targetInstanceName . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:rmdump ' . $targetInstanceName . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
     }
 })->desc('Synchronize database between instances');

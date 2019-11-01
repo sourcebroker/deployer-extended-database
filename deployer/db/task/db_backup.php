@@ -9,8 +9,8 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
  */
 task('db:backup', function () {
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
-    if (!empty(input()->getOption('dumpcode'))) {
-        $dumpCode = input()->getOption('dumpcode');
+    if (!empty(input()->getOption('db-dumpcode'))) {
+        $dumpCode = input()->getOption('db-dumpcode');
     } else {
         if (get('current_stage') == get('target_stage')) {
             $list = [];
@@ -33,7 +33,7 @@ task('db:backup', function () {
         }
         $dumpCode = 'backup' . $dumpCodeRealese . '_' . md5(microtime(true) . rand(0, 10000));
     }
-    $dumpoCodeAndVerbosity = '--dumpcode=' . $dumpCode . ' ' . $verbosity;
+    $dumpoCodeAndVerbosity = '--db-dumpcode=' . $dumpCode . ' ' . $verbosity;
     if (get('current_stage') == get('target_stage')) {
         runLocally('{{local/bin/deployer}} db:export ' . $dumpoCodeAndVerbosity, 0);
         runLocally('{{local/bin/deployer}} db:compress ' . $dumpoCodeAndVerbosity, 0);

@@ -14,7 +14,7 @@ task('db:download', function () {
     if (null === input()->getArgument('stage')) {
         throw new GracefulShutdownException('The target instance is required for db:download command.', 1488143750580);
     }
-    $dumpCode = (new ConsoleUtility())->optionRequired('dumpcode', input());
+    $dumpCode = (new ConsoleUtility())->optionRequired('db-dumpcode', input());
     $rsyncUtility = new RsyncUtility();
     $fileUtility = new FileUtility();
     runLocally(sprintf(

@@ -68,8 +68,8 @@ class ConsoleUtility
     public function getOptionFromDboptions($option, InputInterface $input)
     {
         $dbOptionReturnValue = null;
-        if (!empty($input->getOption('dboptions'))) {
-            $dbOptions = explode(',', $input->getOption('dboptions'));
+        if (!empty($input->getOption('db-options'))) {
+            $dbOptions = explode(',', $input->getOption('db-options'));
             if (is_array($dbOptions)) {
                 foreach ($dbOptions as $dbOption) {
                     $dbOptionParts = explode(':', $dbOption);

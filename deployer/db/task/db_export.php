@@ -11,9 +11,9 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
  * @see https://github.com/sourcebroker/deployer-extended-database#db-export
  */
 task('db:export', function () {
-    if (!empty(input()->getOption('dumpcode'))) {
+    if (!empty(input()->getOption('db-dumpcode'))) {
         $returnDumpCode = false;
-        $dumpCode = input()->getOption('dumpcode');
+        $dumpCode = input()->getOption('db-dumpcode');
     } else {
         $returnDumpCode = true;
         $dumpCode = md5(microtime(true) . rand(0, 10000));
@@ -77,7 +77,7 @@ task('db:export', function () {
     } else {
         $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
-        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:export ' . (input()->getOption('dboptions') ? '--dboptions=' . input()->getOption('dboptions') : '') . ' --dumpcode=' . $dumpCode . ' ' . $verbosity);
+        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:export ' . (input()->getOption('db-options') ? '--db-options=' . input()->getOption('dboptions') : '') . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
     }
     if ($returnDumpCode) {
         writeln(json_encode(['dumpCode' => $dumpCode]));

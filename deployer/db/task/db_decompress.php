@@ -8,7 +8,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
  * @see https://github.com/sourcebroker/deployer-extended-database#db-decompress
  */
 task('db:decompress', function () {
-    $dumpCode = (new ConsoleUtility())->optionRequired('dumpcode', input());
+    $dumpCode = (new ConsoleUtility())->optionRequired('db-dumpcode', input());
     if (get('current_stage') == get('target_stage')) {
         $markersArray = [];
         $markersArray['{{databaseStorageAbsolutePath}}'] = get('db_storage_path_current');
@@ -25,6 +25,6 @@ task('db:decompress', function () {
     } else {
         $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
-        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:decompress --dumpcode=' . $dumpCode . ' ' . $verbosity);
+        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:decompress --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
     }
 })->desc('Compress dumps with given dumpcode');

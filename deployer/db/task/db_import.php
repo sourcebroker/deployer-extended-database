@@ -10,7 +10,7 @@ use Deployer\Exception\GracefulShutdownException;
  * @see https://github.com/sourcebroker/deployer-extended-database#db-import
  */
 task('db:import', function () {
-    $dumpCode = (new ConsoleUtility())->optionRequired('dumpcode', input());
+    $dumpCode = (new ConsoleUtility())->optionRequired('db-dumpcode', input());
     $fileUtility = new FileUtility();
     if (get('current_stage') == get('target_stage')) {
         $currentInstanceDatabaseStoragePath = get('db_storage_path_current');
@@ -21,23 +21,23 @@ task('db:import', function () {
 
             $structureSqlFile = glob($globStart . '*type=structure.sql');
             if (empty($structureSqlFile)) {
-                throw new GracefulShutdownException('No structure file for --dumpcode=' . $dumpCode . '. Glob build: ' .
+                throw new GracefulShutdownException('No structure file for --db-dumpcode=' . $dumpCode . '. Glob build: ' .
                     $globStart . '*type=structure.sql',
                     1500718221204);
             }
             if (count($structureSqlFile) > 1) {
-                throw new GracefulShutdownException('There are more than two structure file for --dumpcode=' . $dumpCode .
+                throw new GracefulShutdownException('There are more than two structure file for --db-dumpcode=' . $dumpCode .
                     '. Glob build: ' . $globStart . '*type=structure.sql. ' .
                     "\n" . ' Files founded: ' . "\n" . implode("\n", $structureSqlFile), 1500722088929);
             }
             $dataSqlFile = glob($globStart . '*type=data.sql');
             if (empty($dataSqlFile)) {
-                throw new GracefulShutdownException('No data file for --dumpcode=' . $dumpCode . '. Glob built: ' .
+                throw new GracefulShutdownException('No data file for --db-dumpcode=' . $dumpCode . '. Glob built: ' .
                     $globStart . '*type=data.sql',
                     1500722093334);
             }
             if (count($dataSqlFile) > 1) {
-                throw new GracefulShutdownException('There are more than two data files for --dumpcode=' . $dumpCode . '. Glob built: ' .
+                throw new GracefulShutdownException('There are more than two data files for --db-dumpcode=' . $dumpCode . '. Glob built: ' .
                     $globStart . '*type=data.sql. ' .
                     "\n" . ' Files founded: ' . "\n" . implode("\n", $dataSqlFile),
                     1500722095323);
@@ -136,13 +136,13 @@ task('db:import', function () {
             }
             if (isset($databaseConfig['post_command']) && is_array($databaseConfig['post_command'])) {
                 foreach ($databaseConfig['post_command'] as $postCommand) {
-                    runLocally($postCommand . ' --dumpcode=' . $dumpCode, 0);
+                    runLocally($postCommand . ' --db-dumpcode=' . $dumpCode, 0);
                 }
             }
         }
     } else {
         $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
-        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:import ' . (input()->getOption('dboptions') ? '--dboptions=' . input()->getOption('dboptions') : '') . ' --dumpcode=' . $dumpCode . ' ' . $verbosity);
+        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:import ' . (input()->getOption('dboptions') ? '--dboptions=' . input()->getOption('dboptions') : '') . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
     }
 })->desc('Import dumps with given dumpcode from current database dumps storage to database');
