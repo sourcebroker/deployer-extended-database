@@ -12,32 +12,32 @@ task('db:copy', function () {
     if (null === input()->getArgument('stage')) {
         throw new GracefulShutdownException("The source instance is required for db:move command.");
     }
-    if (input()->getArgument('targetStage')) {
+    if (input()->getOption('dbtarget')) {
         if (!askConfirmation(sprintf("Do you really want to copy database from instance %s to instance %s",
-          input()->getArgument('stage'),
-          input()->getArgument('targetStage')), true)) {
+            input()->getArgument('stage'),
+            input()->getOption('dbtarget')), true)) {
             die('Process aborted');
         }
 
-        $targetInstanceName = input()->getArgument('targetStage');
+        $targetInstanceName = input()->getOption('dbtarget');
         if ($targetInstanceName == null) {
             throw new GracefulShutdownException(
-              "You must set the target instance the database will be copied to as second parameter."
+                "You must set the target instance the database will be copied to as second parameter."
             );
         }
         if ($targetInstanceName == get('instance_live_name', 'live')) {
             throw new GracefulShutdownException(
-              "FORBIDDEN: For security its forbidden to move database to live instance!"
+                "FORBIDDEN: For security its forbidden to move database to live instance!"
             );
         }
         if ($targetInstanceName == get('instance_local_name', 'local')) {
             throw new GracefulShutdownException(
-              "FORBIDDEN: For synchro local database use: \ndep db:pull live"
+                "FORBIDDEN: For synchro local database use: \ndep db:pull live"
             );
         }
     } else {
         throw new GracefulShutdownException(
-          "The target instance is not set as second parameter. Copy should be run as: dep db:copy source target"
+            "The target instance is not set as second parameter. Copy should be run as: dep db:copy source target"
         );
     }
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
