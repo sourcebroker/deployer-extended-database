@@ -19,7 +19,7 @@ task('db:decompress', function () {
                     array_keys($markersArray),
                     $markersArray,
                     $dbProcessCommand
-                ), 0);
+                ));
             }
         }
     } else {

@@ -30,7 +30,7 @@ task('db:truncate', function () {
                             escapeshellarg($databaseConfig['user']),
                             escapeshellarg($databaseConfig['dbname']),
                             escapeshellarg('TRUNCATE ' . $truncateTable)
-                        ), 0);
+                        ));
                     }
                     writeln('<info>Truncated tables: ' . implode(',', $truncateTables) . '</info>');
                 }

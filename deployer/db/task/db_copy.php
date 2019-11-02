@@ -45,18 +45,18 @@ task('db:copy', function () {
     $dumpCode = md5(microtime(true) . rand(0, 10000));
     $dl = get('local/bin/deployer');
     if (get('current_stage') == get('target_stage')) {
-        runLocally($dl . ' db:export --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:export --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
     } else {
-        runLocally($dl . ' db:export ' . $sourceInstance . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
-        runLocally($dl . ' db:download ' . $sourceInstance . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:export ' . $sourceInstance . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
+        runLocally($dl . ' db:download ' . $sourceInstance . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
     }
-    runLocally($dl . ' db:process --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+    runLocally($dl . ' db:process --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
     if (get('current_stage') == $targetInstanceName) {
-        runLocally($dl . ' db:import --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
-        runLocally($dl . ' db:rmdump --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:import --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
+        runLocally($dl . ' db:rmdump --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
     } else {
-        runLocally($dl . ' db:upload ' . $targetInstanceName . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
-        runLocally($dl . ' db:import ' . $targetInstanceName . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
-        runLocally($dl . ' db:rmdump ' . $targetInstanceName . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity, 0);
+        runLocally($dl . ' db:upload ' . $targetInstanceName . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
+        runLocally($dl . ' db:import ' . $targetInstanceName . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
+        runLocally($dl . ' db:rmdump ' . $targetInstanceName . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
     }
 })->desc('Synchronize database between instances');

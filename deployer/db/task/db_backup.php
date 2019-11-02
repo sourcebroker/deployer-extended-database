@@ -35,9 +35,9 @@ task('db:backup', function () {
     }
     $dumpoCodeAndVerbosity = '--db-dumpcode=' . $dumpCode . ' ' . $verbosity;
     if (get('current_stage') == get('target_stage')) {
-        runLocally('{{local/bin/deployer}} db:export ' . $dumpoCodeAndVerbosity, 0);
-        runLocally('{{local/bin/deployer}} db:compress ' . $dumpoCodeAndVerbosity, 0);
-        runLocally('{{local/bin/deployer}} db:dumpclean' . $verbosity, 0);
+        runLocally('{{local/bin/deployer}} db:export ' . $dumpoCodeAndVerbosity);
+        runLocally('{{local/bin/deployer}} db:compress ' . $dumpoCodeAndVerbosity);
+        runLocally('{{local/bin/deployer}} db:dumpclean' . $verbosity);
     } else {
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
         run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:export ' . $dumpoCodeAndVerbosity);

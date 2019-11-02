@@ -62,7 +62,7 @@ task('db:export', function () {
                 . ((new ConsoleUtility())->getOptionFromDboptions('exportTaskAddIgnoreTablesToStructureDump',
                     input()) ? ' %s' : ''),
                 $mysqlDumpArgs
-            ), 0);
+            ));
 
             // dump database data
             $filenameParts['type'] = 'type=data';
@@ -72,7 +72,7 @@ task('db:export', function () {
             runLocally(vsprintf(
                 'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r%s %s',
                 $mysqlDumpArgs
-            ), 0);
+            ));
         }
     } else {
         $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());

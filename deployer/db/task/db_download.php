@@ -24,5 +24,5 @@ task('db:download', function () {
         escapeshellarg('*dumpcode=' . $dumpCode . '*'),
         escapeshellarg($rsyncUtility->getHostWithDbStoragePath(get('target_stage'))),
         escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current')))
-    ), 0);
+    ));
 })->desc('Download the database dumps with given dumpcode from target to current database dumps storage');

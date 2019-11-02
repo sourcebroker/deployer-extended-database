@@ -59,7 +59,7 @@ task('db:import', function () {
                     escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                     escapeshellarg($databaseConfig['user']),
                     escapeshellarg($databaseConfig['dbname'])
-                ), 0);
+                ));
             }
             // Import dump with database structure.
             runLocally(sprintf(
@@ -72,7 +72,7 @@ task('db:import', function () {
                 escapeshellarg($databaseConfig['user']),
                 escapeshellarg($databaseConfig['dbname']),
                 escapeshellarg('SOURCE ' . $structureSqlFile[0])
-            ), 0);
+            ));
             // Import dump with data.
             runLocally(sprintf(
                 'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s -D%s -e%s',
@@ -84,7 +84,7 @@ task('db:import', function () {
                 escapeshellarg($databaseConfig['user']),
                 escapeshellarg($databaseConfig['dbname']),
                 escapeshellarg('SOURCE ' . $dataSqlFile[0])
-            ), 0);
+            ));
             $postSqlInCollected = [];
             if (isset($databaseConfig['post_sql_in_markers'])) {
                 // Prepare some markers to use in post_sql_in_markers:
@@ -131,12 +131,12 @@ task('db:import', function () {
                     escapeshellarg($databaseConfig['user']),
                     escapeshellarg($databaseConfig['dbname']),
                     escapeshellarg('SOURCE ' . $importSqlFile)
-                ), 0);
+                ));
                 unlink($importSqlFile);
             }
             if (isset($databaseConfig['post_command']) && is_array($databaseConfig['post_command'])) {
                 foreach ($databaseConfig['post_command'] as $postCommand) {
-                    runLocally($postCommand . ' --db-dumpcode=' . $dumpCode, 0);
+                    runLocally($postCommand . ' --db-dumpcode=' . $dumpCode);
                 }
             }
         }
