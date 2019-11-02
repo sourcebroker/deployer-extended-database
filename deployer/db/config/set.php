@@ -40,16 +40,16 @@ set('db_decompress_command', [
 
 // Returns current server configuration.
 set('current_server', function () {
-    return Configuration::getServer(get('current_stage'));
+    return Configuration::getHost(get('current_stage'));
 });
 
 set('current_environment', function () {
-    return Configuration::getEnvironment(get('current_stage'));
+    return Configuration::getHost(get('current_stage'))->getConfig();
 });
 
 // Returns target stage server configuration.
 set('target_server', function () {
-    return Configuration::getServer(get('target_stage'));
+    return Configuration::getHost(get('target_stage'));
 });
 
 // Returns "db_databases" merged for direct use.
@@ -75,7 +75,7 @@ set('db_databases_merged', function () {
                     $dbConfigsMerged[$dbIdentifier] = $arrayUtility->arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier],
                         $mergeArray);
                 } else {
-                    throw new ConfigurationException('The config file does not exists: ' . $dbConfig);
+                    throw new GracefulShutdownException('The config file does not exists: ' . $dbConfig);
                 }
             }
         }

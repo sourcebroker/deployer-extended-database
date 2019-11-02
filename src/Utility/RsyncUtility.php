@@ -19,9 +19,9 @@ class RsyncUtility
     public function getSshOptions($targetStageName)
     {
         $sshOptions = [];
-        $serverConfiguration = Configuration::getServer($targetStageName)->getConfiguration();
+        $serverConfiguration = Configuration::getHost($targetStageName);
         $sshOptions[] = $serverConfiguration->getPort() ? ' -p' . $serverConfiguration->getPort() : null;
-        $sshOptions[] = $serverConfiguration->getPrivateKey() ? ' -i ' . $serverConfiguration->getPrivateKey() : null;
+        $sshOptions[] = $serverConfiguration->getIdentityFile() ? ' -i ' . $serverConfiguration->getIdentityFile() : null;
         if (!empty(array_filter($sshOptions))) {
             return 'ssh ' . implode(' ', $sshOptions);
         } else {
@@ -31,11 +31,11 @@ class RsyncUtility
 
     public function getHostWithDbStoragePath($targetStageName)
     {
-        $serverEnvironment = Configuration::getEnvironment($targetStageName);
-        $serverConfiguration = Configuration::getServer($targetStageName)->getConfiguration();
+        $serverEnvironment = Configuration::getHost($targetStageName)->getConfig();
+        $serverConfiguration = Configuration::getHost($targetStageName);
         $serverWithPath =
             ($serverConfiguration->getUser() ? $serverConfiguration->getUser() . '@' : '') .
-            $serverConfiguration->getHost() .
+            $serverConfiguration->getRealHostname() .
             ':/' . trim($serverEnvironment->get('db_storage_path'), '/') . '/';
         return $serverWithPath;
     }
