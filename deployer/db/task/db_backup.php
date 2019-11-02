@@ -15,7 +15,7 @@ task('db:backup', function () {
         if (get('current_stage') == get('target_stage')) {
             $list = [];
             if (testLocally('[ -e {{deploy_path}}/releases ]')) {
-                $list = runLocally('cd releases && ls -t -1 -d */')->toArray();
+                $list = explode("\n", runLocally('cd releases && ls -t -1 -d */'));
                 $list = array_map(function ($release) {
                     return basename(rtrim(trim($release), '/'));
                 }, $list);

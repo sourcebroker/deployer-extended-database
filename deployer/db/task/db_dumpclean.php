@@ -10,7 +10,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
  */
 task('db:dumpclean', function () {
     if (get('current_stage') == get('target_stage')) {
-        $files = runLocally('ls -1t ' . get('db_storage_path_current'))->toArray();
+        $files = explode("\n", runLocally('ls -1t ' . get('db_storage_path_current')));
         $dumpsStorage = [];
         natsort($files);
         foreach (array_reverse($files) as $file) {
