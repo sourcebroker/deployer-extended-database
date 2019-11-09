@@ -2,6 +2,12 @@
 Changelog
 ---------
 
+master
+~~~~~~
+
+1) Compatibility with Deployer 6.5+
+2) Refactor options to single option --options=key:value,key:value
+
 8.0.0
 ~~~~~
 
