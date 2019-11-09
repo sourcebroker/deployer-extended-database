@@ -434,7 +434,7 @@ db:compress
 +++++++++++
 
 Compress dumps with given dumpcode stored in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
-If no target is given the it will compress dumps on current instance. There is required option --dumpcode to be passed.
+If no target is given the it will compress dumps on current instance. There is required option ``--options=dumpcode:[value]`` to be passed.
 
 Look for config vars 'db_compress_suffix', 'db_compress_command', 'db_uncompress_command' for possible ways to overwrite
 standard gzip compression with your own.
@@ -486,7 +486,7 @@ db:decompress
 +++++++++++++
 
 Decompress dumps with given dumpcode stored in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
-If no target is given the it will compress dumps on current instance. There is required option --dumpcode to be passed.
+If no target is given the it will compress dumps on current instance. There is required option ``--options=dumpcode:[value]`` to be passed.
 
 Look for config vars 'db_compress_suffix', 'db_compress_command', 'db_uncompress_command' for possible ways to overwrite
 standard gzip compression with your own.
@@ -501,7 +501,7 @@ db:download
 
 Download database dumps with selected dumpcode from folder "{{deploy_path}}/.dep/databases/dumps/" on target instance
 and store it in folder "{{deploy_path}}/.dep/databases/dumps/" on current instance.
-There is required option --dumpcode to be passed.
+There is required option ``--options=dumpcode:[value]`` to be passed.
 
 **Example**
 ::
@@ -532,7 +532,7 @@ db:export
 
 Dump database to folder on current instance located by default in "{{deploy_path}}/.dep/databases/dumps/".
 Dumps will be stored in two separate files. One with tables structure. The second with data only.
-There is option --dumpcode that can be passed. If there is no dumpcode then its created and returned as
+There is option ``--options=dumpcode:[value]`` that can be passed. If there is no dumpcode then its created and returned as
 json structure.
 
 **Example**
@@ -564,7 +564,7 @@ db:import
 +++++++++
 
 Import database dump files from current instance folder "{{deploy_path}}/.dep/databases/dumps/" to current database(s).
-There is required option --dumpcode to be passed.
+There is required option ``--options=dumpcode:[value]`` to be passed.
 
 **Example**
 ::
@@ -575,7 +575,7 @@ db:process
 ++++++++++
 
 This command will run some defined commands on pure sql file as its sometimes needed to remove or replace some strings
-directly on sql file before importing. There is required option --dumpcode to be passed.
+directly on sql file before importing. There is required option ``--options=dumpcode:[value]`` to be passed.
 
 **Example**
 ::
@@ -604,7 +604,7 @@ db:rmdump
 +++++++++
 
 This command will remove all dumps with given dumpcode (compressed and uncompressed).
-There is required option --dumpcode to be passed.
+There is required option ``--options=dumpcode:[value]`` to be passed.
 
 **Example**
 ::
@@ -633,7 +633,7 @@ db:upload
 
 Upload database dumps with selected dumpcode from folder "{{deploy_path}}/.dep/databases/dumps/" on current instance and
 store it in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
-There is required option --dumpcode to be passed.
+There is required option ``--options=dumpcode:[value]`` to be passed.
 
 **Example**
 ::
