@@ -14,7 +14,7 @@ task('db:upload', function () {
     if (null === input()->getArgument('stage')) {
         throw new GracefulShutdownException('The target instance is required for db:upload command.', 1500716535614);
     }
-    $dumpCode = (new ConsoleUtility())->optionRequired('db-dumpcode', input());
+    $dumpCode = (new ConsoleUtility())->getOption('dumpcode', true);
     $rsyncUtility = new RsyncUtility();
     $fileUtility = new FileUtility();
     runLocally(sprintf(

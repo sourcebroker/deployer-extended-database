@@ -9,8 +9,8 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
  */
 task('db:backup', function () {
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
-    if (!empty(input()->getOption('db-dumpcode'))) {
-        $dumpCode = input()->getOption('db-dumpcode');
+    if (!empty(input()->getOption('dumpcode'))) {
+        $dumpCode = input()->getOption('dumpcode');
     } else {
         if (get('current_stage') == get('target_stage')) {
             $list = [];
@@ -33,15 +33,15 @@ task('db:backup', function () {
         }
         $dumpCode = 'backup' . $dumpCodeRealese . '_' . md5(microtime(true) . rand(0, 10000));
     }
-    $dumpoCodeAndVerbosity = '--db-dumpcode=' . $dumpCode . ' ' . $verbosity;
+    $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]);
     if (get('current_stage') == get('target_stage')) {
-        runLocally('{{local/bin/deployer}} db:export ' . $dumpoCodeAndVerbosity);
-        runLocally('{{local/bin/deployer}} db:compress ' . $dumpoCodeAndVerbosity);
+        runLocally('{{local/bin/deployer}} db:export ' . $options . ' ' . $verbosity);
+        runLocally('{{local/bin/deployer}} db:compress ' . $options . ' ' . $verbosity);
         runLocally('{{local/bin/deployer}} db:dumpclean' . $verbosity);
     } else {
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
-        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:export ' . $dumpoCodeAndVerbosity);
-        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:compress ' . $dumpoCodeAndVerbosity);
+        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:export ' . $options . ' ' . $verbosity);
+        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:compress ' . $options . ' ' . $verbosity);
         run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:dumpclean' . $verbosity);
     }
 })->desc('Do backup of database (export and compress)');

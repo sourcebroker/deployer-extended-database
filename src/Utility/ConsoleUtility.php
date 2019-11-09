@@ -2,6 +2,7 @@
 
 namespace SourceBroker\DeployerExtendedDatabase\Utility;
 
+use function Deployer\input;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
 
@@ -43,49 +44,51 @@ class ConsoleUtility
     /**
      * Check if option is present and return it. If not throw exception.
      *
-     * @param string $requiredOption
+     * @param $optionToFind
+     * @param bool $required
      * @param InputInterface $input
      * @return mixed
      */
-    public function optionRequired($requiredOption, InputInterface $input)
+    public function getOption($optionToFind, $required = false)
     {
-        if (!empty($input->getOption($requiredOption))) {
-            $requiredOptionValue = $input->getOption($requiredOption);
-        } else {
-            throw new \InvalidArgumentException('No --' . $requiredOption . ' option set.', 1458937128560);
-        }
-        return $requiredOptionValue;
-    }
-
-
-    /**
-     * Check if option is present and return it. If not throw exception.
-     *
-     * @param $option
-     * @param InputInterface $input
-     * @return mixed
-     */
-    public function getOptionFromDboptions($option, InputInterface $input)
-    {
-        $dbOptionReturnValue = null;
-        if (!empty($input->getOption('db-options'))) {
-            $dbOptions = explode(',', $input->getOption('db-options'));
-            if (is_array($dbOptions)) {
-                foreach ($dbOptions as $dbOption) {
-                    $dbOptionParts = explode(':', $dbOption);
-                    if (!empty($dbOptionParts[1])) {
-                        $dbOptionValue = $dbOptionParts[1];
+        $optionReturnValue = null;
+        if (!empty(input()->getOption('options'))) {
+            $options = explode(',', input()->getOption('options'));
+            if (is_array($options)) {
+                foreach ($options as $option) {
+                    $optionParts = explode(':', $option);
+                    if (!empty($optionParts[1])) {
+                        $optionValue = $optionParts[1];
                     }
-                    if ($option === $dbOptionParts[0]) {
-                        if (!empty($dbOptionValue)) {
-                            $dbOptionReturnValue = $dbOptionValue;
+                    if ($optionToFind === $optionParts[0]) {
+                        if (!empty($optionValue)) {
+                            $optionReturnValue = $optionValue;
                         } else {
-                            $dbOptionReturnValue = true;
+                            $optionReturnValue = true;
                         }
                     }
                 }
             }
         }
-        return $dbOptionReturnValue;
+        if ($required && $optionReturnValue === null) {
+            throw new \InvalidArgumentException('No `--options=' . $optionToFind . ':value` set.', 1458937128560);
+        }
+        return $optionReturnValue;
+    }
+
+    public function getOptionsForCliUsage(array $optionsToSet)
+    {
+        $getOptionsForCliUsage = '';
+        $getOptionsForCliUsageArray = [];
+        foreach ($optionsToSet as $optionToSetKey => $optionToSetValue) {
+            if ($optionToSetValue === true) {
+                $optionToSetValue = 'true';
+            } elseif ($optionToSetValue === false) {
+                $optionToSetValue = 'false';
+            }
+            $getOptionsForCliUsageArray[] = $optionToSetKey . ':' . $optionToSetValue;
+        }
+        return $getOptionsForCliUsage . !empty($getOptionsForCliUsageArray) ? implode(',',
+            $getOptionsForCliUsageArray) : '';
     }
 }

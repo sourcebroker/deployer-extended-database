@@ -17,10 +17,11 @@ task('db:pull', function () {
 
     $dl = get('local/bin/deployer');
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
-    runLocally($dl . ' db:export ' . $sourceInstance . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
-    runLocally($dl . ' db:download ' . $sourceInstance . ' --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
-    runLocally($dl . ' db:process --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
-    runLocally($dl . ' db:import --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
-    runLocally($dl . ' db:compress --db-dumpcode=' . $dumpCode . ' ' . $verbosity);
+    $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]);
+    runLocally($dl . ' db:export ' . $sourceInstance . $options . ' ' . $verbosity);
+    runLocally($dl . ' db:download ' . $sourceInstance . $options . ' ' . $verbosity);
+    runLocally($dl . ' db:process ' . $options . ' ' . $verbosity);
+    runLocally($dl . ' db:import ' . $options . ' ' . $verbosity);
+    runLocally($dl . ' db:compress ' . $options . ' ' . $verbosity);
     runLocally($dl . ' db:dumpclean' . $verbosity);
 })->desc('Synchronize database from target instance to current instance');
