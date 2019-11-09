@@ -59,8 +59,7 @@ task('db:export', function () {
                 . implode('#', $filenameParts) . '.sql');
             runLocally(vsprintf(
                 'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r%s'
-                . ((new ConsoleUtility())->getOption('exportTaskAddIgnoreTablesToStructureDump',
-                    input()) ? ' %s' : ''),
+                . ((new ConsoleUtility())->getOption('exportTaskAddIgnoreTablesToStructureDump') ? ' %s' : ''),
                 $mysqlDumpArgs
             ));
 

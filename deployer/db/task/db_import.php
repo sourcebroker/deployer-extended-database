@@ -43,8 +43,7 @@ task('db:import', function () {
                     1500722095323);
             }
             // Drop all tables.
-            if (empty((new ConsoleUtility())->getOption('importTaskDoNotDropAllTablesBeforeImport',
-                input()))) {
+            if (empty((new ConsoleUtility())->getOption('importTaskDoNotDropAllTablesBeforeImport'))) {
                 runLocally(sprintf(
                     'export MYSQL_PWD=%s && %s -h%s -P%s -u%s %s --add-drop-table --no-data | ' .
                     'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s -h%s -P%s -u%s -D%s',

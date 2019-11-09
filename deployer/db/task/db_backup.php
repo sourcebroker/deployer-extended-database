@@ -9,8 +9,8 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
  */
 task('db:backup', function () {
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
-    if (!empty(input()->getOption('dumpcode'))) {
-        $dumpCode = input()->getOption('dumpcode');
+    if (!(new ConsoleUtility())->getOption('dumpcode')) {
+        $dumpCode = (new ConsoleUtility())->getOption('dumpcode');
     } else {
         if (get('current_stage') == get('target_stage')) {
             $list = [];

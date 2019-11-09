@@ -88,7 +88,7 @@ class ConsoleUtility
             }
             $getOptionsForCliUsageArray[] = $optionToSetKey . ':' . $optionToSetValue;
         }
-        return $getOptionsForCliUsage . !empty($getOptionsForCliUsageArray) ? implode(',',
-            $getOptionsForCliUsageArray) : '';
+        return $getOptionsForCliUsage . (!empty($getOptionsForCliUsageArray) ? '--options=' . implode(',',
+            $getOptionsForCliUsageArray) : '');
     }
 }
