@@ -136,7 +136,7 @@ task('db:import', function () {
             if (isset($databaseConfig['post_command']) && is_array($databaseConfig['post_command'])) {
                 foreach ($databaseConfig['post_command'] as $postCommand) {
                     $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]);
-                    runLocally($postCommand . $options);
+                    runLocally($postCommand . ' ' . $options);
                 }
             }
         }

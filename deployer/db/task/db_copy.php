@@ -47,16 +47,16 @@ task('db:copy', function () {
     if (get('current_stage') == get('target_stage')) {
         runLocally($dl . ' db:export ' . $options . ' ' . $verbosity);
     } else {
-        runLocally($dl . ' db:export ' . $sourceInstance . $options . ' ' . $verbosity);
-        runLocally($dl . ' db:download ' . $sourceInstance . $options . ' ' . $verbosity);
+        runLocally($dl . ' db:export ' . $sourceInstance . ' ' . $options . ' ' . $verbosity);
+        runLocally($dl . ' db:download ' . $sourceInstance . ' ' . $options . ' ' . $verbosity);
     }
     runLocally($dl . ' db:process ' . $options . ' ' . $verbosity);
     if (get('current_stage') == $targetInstanceName) {
         runLocally($dl . ' db:import ' . $options . ' ' . $verbosity);
         runLocally($dl . ' db:rmdump ' . $options . ' ' . $verbosity);
     } else {
-        runLocally($dl . ' db:upload ' . $targetInstanceName . $options . ' ' . $verbosity);
-        runLocally($dl . ' db:import ' . $targetInstanceName . $options . ' ' . $verbosity);
-        runLocally($dl . ' db:rmdump ' . $targetInstanceName . $options . ' ' . $verbosity);
+        runLocally($dl . ' db:upload ' . $targetInstanceName . ' ' . $options . ' ' . $verbosity);
+        runLocally($dl . ' db:import ' . $targetInstanceName . ' ' . $options . ' ' . $verbosity);
+        runLocally($dl . ' db:rmdump ' . $targetInstanceName . ' ' . $options . ' ' . $verbosity);
     }
 })->desc('Synchronize database between instances');
