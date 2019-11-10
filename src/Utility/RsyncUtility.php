@@ -2,7 +2,6 @@
 
 namespace SourceBroker\DeployerExtendedDatabase\Utility;
 
-use Deployer\Task\Context;
 use SourceBroker\DeployerInstance\Configuration;
 
 /**
@@ -13,7 +12,7 @@ use SourceBroker\DeployerInstance\Configuration;
 class RsyncUtility
 {
     /**
-     * @param Context $taskContext
+     * @param $targetStageName
      * @return string
      */
     public function getSshOptions($targetStageName)
@@ -31,12 +30,10 @@ class RsyncUtility
 
     public function getHostWithDbStoragePath($targetStageName)
     {
-        $serverEnvironment = Configuration::getHost($targetStageName)->getConfig();
-        $serverConfiguration = Configuration::getHost($targetStageName);
-        $serverWithPath =
-            ($serverConfiguration->getUser() ? $serverConfiguration->getUser() . '@' : '') .
-            $serverConfiguration->getRealHostname() .
-            ':/' . trim($serverEnvironment->get('db_storage_path'), '/') . '/';
-        return $serverWithPath;
+        $host = Configuration::getHost($targetStageName);
+        return
+            ($host->getUser() ? $host->getUser() . '@' : '') .
+            $host->getRealHostname() .
+            ':/' . trim(Configuration::getHost($targetStageName)->getConfig()->get('db_storage_path'), '/') . '/';
     }
 }

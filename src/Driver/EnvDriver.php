@@ -2,7 +2,7 @@
 
 namespace SourceBroker\DeployerExtendedDatabase\Driver;
 
-use Dotenv\Dotenv;
+use Symfony\Component\Dotenv\Dotenv;
 
 /**
  * Configuration reader for database data stored in .env file.
@@ -24,7 +24,7 @@ class EnvDriver
         $absolutePath = null === $absolutePath ? getcwd() : $absolutePath;
         $absolutePath = rtrim($absolutePath, DIRECTORY_SEPARATOR);
         if (file_exists($absolutePath . '/.env')) {
-            (new Dotenv($absolutePath))->load();
+            (new Dotenv())->load($absolutePath . '/.env');
             foreach (['DATABASE_HOST', 'DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD'] as $requiredEnv) {
                 if (false === getenv($prefix . $requiredEnv)) {
                     throw new \Exception('Missing ' . $prefix . $requiredEnv . ' in .env file.');
