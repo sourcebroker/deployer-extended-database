@@ -17,12 +17,9 @@ class RsyncUtility
      */
     public function getSshOptions($targetStageName)
     {
-        $sshOptions = [];
-        $serverConfiguration = Configuration::getHost($targetStageName);
-        $sshOptions[] = $serverConfiguration->getPort() ? ' -p' . $serverConfiguration->getPort() : null;
-        $sshOptions[] = $serverConfiguration->getIdentityFile() ? ' -i ' . $serverConfiguration->getIdentityFile() : null;
-        if (!empty(array_filter($sshOptions))) {
-            return 'ssh ' . implode(' ', $sshOptions);
+        $host = Configuration::getHost($targetStageName);
+        if (!empty($host->getSshArguments())) {
+            return '-e ' . escapeshellarg('ssh ' . $host->getSshArguments()->getCliArguments());
         } else {
             return '';
         }

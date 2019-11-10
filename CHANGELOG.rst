@@ -7,6 +7,7 @@ master
 
 1) Compatibility with Deployer 6.5+
 2) Refactor options to single option --options=key:value,key:value
+3) Use $host->getSshArguments()->getCliArguments() for creating rsync ssh parameters.
 
 8.0.0
 ~~~~~

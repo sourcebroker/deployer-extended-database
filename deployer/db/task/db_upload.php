@@ -19,8 +19,7 @@ task('db:upload', function () {
     $fileUtility = new FileUtility();
     runLocally(sprintf(
         'rsync -rz --remove-source-files %s --include=%s --exclude=* %s %s',
-        $rsyncUtility->getSshOptions(get('target_stage')) ? '-e '
-            . escapeshellarg($rsyncUtility->getSshOptions(get('target_stage'))) : '',
+        $rsyncUtility->getSshOptions(get('target_stage')),
         escapeshellarg('*dumpcode=' . $dumpCode . '*'),
         escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))),
         escapeshellarg($rsyncUtility->getHostWithDbStoragePath(get('target_stage')))
