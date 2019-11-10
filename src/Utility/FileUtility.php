@@ -10,7 +10,7 @@ class FileUtility
 {
     /**
      * @param $filename
-     * @return mixed
+     * @return string
      */
     public function normalizeFilename($filename)
     {

@@ -25,6 +25,10 @@ class RsyncUtility
         }
     }
 
+    /**
+     * @param $targetStageName
+     * @return string
+     */
     public function getHostWithDbStoragePath($targetStageName)
     {
         $host = Configuration::getHost($targetStageName);

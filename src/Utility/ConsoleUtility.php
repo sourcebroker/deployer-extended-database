@@ -45,7 +45,7 @@ class ConsoleUtility
      *
      * @param $optionToFind
      * @param bool $required
-     * @return mixed
+     * @return string
      */
     public function getOption($optionToFind, $required = false)
     {
