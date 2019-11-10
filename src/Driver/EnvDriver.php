@@ -14,17 +14,17 @@ class EnvDriver
 {
     /**
      * @param string $prefix
-     * @param null $absolutePath
+     * @param string $absolutePath
      * @return array
      * @throws \Exception
-     * @internal param null $params
      */
-    public function getDatabaseConfig($prefix = '', $absolutePath = null)
+    public function getDatabaseConfig(string $prefix = '', string $absolutePath = null)
     {
         $absolutePath = null === $absolutePath ? getcwd() : $absolutePath;
         $absolutePath = rtrim($absolutePath, DIRECTORY_SEPARATOR);
-        if (file_exists($absolutePath . '/.env')) {
-            (new Dotenv())->load($absolutePath . '/.env');
+        $envFilePath = $absolutePath . '/.env';
+        if (file_exists($envFilePath)) {
+            (new Dotenv())->load($envFilePath);
             foreach (['DATABASE_HOST', 'DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD'] as $requiredEnv) {
                 if (false === getenv($prefix . $requiredEnv)) {
                     throw new \Exception('Missing ' . $prefix . $requiredEnv . ' in .env file.');
@@ -38,7 +38,7 @@ class EnvDriver
                 'password' => getenv($prefix . 'DATABASE_PASSWORD')
             ];
         } else {
-            throw new \Exception('Missing file "' . getcwd() . '/.env');
+            throw new \Exception('Missing file "' . $envFilePath);
         }
     }
 }
