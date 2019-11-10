@@ -13,7 +13,7 @@ task('db:rmdump', function () {
         runLocally('cd ' . get('db_storage_path_current') .
             ' && rm -f *dumpcode=' . $dumpCode . '*');
     } else {
-        $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
+        $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
         $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]);
         run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:rmdump ' . $options . ' ' . $verbosity);

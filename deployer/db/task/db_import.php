@@ -141,7 +141,7 @@ task('db:import', function () {
             }
         }
     } else {
-        $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
+        $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
         run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:import ' . (input()->getOption('options') ? '--options=' . input()->getOption('options') : '') . ' ' . $verbosity);
     }

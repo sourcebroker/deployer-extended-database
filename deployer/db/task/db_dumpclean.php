@@ -53,6 +53,6 @@ task('db:dumpclean', function () {
     } else {
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
         run('cd ' . $activePath .
-            ' && {{bin/php}} {{bin/deployer}} db:dumpclean ' . (new ConsoleUtility())->getVerbosityAsParameter(output()));
+            ' && {{bin/php}} {{bin/deployer}} db:dumpclean ' . (new ConsoleUtility())->getVerbosityAsParameter());
     }
 })->desc('Cleans the database dump storage');

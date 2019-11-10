@@ -40,7 +40,7 @@ task('db:copy', function () {
             "The target instance is not set as second parameter. You must set the target instance as '--options=target:[target-name]'"
         );
     }
-    $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
+    $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
     $sourceInstance = get('target_stage');
     $dl = get('local/bin/deployer');
     $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => md5(microtime(true) . rand(0, 10000))]);

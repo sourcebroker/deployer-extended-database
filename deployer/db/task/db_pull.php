@@ -16,7 +16,7 @@ task('db:pull', function () {
     $dumpCode = md5(microtime(true) . rand(0, 10000));
 
     $dl = get('local/bin/deployer');
-    $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
+    $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
     $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]);
     runLocally($dl . ' db:export ' . $sourceInstance . ' ' . $options . ' ' . $verbosity);
     runLocally($dl . ' db:download ' . $sourceInstance . ' ' . $options . ' ' . $verbosity);

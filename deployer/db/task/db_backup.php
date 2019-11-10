@@ -8,7 +8,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
  * @see https://github.com/sourcebroker/deployer-extended-database#db-backup
  */
 task('db:backup', function () {
-    $verbosity = (new ConsoleUtility())->getVerbosityAsParameter(output());
+    $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
     $dumpCode = (new ConsoleUtility())->getOption('dumpcode');
     if (empty($dumpCode)) {
         if (get('current_stage') == get('target_stage')) {

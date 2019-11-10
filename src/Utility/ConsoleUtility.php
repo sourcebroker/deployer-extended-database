@@ -3,8 +3,8 @@
 namespace SourceBroker\DeployerExtendedDatabase\Utility;
 
 use function Deployer\input;
+use function Deployer\output;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputInterface;
 
 /**
  * Class ConsoleUtility
@@ -16,12 +16,11 @@ class ConsoleUtility
     /**
      * Returns OutputInterface verbosity as parameter that can be used in cli command
      *
-     * @param OutputInterface $output
      * @return string
      */
-    public function getVerbosityAsParameter(OutputInterface $output)
+    public function getVerbosityAsParameter()
     {
-        switch ($output->getVerbosity()) {
+        switch (output()->getVerbosity()) {
             case OutputInterface::VERBOSITY_DEBUG:
                 $verbosity = ' -vvv';
                 break;
@@ -46,7 +45,6 @@ class ConsoleUtility
      *
      * @param $optionToFind
      * @param bool $required
-     * @param InputInterface $input
      * @return mixed
      */
     public function getOption($optionToFind, $required = false)
@@ -89,6 +87,6 @@ class ConsoleUtility
             $getOptionsForCliUsageArray[] = $optionToSetKey . ':' . $optionToSetValue;
         }
         return $getOptionsForCliUsage . (!empty($getOptionsForCliUsageArray) ? '--options=' . implode(',',
-            $getOptionsForCliUsageArray) : '');
+                    $getOptionsForCliUsageArray) : '');
     }
 }
