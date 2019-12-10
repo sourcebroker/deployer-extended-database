@@ -451,13 +451,13 @@ db:copy
 This command allows you to copy database between instances.
 ::
 
-   dep db:copy [source-instance] [target-instance]
+   dep db:copy [source-instance] --options=target:[target-instance]
 
 In the background it runs several other tasks to accomplish this. Lets assume we want to copy database from live
 to dev instance. We will run following command on you local current (in out exmaple local instance):
 ::
 
-   dep db:copy live dev
+   dep db:copy live --options=target:dev
 
 Here are the tasks that will be run in background:
 
