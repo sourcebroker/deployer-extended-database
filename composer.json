@@ -17,7 +17,6 @@
   "require": {
     "deployer/dist": "^6.4.0",
     "symfony/dotenv": "^3.3.0 || ^4.0",
-    "sourcebroker/deployer-loader": "^2.0.0",
     "sourcebroker/deployer-instance": "^2.0.0"
   },
   "autoload": {

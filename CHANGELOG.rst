@@ -6,6 +6,7 @@ master
 
 1) [FEATURE] Add db:push command.
 2) [FEATURE] Add FileUtility->locateLocalBinaryPath.
+3) [TASK][BREAKING] Remove not needed dependency to deployer-extended-loader.
 
 9.0.0
 ~~~~~~
