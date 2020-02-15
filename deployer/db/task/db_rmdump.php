@@ -9,8 +9,8 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
  */
 task('db:rmdump', function () {
     $dumpCode = (new ConsoleUtility())->getOption('dumpcode', true);
-    if (get('current_stage') == get('target_stage')) {
-        runLocally('cd ' . get('db_storage_path_current') .
+    if (empty(get('argument_stage'))) {
+        runLocally('cd ' . get('db_storage_path_local') .
             ' && rm -f *dumpcode=' . $dumpCode . '*');
     } else {
         $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();

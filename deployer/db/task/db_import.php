@@ -12,10 +12,10 @@ use Deployer\Exception\GracefulShutdownException;
 task('db:import', function () {
     $dumpCode = (new ConsoleUtility())->getOption('dumpcode', true);
     $fileUtility = new FileUtility();
-    if (get('current_stage') == get('target_stage')) {
-        $currentInstanceDatabaseStoragePath = get('db_storage_path_current');
+    if (empty(get('argument_stage'))) {
+        $localInstanceDatabaseStoragePath = get('db_storage_path_local');
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
-            $globStart = $fileUtility->normalizeFolder($currentInstanceDatabaseStoragePath)
+            $globStart = $fileUtility->normalizeFolder($localInstanceDatabaseStoragePath)
                 . '*dbcode=' . $fileUtility->normalizeFilename($databaseCode)
                 . '*dumpcode=' . $dumpCode;
 
@@ -119,7 +119,7 @@ task('db:import', function () {
                 $postSqlInCollected[] = $databaseConfig['post_sql_in'];
             }
             if (!empty($postSqlInCollected)) {
-                $importSqlFile = $fileUtility->normalizeFolder($currentInstanceDatabaseStoragePath) . $dumpCode . '.sql';
+                $importSqlFile = $fileUtility->normalizeFolder($localInstanceDatabaseStoragePath) . $dumpCode . '.sql';
                 file_put_contents($importSqlFile, implode(' ', $postSqlInCollected));
                 runLocally(sprintf(
                     'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e%s',
@@ -145,4 +145,4 @@ task('db:import', function () {
         $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
         run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:import ' . (input()->getOption('options') ? '--options=' . input()->getOption('options') : '') . ' ' . $verbosity);
     }
-})->desc('Import dumps with given dumpcode from current database dumps storage to database');
+})->desc('Import dump with given dumpcode from database dumps storage to database');

@@ -11,7 +11,7 @@ use Deployer\Exception\GracefulShutdownException;
  * @see https://github.com/sourcebroker/deployer-extended-database#db-download
  */
 task('db:download', function () {
-    if (null === input()->getArgument('stage')) {
+    if (null === get('argument_stage')) {
         throw new GracefulShutdownException('The target instance is required for db:download command.', 1488143750580);
     }
     $dumpCode = (new ConsoleUtility())->getOption('dumpcode', true);
@@ -19,9 +19,9 @@ task('db:download', function () {
     $fileUtility = new FileUtility();
     runLocally(sprintf(
         'rsync -rz --remove-source-files %s --include=%s --exclude=* %s %s',
-        $rsyncUtility->getSshOptions(get('target_stage')),
+        $rsyncUtility->getSshOptions(get('argument_stage')),
         escapeshellarg('*dumpcode=' . $dumpCode . '*'),
-        escapeshellarg($rsyncUtility->getHostWithDbStoragePath(get('target_stage'))),
-        escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current')))
+        escapeshellarg($rsyncUtility->getHostWithDbStoragePath(get('argument_stage'))),
+        escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_local')))
     ));
-})->desc('Download the database dumps with given dumpcode from target to current database dumps storage');
+})->desc('Download the database dumps with given dumpcode from remote to local database dumps storage');

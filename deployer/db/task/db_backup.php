@@ -11,7 +11,7 @@ task('db:backup', function () {
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
     $dumpCode = (new ConsoleUtility())->getOption('dumpcode');
     if (empty($dumpCode)) {
-        if (get('current_stage') == get('target_stage')) {
+        if (empty(get('argument_stage'))) {
             $list = [];
             if (testLocally('[ -e {{deploy_path}}/releases ]')) {
                 $list = explode("\n", runLocally('cd releases && ls -t -1 -d */'));
@@ -33,7 +33,7 @@ task('db:backup', function () {
         $dumpCode = 'backup' . $dumpCodeRealese . '_' . md5(microtime(true) . rand(0, 10000));
     }
     $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]);
-    if (get('current_stage') == get('target_stage')) {
+    if (empty(get('argument_stage'))) {
         runLocally('{{local/bin/deployer}} db:export ' . $options . ' ' . $verbosity);
         runLocally('{{local/bin/deployer}} db:compress ' . $options . ' ' . $verbosity);
         runLocally('{{local/bin/deployer}} db:dumpclean' . $verbosity);

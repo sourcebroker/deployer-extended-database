@@ -9,9 +9,9 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
  */
 task('db:compress', function () {
     $dumpCode = (new ConsoleUtility())->getOption('dumpcode', true);
-    if (get('current_stage') == get('target_stage')) {
+    if (empty(get('argument_stage'))) {
         $markersArray = [];
-        $markersArray['{{databaseStorageAbsolutePath}}'] = get('db_storage_path_current');
+        $markersArray['{{databaseStorageAbsolutePath}}'] = get('db_storage_path_local');
         $markersArray['{{dumpcode}}'] = $dumpCode;
         if (get('db_compress_command', false) !== false) {
             foreach (get('db_compress_command') as $dbProcessCommand) {

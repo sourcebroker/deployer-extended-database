@@ -3,20 +3,16 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
+use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerInstance\Configuration;
 use Deployer\Exception\GracefulShutdownException;
 
-// mysqldump options for dumping structure.
 set('db_export_mysqldump_options_structure', '--no-data=true --default-character-set=utf8');
 
-// mysqldump options for dumping data.
-set('db_export_mysqldump_options_data',
-    '--opt --skip-lock-tables --single-transaction --no-create-db --default-character-set=utf8');
+set('db_export_mysqldump_options_data', '--opt --skip-lock-tables --single-transaction --no-create-db --default-character-set=utf8');
 
-// mysql options for importing structure.
 set('db_import_mysql_options_structure', '--default-character-set=utf8');
 
-// mysql options for importing data.
 set('db_import_mysql_options_data', '--default-character-set=utf8');
 
 // Return commands for direct processing of sql file. Can be used before mysql import.
@@ -29,28 +25,13 @@ set('db_process_commands', [
 
 set('db_compress_suffix', '.gz');
 
-// Return commands for compressing sql file.
 set('db_compress_command', [
     '{{local/bin/gzip}} --force --name {{databaseStorageAbsolutePath}}/*dumpcode={{dumpcode}}*.sql --suffix ' . get('db_compress_suffix')
 ]);
-// Return commands for compressing sql file.
+
 set('db_decompress_command', [
     '{{local/bin/gzip}} --force --name --uncompress ' . ' --suffix ' . get('db_compress_suffix') . ' {{databaseStorageAbsolutePath}}/*dumpcode={{dumpcode}}*' . get('db_compress_suffix')
 ]);
-
-// Returns current server configuration.
-set('current_server', function () {
-    return Configuration::getHost(get('current_stage'));
-});
-
-set('current_environment', function () {
-    return Configuration::getHost(get('current_stage'))->getConfig();
-});
-
-// Returns target stage server configuration.
-set('target_server', function () {
-    return Configuration::getHost(get('target_stage'));
-});
 
 // Returns "db_databases" merged for direct use.
 set('db_databases_merged', function () {
@@ -83,19 +64,19 @@ set('db_databases_merged', function () {
     return $dbConfigsMerged;
 });
 
-// Returns path to store database dumps on current instance.
-set('db_storage_path_current', function () {
-    if (get('current_environment')->get('db_storage_path_relative', false) == false) {
-        $dbStoragePathCurrent = get('current_environment')->get('deploy_path') . '/.dep/database/dumps';
+// Returns path to store database dumps on local stage.
+set('db_storage_path_local', function () {
+    if (Configuration::getLocalHost()->getConfig()->get('db_storage_path_relative', false) == false) {
+        $dbStoragePathLocal = Configuration::getLocalHost()->getConfig()->get('deploy_path') . '/.dep/database/dumps';
     } else {
-        $dbStoragePathCurrent = get('current_environment')->get('deploy_path') . '/'
-            . get('current_environment')->get('db_storage_path_relative');
+        $dbStoragePathLocal = Configuration::getLocalHost()->getConfig()->get('deploy_path') . '/'
+            . Configuration::getLocalHost()->getConfig()->get('db_storage_path_relative');
     }
-    runLocally('[ -d ' . $dbStoragePathCurrent . ' ] || mkdir -p ' . $dbStoragePathCurrent);
-    return $dbStoragePathCurrent;
+    runLocally('[ -d ' . $dbStoragePathLocal . ' ] || mkdir -p ' . $dbStoragePathLocal);
+    return $dbStoragePathLocal;
 });
 
-// Returns path to store database dumps on target stage instance.
+// Returns path to store database dumps on remote stage.
 set('db_storage_path', function () {
     if (get('db_storage_path_relative', false) == false) {
         $dbStoragePath = get('deploy_path') . '/.dep/database/dumps';
@@ -108,7 +89,6 @@ set('db_storage_path', function () {
 
 set('bin/deployer', function () {
     $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
-    // We need check if there is composer based deployer
     if (test('[ -e ' . escapeshellarg($activePath . '/vendor/bin/dep') . ' ]')) {
         $deployerBin = $activePath . '/vendor/bin/dep';
     } else {
@@ -122,28 +102,13 @@ set('local/bin/deployer', function () {
 });
 
 set('local/bin/mysqldump', function () {
-    if (testLocally('hash mysqldump 2>/dev/null')) {
-        return 'mysqldump';
-    } else {
-        throw new GracefulShutdownException('The mysqldump path on server "' . get('target_stage') . '" is unknown. 
-        You can set it in env var "local/bin/mysqldump"', 1500717760352);
-    }
+    return (new FileUtility())->locateLocalBinaryPath('mysqldump');
 });
 
 set('local/bin/mysql', function () {
-    if (testLocally('hash mysql 2>/dev/null')) {
-        return 'mysql';
-    } else {
-        throw new GracefulShutdownException('The mysql path on server "' . get('target_stage') . '" is unknown.
-        You can set it in env var "local/bin/mysql".', 1500717744659);
-    }
+    return (new FileUtility())->locateLocalBinaryPath('mysql');
 });
 
 set('local/bin/gzip', function () {
-    if (testLocally('hash gzip 2>/dev/null')) {
-        return 'gzip';
-    } else {
-        throw new GracefulShutdownException('The gzip path on server "' . get('target_stage') . '" is unknown. 
-        You can set it in env var "local/bin/gzip"', 1512217259381);
-    }
+    return (new FileUtility())->locateLocalBinaryPath('gzip');
 });

@@ -12,7 +12,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 task('db:truncate', function () {
     $arrayUtility = new ArrayUtility();
     $databaseUtility = new DatabaseUtility();
-    if (get('current_stage') == get('target_stage')) {
+    if (empty(get('argument_stage'))) {
         foreach (get('db_databases_merged') as $databaseConfig) {
             if (isset($databaseConfig['truncate_tables']) && is_array($databaseConfig['truncate_tables'])) {
                 $truncateTables = $arrayUtility->filterWithRegexp(

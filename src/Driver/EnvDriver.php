@@ -18,7 +18,7 @@ class EnvDriver
      * @return array
      * @throws \Exception
      */
-    public function getDatabaseConfig(string $prefix = '', string $absolutePath = null)
+    public function getDatabaseConfig(string $prefix = null, string $absolutePath = null)
     {
         $absolutePath = null === $absolutePath ? getcwd() : $absolutePath;
         $absolutePath = rtrim($absolutePath, DIRECTORY_SEPARATOR);

@@ -21,11 +21,11 @@ task('db:export', function () {
     $fileUtility = new FileUtility();
     $arrayUtility = new ArrayUtility();
     $databaseUtility = new DatabaseUtility();
-    if (get('current_stage') == get('target_stage')) {
+    if (empty(get('argument_stage'))) {
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
             $filenameParts = [
                 'dateTime' => date('Y-m-d_H-i-s'),
-                'server' => 'server=' . $fileUtility->normalizeFilename(get('target_stage')),
+                'server' => 'server=' . $fileUtility->normalizeFilename(get('argument_stage')),
                 'dbcode' => 'dbcode=' . $fileUtility->normalizeFilename($databaseCode),
                 'dumpcode' => 'dumpcode=' . $fileUtility->normalizeFilename($dumpCode),
                 'type' => '',
@@ -55,7 +55,7 @@ task('db:export', function () {
             // dump database structure
             $filenameParts['type'] = 'type=structure';
             $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_structure', '');
-            $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))
+            $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_local'))
                 . implode('#', $filenameParts) . '.sql');
             runLocally(vsprintf(
                 'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r%s'
@@ -66,7 +66,7 @@ task('db:export', function () {
             // dump database data
             $filenameParts['type'] = 'type=data';
             $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_data', '');
-            $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_current'))
+            $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_local'))
                 . implode('#', $filenameParts) . '.sql');
             runLocally(vsprintf(
                 'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r%s %s',
@@ -81,4 +81,4 @@ task('db:export', function () {
     if ($returnDumpCode) {
         writeln(json_encode(['dumpCode' => $dumpCode]));
     }
-})->desc('Export database dumps to current database dumps storage');
+})->desc('Dump database and store it in database dumps storage');

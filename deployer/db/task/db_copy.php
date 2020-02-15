@@ -9,13 +9,13 @@ use Deployer\Exception\GracefulShutdownException;
  * @see https://github.com/sourcebroker/deployer-extended-database#db-copy
  */
 task('db:copy', function () {
-    if (null === input()->getArgument('stage')) {
+    if (null === get('argument_stage')) {
         throw new GracefulShutdownException("The source instance is required for db:move command.");
     }
     $targetInstanceName = (new ConsoleUtility())->getOption('target');
     if ($targetInstanceName) {
         if (!askConfirmation(sprintf("Do you really want to copy database from instance %s to instance %s",
-            input()->getArgument('stage'), $targetInstanceName), true)) {
+            get('argument_stage'), $targetInstanceName), true)) {
             throw new GracefulShutdownException(
                 "Process aborted"
             );
@@ -41,17 +41,17 @@ task('db:copy', function () {
         );
     }
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
-    $sourceInstance = get('target_stage');
+    $sourceInstance = get('argument_stage');
     $dl = get('local/bin/deployer');
     $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => md5(microtime(true) . rand(0, 10000))]);
-    if (get('current_stage') == get('target_stage')) {
+    if (empty(get('argument_stage'))) {
         runLocally($dl . ' db:export ' . $options . ' ' . $verbosity);
     } else {
         runLocally($dl . ' db:export ' . $sourceInstance . ' ' . $options . ' ' . $verbosity);
         runLocally($dl . ' db:download ' . $sourceInstance . ' ' . $options . ' ' . $verbosity);
     }
     runLocally($dl . ' db:process ' . $options . ' ' . $verbosity);
-    if (get('current_stage') == $targetInstanceName) {
+    if (get('default_stage') == $targetInstanceName) {
         runLocally($dl . ' db:import ' . $options . ' ' . $verbosity);
         runLocally($dl . ' db:rmdump ' . $options . ' ' . $verbosity);
     } else {
