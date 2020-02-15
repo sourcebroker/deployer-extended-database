@@ -23,8 +23,9 @@ What does it do?
 The package provides additional tasks for deployer (deployer.org) for synchronizing databases between instances.
 Most useful are two tasks:
 
-1. task "`db:pull`_ [source-instance]" task which allows you to pull database from source instance to current
-   instance,
+1. task "`db:pull`_ [source-instance]" task which allows you to pull database from remote instance to local instance,
+
+2. task "`db:push`_ [target-instance]" task which allows you to push database from local to remote instance,
 
 2. task "`db:copy`_ [source-instance] --options=target:[target-instance]" which allows to copy database between instances.
 
@@ -599,6 +600,25 @@ Here is the list of tasks that will be done afer "db:pull":
 ::
 
    dep db:pull live
+
+
+db:push
++++++++
+
+This command allows you to push database from local instance to remote instance.
+In the background it runs several other tasks to accomplish this.
+
+Here is the list of tasks that will be done afer "db:pull":
+
+1) First it runs `db:export`_ task on local instance and get the "dumpcode" as return to use it in next commands.
+2) Then it runs `db:upload`_ on local instance with remote as argument (with "dumpcode" value from first task).
+3) Then it runs `db:process`_ on remote instance (with "dumpcode" value from first task).
+4) Then it runs `db:import`_ on remote instance (with "dumpcode" value from first task).
+
+**Example**
+::
+
+   dep db:push live
 
 db:rmdump
 +++++++++
