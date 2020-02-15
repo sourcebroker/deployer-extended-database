@@ -32,7 +32,7 @@ class FileUtility
      * @param $name
      * @return string
      */
-    function locateLocalBinaryPath($name)
+    public function locateLocalBinaryPath($name)
     {
         $nameEscaped = escapeshellarg($name);
         // Try `command`, should cover all Bourne-like shells
