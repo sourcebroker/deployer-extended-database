@@ -1,6 +1,10 @@
 
 Changelog
 ---------
+master
+~~~~~~
+
+1) [FEATURE] Add db:push command.
 
 9.0.0
 ~~~~~~
