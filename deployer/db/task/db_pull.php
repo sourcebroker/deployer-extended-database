@@ -17,8 +17,7 @@ task('db:pull', function () {
     if (get('default_stage') === get('instance_live_name', 'live')) {
         if (!get('db_allow_pull_live', true)) {
             throw new GracefulShutdownException(
-                'FORBIDDEN: For security its forbidden to pull database to top instance: "' .
-                get('instance_live_name', 'live') . '"!'
+                'FORBIDDEN: For security its forbidden to pull database to top instance: "' . get('default_stage') . '"!'
             );
         }
         if (!get('db_allow_pull_live_force', false)) {
