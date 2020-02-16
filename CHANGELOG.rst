@@ -8,6 +8,7 @@ master
 2) [FEATURE] Add FileUtility->locateLocalBinaryPath.
 3) [TASK][BREAKING] Remove not needed dependency to deployer-extended-loader.
 4) [TASK][BREAKING] Cleanup variables naming.
+5) [TASK] Protect copying/pushing/pulling database to top level instance.
 
 9.0.0
 ~~~~~~

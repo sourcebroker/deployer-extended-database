@@ -10,16 +10,29 @@ use Deployer\Exception\GracefulShutdownException;
  */
 task('db:pull', function () {
     $sourceName = get('argument_stage');
-    if (null !== $sourceName) {
-        if (!get('db_allow_pull_live', false) && get('default_stage') === get('instance_live_name', 'live')) {
+    if (null === $sourceName) {
+        throw new GracefulShutdownException("The source instance is required for db:pull command. [Error code: 1488149981776]");
+    }
+
+    if (get('default_stage') === get('instance_live_name', 'live')) {
+        if (!get('db_allow_pull_live', true)) {
             throw new GracefulShutdownException(
-                'FORBIDDEN: For security its forbidden to pull database to "'
-                . get('instance_live_name', 'live') . '" instance! ' .
-                ' Use "set(\'db_allow_push_live\', true);" to allow this. [Error code: 1488149981777]'
+                'FORBIDDEN: For security its forbidden to pull database to top instance: "' .
+                get('instance_live_name', 'live') . '"!'
             );
         }
-    } else {
-        throw new GracefulShutdownException("The source instance is required for db:pull command. [Error code: 1488149981776]");
+        if (!get('db_allow_pull_live_force', false)) {
+            write("<error>\n\n");
+            write(sprintf("You going to pull database to top instance \"%s\". ", get('default_stage')));
+            write("This can be destructive.\n\n");
+            write("</error>");
+            if (!askConfirmation('Do you really want to continue?', false)) {
+                throw new GracefulShutdownException('Process aborted.');
+            }
+            if (!askConfirmation('Are you sure?', false)) {
+                throw new GracefulShutdownException('Process aborted.');
+            }
+        }
     }
 
     $dumpCode = md5(microtime(true) . rand(0, 10000));

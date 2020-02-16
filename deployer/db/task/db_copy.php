@@ -12,34 +12,51 @@ task('db:copy', function () {
     if (null === get('argument_stage')) {
         throw new GracefulShutdownException("The source instance is required for db:move command.");
     }
+
     $targetInstanceName = (new ConsoleUtility())->getOption('target');
-    if ($targetInstanceName) {
-        if (!askConfirmation(sprintf("Do you really want to copy database from instance %s to instance %s",
-            get('argument_stage'), $targetInstanceName), true)) {
-            throw new GracefulShutdownException(
-                "Process aborted"
-            );
-        }
-        if ($targetInstanceName == null) {
-            throw new GracefulShutdownException(
-                "You must set the target instance the database will be copied to as second parameter."
-            );
-        }
-        if ($targetInstanceName == get('instance_live_name', 'live')) {
-            throw new GracefulShutdownException(
-                "FORBIDDEN: For security its forbidden to move database to live instance!"
-            );
-        }
-        if ($targetInstanceName == get('instance_local_name', 'local')) {
-            throw new GracefulShutdownException(
-                "FORBIDDEN: For synchro local database use: \ndep db:pull live"
-            );
-        }
-    } else {
+    if (null === $targetInstanceName) {
         throw new GracefulShutdownException(
             "The target instance is not set as second parameter. You must set the target instance as '--options=target:[target-name]'"
         );
     }
+
+    $doNotAskAgainForLive = false;
+    if ($targetInstanceName === get('instance_live_name', 'live')) {
+        if (!get('db_allow_copy_live', true)) {
+            throw new GracefulShutdownException(
+                'FORBIDDEN: For security its forbidden to copy database to top instance: "' .
+                get('instance_live_name', 'live') . '"!'
+            );
+        }
+        if (!get('db_allow_copy_live_force', false)) {
+            $doNotAskAgainForLive = true;
+            write("<error>\n\n");
+            write(sprintf("You going to copy database to top instance \"%s\". ", get('argument_stage')));
+            write("This can be destructive.\n\n");
+            write("</error>");
+            if (!askConfirmation('Do you really want to continue?', false)) {
+                throw new GracefulShutdownException('Process aborted.');
+            }
+            if (!askConfirmation('Are you sure?', false)) {
+                throw new GracefulShutdownException('Process aborted.');
+            }
+        }
+
+    }
+
+    if ($targetInstanceName == get('instance_local_name', 'local')) {
+        throw new GracefulShutdownException(
+            "FORBIDDEN: For synchro local database use: \ndep db:pull live"
+        );
+    }
+
+    if (!$doNotAskAgainForLive && !askConfirmation(sprintf("Do you really want to copy database from instance %s to instance %s",
+            get('argument_stage'), $targetInstanceName), true)) {
+        throw new GracefulShutdownException(
+            "Process aborted"
+        );
+    }
+
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
     $sourceInstance = get('argument_stage');
     $dl = get('local/bin/deployer');
