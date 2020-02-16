@@ -41,7 +41,6 @@ task('db:copy', function () {
                 throw new GracefulShutdownException('Process aborted.');
             }
         }
-
     }
 
     if ($targetInstanceName == get('instance_local_name', 'local')) {
