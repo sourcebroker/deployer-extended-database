@@ -6,6 +6,7 @@ Changelog
 ~~~~~~
 
 1) [BUGFIX] Force dumpcode to be only a-z, A-Z, 0-9.
+2) [BUGFIX] Fix for normalize file regexp.
 
 10.0.0
 ~~~~~~

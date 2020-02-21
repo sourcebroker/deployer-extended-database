@@ -16,7 +16,7 @@ class FileUtility
      */
     public function normalizeFilename($filename)
     {
-        return preg_replace('/[^a-zA-Z0-9_]+/', '', $filename);
+        return preg_replace('/^[a-zA-Z0-9_]+/', '', $filename);
     }
 
     /**
