@@ -45,8 +45,8 @@ Changelog
 7.0.0
 ~~~~~
 
-1) [TASK][BREAKING] Possible breaking change for those using global "dep" instead of that one in './vendor/bin/dep' as
-   'local/bin/deployer' is set now to './vendor/bin/dep'.
+1) [TASK][BREAKING] Possible breaking change for those using global ``dep`` instead of that one in ``./vendor/bin/dep`` as
+   ``local/bin/deployer`` is set now to ``./vendor/bin/dep``.
 
 6.2.1
 ~~~~~
@@ -73,20 +73,20 @@ Changelog
 6.1.0
 ~~~~~
 
-1) [FEATURE] Add 'db:dumpclean' task. Add 'db:dumpclean' as last task to 'db:backup' and 'db:pull'. Add docs.
+1) [FEATURE] Add ``db:dumpclean`` task. Add ``db:dumpclean`` as last task to ``db:backup`` and ``db:pull``. Add docs.
 
 6.0.0
 ~~~~~
 
-1) [BREAKING] Remove 'db_deployer_version' config var as its not needed for deployer/distribution based version now.
+1) [BREAKING] Remove ``db_deployer_version`` config var as its not needed for deployer/distribution based version now.
 2) [DOCS] Change to number ordered list on CHANGELOG.rst.
-3) [TASK] Rename 'type' to 'absolutePath' in $mysqlDumpArgs of db:export so it have more meaning.
+3) [TASK] Rename ``type`` to ``absolutePath`` in $mysqlDumpArgs of db:export so it have more meaning.
 4) [TASK] Improve tasks descriptions.
 5) [FEATURE] Add db:compress and db:decompress tasks and extend docs.
 6) [TASK] Cleanup for db:upload, db:download tasks.
-7) [FEATURE] Compress local dumps after importing them with 'db:pull [instance]'.
+7) [FEATURE] Compress local dumps after importing them with ``db:pull [instance]``.
 8) [FEATURE] Add db:rmdump task and documentation.
-9) [FEATURE] Add db:rmdump task at the end of "db:copy [source] [target]" task.
+9) [FEATURE] Add db:rmdump task at the end of ``db:copy [source] [target]`` task.
 10) [FEATURE] Add db:backup task.
 
 
@@ -99,7 +99,7 @@ Changelog
 5.0.3
 ~~~~~
 
-1) [BUGFIX] Do not show error on database pull if "public_urls" are not set.
+1) [BUGFIX] Do not show error on database pull if ``public_urls`` are not set.
 
 5.0.2
 ~~~~~
@@ -133,7 +133,7 @@ Changelog
 4.0.3
 ~~~~~
 
-1) [TASK] Make "bin/deployer" use of vendor/bin/dep from deployer-dist.
+1) [TASK] Make ``bin/deployer`` use of vendor/bin/dep from deployer-dist.
 
 4.0.2
 ~~~~~
@@ -148,26 +148,22 @@ Changelog
 4.0.0
 ~~~~~
 
-1) [TASK] db:export refactor:
-   - add possibility to call command on remote instance
-   - add "db_export_mysqldump_options_structure" and "db_export_mysqldump_options_data" env
+1) [TASK] db:export refactor: add possibility to call command on remote instance, add ``db_export_mysqldump_options_structure`` and ``db_export_mysqldump_options_data`` env.
 2) [BUGFIX] Fix wrong changlog address in main docs.
-3) [TASK] db:truncate refactor:
-   - add escapeshellargs
+3) [TASK] db:truncate refactor add escapeshellargs
 4) [TASK] Escapeshellargs for all commands
 5) [TASK][BREAKING] Change static utilities method calls to regular objects method call.
-6) [TASK] Cleanup db:download and db:upload tasks with RsyncUtility
-8) [TASK][BREAKING] Rename var "bin/mysql" to "local/bin/mysql"
-9) [TASK] Refactor db:import
-10) [TASK] db:import refactor:
-   - add possibility to call command on remote instance
-11) [TASK] Enable duplication check for scrutinizer.
-12) [TASK] Pass verbosity to commands run locally in db:pull task.
-13) [TASK] Move mysql options from db:import task to variables.
-14) [TASK] Pass verbosity to commands run locally with use of ConsoleUtility.
-15) [TASK] Implement optionRequired() in ConsoleUtility.
+6) [TASK] Cleanup ``db:download`` and ``db:upload`` tasks with RsyncUtility
+7) [TASK][BREAKING] Rename var ``bin/mysql`` to ``local/bin/mysql``
+8) [TASK] Refactor db:import
+9) [TASK] db:import refactor add possibility to call command on remote instance
+10) [TASK] Enable duplication check for scrutinizer.
+11) [TASK] Pass verbosity to commands run locally in db:pull task.
+12) [TASK] Move mysql options from db:import task to variables.
+13) [TASK] Pass verbosity to commands run locally with use of ConsoleUtility.
+14) [TASK] Implement optionRequired() in ConsoleUtility.
 
 3.0.0
 ~~~~~
 
-1) Set "default_stage" as callable. This way "default_stage" can be now overwritten in higher level packages.
+1) Set ``default_stage`` as callable. This way ``default_stage`` can be now overwritten in higher level packages.
