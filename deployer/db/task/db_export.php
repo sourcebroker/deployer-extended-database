@@ -15,7 +15,7 @@ task('db:export', function () {
     if (!empty((new ConsoleUtility())->getOption('dumpcode'))) {
         $returnDumpCode = false;
         $dumpCode = (new ConsoleUtility())->getOption('dumpcode');
-        if(!preg_match('/^[a-zA-Z0-9]+$/', $dumpCode)) {
+        if (!preg_match('/^[a-zA-Z0-9]+$/', $dumpCode)) {
             throw new GracefulShutdownException('dumpcode can be only a-z, A-Z, 0-9', 1582316535496);
         }
     } else {
