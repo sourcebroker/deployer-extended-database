@@ -6,6 +6,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
+use Deployer\Exception\GracefulShutdownException;
 
 /*
  * @see https://github.com/sourcebroker/deployer-extended-database#db-export
@@ -14,6 +15,9 @@ task('db:export', function () {
     if (!empty((new ConsoleUtility())->getOption('dumpcode'))) {
         $returnDumpCode = false;
         $dumpCode = (new ConsoleUtility())->getOption('dumpcode');
+        if(!preg_match('/^[a-zA-Z0-9]+$/', $dumpCode)) {
+            throw new GracefulShutdownException('dumpcode can be only a-z, A-Z, 0-9', 1582316535496);
+        }
     } else {
         $returnDumpCode = true;
         $dumpCode = md5(microtime(true) . rand(0, 10000));
