@@ -2,6 +2,11 @@
 Changelog
 ---------
 
+11.0.0
+~~~~~~
+
+1) [TASK][BREAKING] Add dependency to deployer-extended-loader.
+
 10.0.1
 ~~~~~~
 

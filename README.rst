@@ -27,7 +27,7 @@ Most useful are two tasks:
 
 2. task "`db:push`_ [target-instance]" task which allows you to push database from local to remote instance,
 
-2. task "`db:copy`_ [source-instance] --options=target:[target-instance]" which allows to copy database between instances.
+2. task "`db:copy`_ [source-instance] --options=target:[target-instance]" which allows to copy database between remote instances.
 
 Installation
 ------------
