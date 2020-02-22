@@ -2,6 +2,11 @@
 Changelog
 ---------
 
+11.0.1
+~~~~~~
+
+1) [BUGFIX] Force dumpcode to be only a-z, A-Z, 0-9, _.
+
 11.0.0
 ~~~~~~
 
