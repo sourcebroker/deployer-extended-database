@@ -2,6 +2,11 @@
 Changelog
 ---------
 
+12.0.0
+~~~~~~
+
+1) [TASK][BREAKING] Add new default option for mysqldump '--no-tablespaces' . https://dba.stackexchange.com/questions/271981/access-denied-you-need-at-least-one-of-the-process-privileges-for-this-ope
+
 11.0.2
 ~~~~~~
 
