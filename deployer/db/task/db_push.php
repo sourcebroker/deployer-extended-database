@@ -22,8 +22,11 @@ task('db:push', function () {
         }
         if (!get('db_allow_push_live_force', false)) {
             write("<error>\n\n");
-            write(sprintf("You going to push database from instance: \"%s\" to top instance: \"%s\". ",
-                get('default_stage'), $targetName));
+            write(sprintf(
+                "You going to push database from instance: \"%s\" to top instance: \"%s\". ",
+                get('default_stage'),
+                $targetName
+            ));
             write("This can be destructive.\n\n");
             write("</error>");
             if (!askConfirmation('Do you really want to continue?', false)) {

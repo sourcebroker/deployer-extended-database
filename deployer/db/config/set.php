@@ -46,14 +46,18 @@ set('db_databases_merged', function () {
             }
             if (is_object($dbConfig) && ($dbConfig instanceof \Closure)) {
                 $mergeArray = call_user_func($dbConfig);
-                $dbConfigsMerged[$dbIdentifier] = $arrayUtility->arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier],
-                    $mergeArray);
+                $dbConfigsMerged[$dbIdentifier] = $arrayUtility->arrayMergeRecursiveDistinct(
+                    $dbConfigsMerged[$dbIdentifier],
+                    $mergeArray
+                );
             }
             if (is_string($dbConfig)) {
                 if (file_exists($dbConfig)) {
                     $mergeArray = include($dbConfig);
-                    $dbConfigsMerged[$dbIdentifier] = $arrayUtility->arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier],
-                        $mergeArray);
+                    $dbConfigsMerged[$dbIdentifier] = $arrayUtility->arrayMergeRecursiveDistinct(
+                        $dbConfigsMerged[$dbIdentifier],
+                        $mergeArray
+                    );
                 } else {
                     throw new GracefulShutdownException('The config file does not exists: ' . $dbConfig);
                 }
