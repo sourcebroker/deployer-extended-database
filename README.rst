@@ -40,7 +40,10 @@ Installation
 2) If you are using deployer as composer package then just put following line in your deploy.php:
    ::
 
-      new \SourceBroker\DeployerLoader\Load([['path' => 'vendor/sourcebroker/deployer-extended-database/deployer']]);
+      new \SourceBroker\DeployerLoader\Load([
+          ['path' => 'vendor/sourcebroker/deployer-instance/deployer'],
+          ['path' => 'vendor/sourcebroker/deployer-extended-database/deployer'],
+      ]);
 
 3) If you are using deployer as phar then put following lines in your deploy.php:
    ::
