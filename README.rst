@@ -49,7 +49,10 @@ Installation
    ::
 
       require_once(__DIR__ . '/vendor/sourcebroker/deployer-loader/autoload.php');
-      new \SourceBroker\DeployerLoader\Load([['path' => 'vendor/sourcebroker/deployer-extended-database/deployer']]);
+      new \SourceBroker\DeployerLoader\Load([
+          ['path' => 'vendor/sourcebroker/deployer-instance/deployer'],
+          ['path' => 'vendor/sourcebroker/deployer-extended-database/deployer'],
+      ]);
 
    | IMPORTANT NOTE!
    | Do not put ``require('/vendor/autoload.php')`` inside your deploy.php because you can have dependency problems.
