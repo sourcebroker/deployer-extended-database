@@ -24,7 +24,13 @@ class EnvDriver
         $absolutePath = rtrim($absolutePath, DIRECTORY_SEPARATOR);
         $envFilePath = $absolutePath . '/.env';
         if (file_exists($envFilePath)) {
-            (new Dotenv())->load($envFilePath);
+            $dotEnv = new Dotenv();
+            if (method_exists($dotEnv, 'loadEnv')) {
+                // Symfony => 4.2 style
+                $dotEnv->loadEnv($envFilePath);
+            } else {
+                $dotEnv->load($envFilePath);
+            }
             foreach (['DATABASE_HOST', 'DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD'] as $requiredEnv) {
                 if (false === getenv($prefix . $requiredEnv)) {
                     throw new \Exception('Missing ' . $prefix . $requiredEnv . ' in .env file.');
@@ -32,13 +38,13 @@ class EnvDriver
             }
             return [
                 'host' => getenv($prefix . 'DATABASE_HOST'),
-                'port' => getenv($prefix . 'DATABASE_PORT') ? getenv($prefix . 'DATABASE_PORT') : 3306,
+                'port' => getenv($prefix . 'DATABASE_PORT') ?: 3306,
                 'dbname' => getenv($prefix . 'DATABASE_NAME'),
                 'user' => getenv($prefix . 'DATABASE_USER'),
                 'password' => getenv($prefix . 'DATABASE_PASSWORD')
             ];
-        } else {
-            throw new \Exception('Missing file "' . $envFilePath);
         }
+
+        throw new \Exception('Missing file "' . $envFilePath);
     }
 }
