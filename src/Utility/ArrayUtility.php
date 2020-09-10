@@ -49,16 +49,16 @@ class ArrayUtility
     /**
      * Filter $haystack array items with items from array $patterns.
      * Example usage:
-     * filterWithRegexp(['cf_*', 'bcd'], ['abc', 'cf_test1', 'bcd' ,'cf_test2', 'cde']) will return ['cf_test1', 'bcd', 'cf_test2']
+     * filterWithRegexp(['cf_.*', 'bcd'], ['abc', 'cf_test1', 'bcd' ,'cf_test2', 'cde']) will return ['cf_test1', 'bcd', 'cf_test2']
      *
-     * @param $patterns
+     * @param array $patterns
      * @param array $haystack
      * @return array
      */
     public function filterWithRegexp(array $patterns, array $haystack)
     {
         $foundItems = [];
-        foreach ((array)$patterns as $pattern) {
+        foreach ($patterns as $pattern) {
             $regexp = false;
 
             set_error_handler(function () {
