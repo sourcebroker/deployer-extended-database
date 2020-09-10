@@ -22,8 +22,11 @@ task('db:pull', function () {
         }
         if (!get('db_allow_pull_live_force', false)) {
             write("<error>\n\n");
-            write(sprintf("You going to pull database from instance: \"%s\" to top instance: \"%s\". ",
-                $sourceName, get('default_stage')));
+            write(sprintf(
+                "You going to pull database from instance: \"%s\" to top instance: \"%s\". ",
+                $sourceName,
+                get('default_stage')
+            ));
             write("This can be destructive.\n\n");
             write("</error>");
             if (!askConfirmation('Do you really want to continue?', false)) {

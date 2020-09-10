@@ -21,9 +21,11 @@ task('db:import', function () {
 
             $structureSqlFile = glob($globStart . '*type=structure.sql');
             if (empty($structureSqlFile)) {
-                throw new GracefulShutdownException('No structure file for --options=dumpcode:' . $dumpCode . '. Glob build: ' .
+                throw new GracefulShutdownException(
+                    'No structure file for --options=dumpcode:' . $dumpCode . '. Glob build: ' .
                     $globStart . '*type=structure.sql',
-                    1500718221204);
+                    1500718221204
+                );
             }
             if (count($structureSqlFile) > 1) {
                 throw new GracefulShutdownException('There are more than two structure file for --options=dumpcode:' . $dumpCode .
@@ -32,15 +34,19 @@ task('db:import', function () {
             }
             $dataSqlFile = glob($globStart . '*type=data.sql');
             if (empty($dataSqlFile)) {
-                throw new GracefulShutdownException('No data file for --options=dumpcode:' . $dumpCode . '. Glob built: ' .
+                throw new GracefulShutdownException(
+                    'No data file for --options=dumpcode:' . $dumpCode . '. Glob built: ' .
                     $globStart . '*type=data.sql',
-                    1500722093334);
+                    1500722093334
+                );
             }
             if (count($dataSqlFile) > 1) {
-                throw new GracefulShutdownException('There are more than two data files for --options=dumpcode:' . $dumpCode . '. Glob built: ' .
+                throw new GracefulShutdownException(
+                    'There are more than two data files for --options=dumpcode:' . $dumpCode . '. Glob built: ' .
                     $globStart . '*type=data.sql. ' .
                     "\n" . ' Files founded: ' . "\n" . implode("\n", $dataSqlFile),
-                    1500722095323);
+                    1500722095323
+                );
             }
             // Drop all tables.
             if (empty((new ConsoleUtility())->getOption('importTaskDoNotDropAllTablesBeforeImport'))) {
@@ -103,9 +109,9 @@ task('db:import', function () {
                         }
                     }
                     $markersArray['{{domainsSeparatedByComma}}'] = '"' . implode(
-                            '","',
-                            $publicUrlCollected
-                        ) . '"';
+                        '","',
+                        $publicUrlCollected
+                    ) . '"';
                     $markersArray['{{firstDomainWithScheme}}'] = get('public_urls')[0];
                     $markersArray['{{firstDomainWithSchemeAndEndingSlash}}'] = rtrim(get('public_urls')[0], '/') . '/';
                 }

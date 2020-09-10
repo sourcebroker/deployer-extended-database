@@ -26,7 +26,6 @@ class EnvDriver
         if (file_exists($envFilePath)) {
             $dotEnv = new Dotenv();
             if (method_exists($dotEnv, 'loadEnv')) {
-                // Symfony => 4.2 style
                 $dotEnv->loadEnv($envFilePath);
             } else {
                 $dotEnv->load($envFilePath);
@@ -44,7 +43,6 @@ class EnvDriver
                 'password' => getenv($prefix . 'DATABASE_PASSWORD')
             ];
         }
-
         throw new \Exception('Missing file "' . $envFilePath);
     }
 }

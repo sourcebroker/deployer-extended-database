@@ -30,8 +30,11 @@ task('db:copy', function () {
         if (!get('db_allow_copy_live_force', false)) {
             $doNotAskAgainForLive = true;
             write("<error>\n\n");
-            write(sprintf("You going to copy database form instance: \"%s\" to top instance: \"%s\". ",
-                get('argument_stage'), $targetInstanceName));
+            write(sprintf(
+                "You going to copy database form instance: \"%s\" to top instance: \"%s\". ",
+                get('argument_stage'),
+                $targetInstanceName
+            ));
             write("This can be destructive.\n\n");
             write("</error>");
             if (!askConfirmation('Do you really want to continue?', false)) {
@@ -49,8 +52,11 @@ task('db:copy', function () {
         );
     }
 
-    if (!$doNotAskAgainForLive && !askConfirmation(sprintf("Do you really want to copy database from instance %s to instance %s",
-            get('argument_stage'), $targetInstanceName), true)) {
+    if (!$doNotAskAgainForLive && !askConfirmation(sprintf(
+        "Do you really want to copy database from instance %s to instance %s",
+        get('argument_stage'),
+        $targetInstanceName
+    ), true)) {
         throw new GracefulShutdownException(
             "Process aborted"
         );
