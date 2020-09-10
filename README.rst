@@ -198,7 +198,7 @@ deploy.php file:
 
    set('db_defaults', [
       'ignore_tables_out' => [
-          'caching_*'
+          'caching_.*'
       ]
    ]);
 
@@ -237,7 +237,7 @@ deploy.php file:
        [
            'database_foo' => [
                'ignore_tables_out' => [
-                  'caching_*'
+                  'caching_.*'
                ]
                (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
             ],
@@ -274,13 +274,13 @@ deploy.php file:
        [
             'database_application1' => [
                'ignore_tables_out' => [
-                  'caching_*'
+                  'caching_.*'
                ]
             (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig('APP1_')
          ],
             'database_application2' => [
                'ignore_tables_out' => [
-                  'cf_*'
+                  'cf_.*'
                 ]
             (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig('APP2_')
          ],
@@ -348,7 +348,7 @@ deploy.php file:
        [
            'database_foo' => [
                'ignore_tables_out' => [
-                  'caching_*'
+                  'caching_.*'
                ]
                get('db_default'),
                __DIR__ . '/databases/conifg/additional_db_config.php
