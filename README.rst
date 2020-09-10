@@ -40,13 +40,19 @@ Installation
 2) If you are using deployer as composer package then just put following line in your deploy.php:
    ::
 
-      new \SourceBroker\DeployerLoader\Load([['path' => 'vendor/sourcebroker/deployer-extended-database/deployer']]);
+      new \SourceBroker\DeployerLoader\Load([
+          ['path' => 'vendor/sourcebroker/deployer-instance/deployer'],
+          ['path' => 'vendor/sourcebroker/deployer-extended-database/deployer'],
+      ]);
 
 3) If you are using deployer as phar then put following lines in your deploy.php:
    ::
 
       require_once(__DIR__ . '/vendor/sourcebroker/deployer-loader/autoload.php');
-      new \SourceBroker\DeployerLoader\Load([['path' => 'vendor/sourcebroker/deployer-extended-database/deployer']]);
+      new \SourceBroker\DeployerLoader\Load([
+          ['path' => 'vendor/sourcebroker/deployer-instance/deployer'],
+          ['path' => 'vendor/sourcebroker/deployer-extended-database/deployer'],
+      ]);
 
    | IMPORTANT NOTE!
    | Do not put ``require('/vendor/autoload.php')`` inside your deploy.php because you can have dependency problems.
