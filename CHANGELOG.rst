@@ -2,6 +2,12 @@
 Changelog
 ---------
 
+12.1.0
+~~~~~~
+
+1) [FEATURE] Use loadEnv function from Symfony\Dotenv if possible.
+2) [BUGFIX] Documentation bugfixes.
+
 12.0.0
 ~~~~~~
 
