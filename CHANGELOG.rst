@@ -2,10 +2,15 @@
 Changelog
 ---------
 
+12.2.1
+~~~~~~
+
+1) [BUGFIX] Fix changelog typo.
+
 12.2.0
 ~~~~~~
 
-1) [TASK] Increase ``helhum/dotenv-connector`` version.
+1) [TASK] Increase `symfony/dotenv` version.
 
 12.1.0
 ~~~~~~
