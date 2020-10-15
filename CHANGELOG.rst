@@ -6,6 +6,7 @@ master
 ~~~~~~
 
 1) [TASK] Add ddev config.
+2) [BUGFIX] Fix compatibility with symfony/dotenv 5.0 which do not use getenv() by default.
 
 12.2.1
 ~~~~~~

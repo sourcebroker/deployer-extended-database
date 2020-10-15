@@ -2,7 +2,8 @@
 
 namespace SourceBroker\DeployerExtendedDatabase\Driver;
 
-use Symfony\Component\Dotenv\Dotenv;
+use RuntimeException;
+use SourceBroker\DeployerInstance\Env;
 
 /**
  * Configuration reader for database data stored in .env file.
@@ -13,36 +14,31 @@ use Symfony\Component\Dotenv\Dotenv;
 class EnvDriver
 {
     /**
-     * @param string $prefix
-     * @param string $absolutePath
+     * @param string|null $prefix
+     * @param string|null $absolutePath
      * @return array
      * @throws \Exception
      */
-    public function getDatabaseConfig(string $prefix = null, string $absolutePath = null)
+    public function getDatabaseConfig(string $prefix = null, string $absolutePath = null): array
     {
-        $absolutePath = null === $absolutePath ? getcwd() : $absolutePath;
-        $absolutePath = rtrim($absolutePath, DIRECTORY_SEPARATOR);
-        $envFilePath = $absolutePath . '/.env';
-        if (file_exists($envFilePath)) {
-            $dotEnv = new Dotenv();
-            if (method_exists($dotEnv, 'loadEnv')) {
-                $dotEnv->loadEnv($envFilePath);
-            } else {
-                $dotEnv->load($envFilePath);
+        $envFilePath = rtrim($absolutePath ?? getcwd(), DIRECTORY_SEPARATOR) . '/.env';
+        (new Env)->load($envFilePath);
+        foreach (['DATABASE_HOST', 'DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD'] as $requiredEnv) {
+            if (false === $this->getenv($prefix . $requiredEnv)) {
+                throw new RuntimeException('Missing ' . $prefix . $requiredEnv . ' in ' . $envFilePath . ' file.');
             }
-            foreach (['DATABASE_HOST', 'DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD'] as $requiredEnv) {
-                if (false === getenv($prefix . $requiredEnv)) {
-                    throw new \Exception('Missing ' . $prefix . $requiredEnv . ' in .env file.');
-                }
-            }
-            return [
-                'host' => getenv($prefix . 'DATABASE_HOST'),
-                'port' => getenv($prefix . 'DATABASE_PORT') ?: 3306,
-                'dbname' => getenv($prefix . 'DATABASE_NAME'),
-                'user' => getenv($prefix . 'DATABASE_USER'),
-                'password' => getenv($prefix . 'DATABASE_PASSWORD')
-            ];
         }
-        throw new \Exception('Missing file "' . $envFilePath);
+        return [
+            'host' => $this->getenv($prefix . 'DATABASE_HOST'),
+            'port' => $this->getenv($prefix . 'DATABASE_PORT') ?: 3306,
+            'dbname' => $this->getenv($prefix . 'DATABASE_NAME'),
+            'user' => $this->getenv($prefix . 'DATABASE_USER'),
+            'password' => $this->getenv($prefix . 'DATABASE_PASSWORD')
+        ];
+    }
+
+    private function getenv($env)
+    {
+        return $_ENV[$env] ?? null;
     }
 }
