@@ -2,6 +2,11 @@
 Changelog
 ---------
 
+13.0.1
+~~~~~~
+
+1) [BUGFIX] Add dependency to sourcebroker/deployer-instance (fix compatibility with symfony/dotenv 5.0)
+
 13.0.0
 ~~~~~~
 
