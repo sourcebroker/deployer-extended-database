@@ -15,7 +15,7 @@ class DatabaseUtility
      */
     public function getTables($dbConf)
     {
-        $link = mysqli_connect($dbConf['host'], $dbConf['user'], $dbConf['password'], $dbConf['dbname']);
+        $link = mysqli_connect($dbConf['host'], $dbConf['user'], $dbConf['password'], $dbConf['dbname'], $dbConf['port']);
         $result = $link->query('SHOW TABLES');
         $allTables = [];
         while ($row = $result->fetch_row()) {
