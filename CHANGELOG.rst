@@ -2,6 +2,12 @@
 Changelog
 ---------
 
+13.0.2
+~~~~~~
+
+1) [BUGFIX] Use port-parameter in mysqli_connect (tnx to mavolkmer)
+2) [TASK] Drop styleci.
+
 13.0.1
 ~~~~~~
 
