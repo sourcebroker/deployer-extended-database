@@ -7,6 +7,7 @@ Changelog
 
 1) [BUGFIX] Use port-parameter in mysqli_connect (tnx to mavolkmer)
 2) [TASK] Drop styleci.
+3) [TASK] Drop date from licence.
 
 13.0.1
 ~~~~~~
