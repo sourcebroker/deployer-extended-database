@@ -2,6 +2,12 @@
 Changelog
 ---------
 
+14.0.0
+~~~~~~
+
+1) [TASK][BREAKING] Update dependency to ``sourcebroker/deployer-loader`` which introduce load folder/files
+   alphabetically.
+
 13.0.2
 ~~~~~~
 
