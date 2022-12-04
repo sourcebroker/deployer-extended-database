@@ -6,6 +6,7 @@ master
 ~~~~~~
 
 1) [TASK][BREAKING] Refactor to Deployer 7.
+2) [TASK] Extend dependency to internal packages to dev-master.
 
 14.0.0
 ~~~~~~
