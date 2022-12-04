@@ -9,7 +9,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
  */
 task('db:decompress', function () {
     $dumpCode = (new ConsoleUtility())->getOption('dumpcode', true);
-    if (empty(get('argument_stage'))) {
+    if (get('is_argument_host_the_same_as_local_host')) {
         $markersArray = [];
         $markersArray['{{databaseStorageAbsolutePath}}'] = get('db_storage_path_local');
         $markersArray['{{dumpcode}}'] = $dumpCode;
@@ -23,9 +23,11 @@ task('db:decompress', function () {
             }
         }
     } else {
-        $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
-        $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
-        $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]);
-        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:decompress ' . $options . ' ' . $verbosity);
+        $params = [
+            get('argument_host'),
+            (new ConsoleUtility())->getVerbosityAsParameter(),
+            (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]),
+        ];
+        run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:decompress ' . implode(' ', $params));
     }
 })->desc('Compress dumps with given dumpcode');

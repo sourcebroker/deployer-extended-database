@@ -5,6 +5,7 @@ namespace Deployer;
 use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /*
  * @see https://github.com/sourcebroker/deployer-extended-database#db-truncate
@@ -12,7 +13,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 task('db:truncate', function () {
     $arrayUtility = new ArrayUtility();
     $databaseUtility = new DatabaseUtility();
-    if (empty(get('argument_stage'))) {
+    if (get('is_argument_host_the_same_as_local_host')) {
         foreach (get('db_databases_merged') as $databaseConfig) {
             if (isset($databaseConfig['truncate_tables']) && is_array($databaseConfig['truncate_tables'])) {
                 $truncateTables = $arrayUtility->filterWithRegexp(
@@ -32,13 +33,14 @@ task('db:truncate', function () {
                             escapeshellarg('TRUNCATE ' . $truncateTable)
                         ));
                     }
-                    writeln('<info>Truncated tables: ' . implode(',', $truncateTables) . '</info>');
+                    if (output()->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+                        info('Truncated tables: ' . implode(',', $truncateTables));
+                    }
                 }
             }
         }
     } else {
         $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
-        $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
-        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:truncate ' . $verbosity);
+        run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:truncate ' . get('argument_host') . $verbosity);
     }
 })->desc('Truncate tables defined in "truncate_tables" variable');

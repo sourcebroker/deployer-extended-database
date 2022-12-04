@@ -9,13 +9,15 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
  */
 task('db:rmdump', function () {
     $dumpCode = (new ConsoleUtility())->getOption('dumpcode', true);
-    if (empty(get('argument_stage'))) {
+    if (get('is_argument_host_the_same_as_local_host')) {
         runLocally('cd ' . get('db_storage_path_local') .
             ' && rm -f *dumpcode=' . $dumpCode . '*');
     } else {
-        $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
-        $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
-        $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]);
-        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:rmdump ' . $options . ' ' . $verbosity);
+        $params = [
+            get('argument_host'),
+            (new ConsoleUtility())->getVerbosityAsParameter(),
+            input()->getOption('options') ? '--options=' . input()->getOption('options') : '',
+        ];
+        run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:rmdump ' . implode(' ', $params));
     }
 })->desc('Remove all dumps with given dumpcode (compressed and uncompressed)');

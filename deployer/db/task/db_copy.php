@@ -9,14 +9,10 @@ use Deployer\Exception\GracefulShutdownException;
  * @see https://github.com/sourcebroker/deployer-extended-database#db-copy
  */
 task('db:copy', function () {
-    if (null === get('argument_stage')) {
-        throw new GracefulShutdownException("The source instance is required for db:move command.");
-    }
-
     $targetInstanceName = (new ConsoleUtility())->getOption('target');
     if (null === $targetInstanceName) {
         throw new GracefulShutdownException(
-            "The target instance is not set as second parameter. You must set the target instance as '--options=target:[target-name]'"
+            "The target instance is not set in options. You must set the target instance as '--options=target:[target-name]'"
         );
     }
 
@@ -32,7 +28,7 @@ task('db:copy', function () {
             write("<error>\n\n");
             write(sprintf(
                 "You going to copy database form instance: \"%s\" to top instance: \"%s\". ",
-                get('argument_stage'),
+                get('argument_host'),
                 $targetInstanceName
             ));
             write("This can be destructive.\n\n");
@@ -46,36 +42,41 @@ task('db:copy', function () {
         }
     }
 
-    if ($targetInstanceName == get('instance_local_name', 'local')) {
+    if ($targetInstanceName === get('instance_local_name', 'local')) {
         throw new GracefulShutdownException(
             "FORBIDDEN: For synchro local database use: \ndep db:pull live"
         );
     }
 
     if (!$doNotAskAgainForLive && !askConfirmation(sprintf(
-        "Do you really want to copy database from instance %s to instance %s",
-        get('argument_stage'),
-        $targetInstanceName
-    ), true)) {
+            "Do you really want to copy database from instance %s to instance %s",
+            get('argument_host'),
+            $targetInstanceName
+        ), true)) {
         throw new GracefulShutdownException(
             "Process aborted"
         );
     }
 
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
-    $sourceInstance = get('argument_stage');
+    $sourceInstance = get('argument_host');
     $dl = get('local/bin/deployer');
-    $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => md5(microtime(true) . rand(0, 10000))]);
-    if (empty(get('argument_stage'))) {
-        runLocally($dl . ' db:export ' . $options . ' ' . $verbosity);
+    $options = (new ConsoleUtility())->getOptionsForCliUsage([
+        'dumpcode' => md5(microtime(true) . random_int(0, 10000))
+    ]);
+    $local = get('local_host');
+    if (get('is_argument_host_the_same_as_local_host')) {
+        // TODO $local
+        runLocally($dl . ' db:export ' . $local . ' ' . $options . ' ' . $verbosity);
     } else {
         runLocally($dl . ' db:export ' . $sourceInstance . ' ' . $options . ' ' . $verbosity);
         runLocally($dl . ' db:download ' . $sourceInstance . ' ' . $options . ' ' . $verbosity);
     }
-    runLocally($dl . ' db:process ' . $options . ' ' . $verbosity);
-    if (get('default_stage') == $targetInstanceName) {
-        runLocally($dl . ' db:import ' . $options . ' ' . $verbosity);
-        runLocally($dl . ' db:rmdump ' . $options . ' ' . $verbosity);
+    runLocally($dl . ' db:process ' . $local . ' ' . $options . ' ' . $verbosity);
+    if (get('is_argument_host_the_same_as_local_host')) {
+        // TODO $local
+        runLocally($dl . ' db:import ' . $local . ' ' . $options . ' ' . $verbosity);
+        runLocally($dl . ' db:rmdump ' . $local . ' ' . $options . ' ' . $verbosity);
     } else {
         runLocally($dl . ' db:upload ' . $targetInstanceName . ' ' . $options . ' ' . $verbosity);
         runLocally($dl . ' db:import ' . $targetInstanceName . ' ' . $options . ' ' . $verbosity);

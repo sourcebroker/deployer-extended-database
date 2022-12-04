@@ -20,16 +20,16 @@ task('db:export', function () {
         }
     } else {
         $returnDumpCode = true;
-        $dumpCode = md5(microtime(true) . rand(0, 10000));
+        $dumpCode = md5(microtime(true) . random_int(0, 10000));
     }
     $fileUtility = new FileUtility();
     $arrayUtility = new ArrayUtility();
     $databaseUtility = new DatabaseUtility();
-    if (empty(get('argument_stage'))) {
+    if (get('is_argument_host_the_same_as_local_host')) {
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
             $filenameParts = [
                 'dateTime' => date('Y-m-d_H-i-s'),
-                'server' => 'server=' . $fileUtility->normalizeFilename(get('default_stage')),
+                'server' => 'server=' . $fileUtility->normalizeFilename(get('local_host')),
                 'dbcode' => 'dbcode=' . $fileUtility->normalizeFilename($databaseCode),
                 'dumpcode' => 'dumpcode=' . $fileUtility->normalizeFilename($dumpCode),
                 'type' => '',
@@ -43,7 +43,7 @@ task('db:export', function () {
                 'user' => escapeshellarg($databaseConfig['user']),
                 'dbname' => escapeshellarg($databaseConfig['dbname']),
                 'absolutePath' => '',
-                'ignore-tables' => ''
+                'ignore-tables' => '',
             ];
 
             if (isset($databaseConfig['ignore_tables_out']) && is_array($databaseConfig['ignore_tables_out'])) {
@@ -78,11 +78,14 @@ task('db:export', function () {
             ));
         }
     } else {
-        $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
-        $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
-        run('cd ' . $activePath . ' && {{bin/php}} {{bin/deployer}} db:export ' . (input()->getOption('options') ? '--options=' . input()->getOption('options') : '') . ' ' . $verbosity);
+        $params = [
+            get('argument_host'),
+            (new ConsoleUtility())->getVerbosityAsParameter(),
+            input()->getOption('options') ? '--options=' . input()->getOption('options') : '',
+        ];
+        run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:export ' . implode(' ', $params));
     }
     if ($returnDumpCode) {
-        writeln(json_encode(['dumpCode' => $dumpCode]));
+        writeln(json_encode(['dumpCode' => $dumpCode], JSON_THROW_ON_ERROR));
     }
 })->desc('Dump database and store it in database dumps storage');

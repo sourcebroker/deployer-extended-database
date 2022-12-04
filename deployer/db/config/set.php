@@ -2,6 +2,9 @@
 
 namespace Deployer;
 
+use Closure;
+use Deployer\Host\Localhost;
+use Deployer\Task\Context;
 use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerInstance\Configuration;
@@ -9,7 +12,8 @@ use Deployer\Exception\GracefulShutdownException;
 
 set('db_export_mysqldump_options_structure', '--no-data=true --default-character-set=utf8 --no-tablespaces');
 
-set('db_export_mysqldump_options_data', '--opt --skip-lock-tables --single-transaction --no-create-db --default-character-set=utf8 --no-tablespaces');
+set('db_export_mysqldump_options_data',
+    '--opt --skip-lock-tables --single-transaction --no-create-db --default-character-set=utf8 --no-tablespaces');
 
 set('db_import_mysql_options_structure', '--default-character-set=utf8');
 
@@ -25,11 +29,11 @@ set('db_process_commands', [
 set('db_compress_suffix', '.gz');
 
 set('db_compress_command', [
-    '{{local/bin/gzip}} --force --name {{databaseStorageAbsolutePath}}/*dumpcode={{dumpcode}}*.sql --suffix ' . get('db_compress_suffix')
+    '{{local/bin/gzip}} --force --name {{databaseStorageAbsolutePath}}/*dumpcode={{dumpcode}}*.sql --suffix ' . get('db_compress_suffix'),
 ]);
 
 set('db_decompress_command', [
-    '{{local/bin/gzip}} --force --name --uncompress ' . ' --suffix ' . get('db_compress_suffix') . ' {{databaseStorageAbsolutePath}}/*dumpcode={{dumpcode}}*' . get('db_compress_suffix')
+    '{{local/bin/gzip}} --force --name --uncompress ' . ' --suffix ' . get('db_compress_suffix') . ' {{databaseStorageAbsolutePath}}/*dumpcode={{dumpcode}}*' . get('db_compress_suffix'),
 ]);
 
 // Returns "db_databases" merged for direct use.
@@ -44,8 +48,8 @@ set('db_databases_merged', function () {
                     = $arrayUtility->arrayMergeRecursiveDistinct($dbConfigsMerged[$dbIdentifier], $dbConfig);
                 continue;
             }
-            if (is_object($dbConfig) && ($dbConfig instanceof \Closure)) {
-                $mergeArray = call_user_func($dbConfig);
+            if ($dbConfig instanceof Closure) {
+                $mergeArray = $dbConfig();
                 $dbConfigsMerged[$dbIdentifier] = $arrayUtility->arrayMergeRecursiveDistinct(
                     $dbConfigsMerged[$dbIdentifier],
                     $mergeArray
@@ -64,39 +68,41 @@ set('db_databases_merged', function () {
             }
         }
     }
+
     return $dbConfigsMerged;
 });
 
 // Returns path to store database dumps on local stage.
 set('db_storage_path_local', function () {
-    if (Configuration::getLocalHost()->getConfig()->get('db_storage_path_relative', false) == false) {
-        $dbStoragePathLocal = Configuration::getLocalHost()->getConfig()->get('deploy_path') . '/.dep/database/dumps';
+    if (Configuration::getLocalHost()->get('db_storage_path_relative', false) === false) {
+        $dbStoragePathLocal = Configuration::getLocalHost()->get('deploy_path') . '/.dep/database/dumps';
     } else {
-        $dbStoragePathLocal = Configuration::getLocalHost()->getConfig()->get('deploy_path') . '/'
-            . Configuration::getLocalHost()->getConfig()->get('db_storage_path_relative');
+        $dbStoragePathLocal = Configuration::getLocalHost()->get('deploy_path') . '/'
+            . Configuration::getLocalHost()->get('db_storage_path_relative');
     }
     runLocally('[ -d ' . $dbStoragePathLocal . ' ] || mkdir -p ' . $dbStoragePathLocal);
+
     return $dbStoragePathLocal;
 });
 
 // Returns path to store database dumps on remote stage.
 set('db_storage_path', function () {
-    if (get('db_storage_path_relative', false) == false) {
+    if (get('db_storage_path_relative', false) === false) {
         $dbStoragePath = get('deploy_path') . '/.dep/database/dumps';
     } else {
         $dbStoragePath = get('deploy_path') . '/' . get('db_storage_path_relative');
     }
     run('[ -d ' . $dbStoragePath . ' ] || mkdir -p ' . $dbStoragePath);
+
     return $dbStoragePath;
 });
 
 set('bin/deployer', function () {
-    $activePath = get('deploy_path') . '/' . (test('[ -L {{deploy_path}}/release ]') ? 'release' : 'current');
-    if (test('[ -e ' . escapeshellarg($activePath . '/vendor/bin/dep') . ' ]')) {
-        $deployerBin = $activePath . '/vendor/bin/dep';
-    } else {
-        throw new GracefulShutdownException('There must be ' . $activePath . '/vendor/bin/dep phar file, but it could not be found.');
+    $deployerBin = get('release_or_current_path') . '/vendor/bin/dep';
+    if (!test('[ -e ' . escapeshellarg($deployerBin) . ' ]')) {
+        throw new GracefulShutdownException('There must be ' . $deployerBin . ' phar file, but it could not be found.');
     }
+
     return $deployerBin;
 });
 

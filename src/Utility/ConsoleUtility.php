@@ -18,7 +18,7 @@ class ConsoleUtility
      *
      * @return string
      */
-    public function getVerbosityAsParameter()
+    public function getVerbosityAsParameter(): string
     {
         switch (output()->getVerbosity()) {
             case OutputInterface::VERBOSITY_DEBUG:
@@ -47,7 +47,7 @@ class ConsoleUtility
      * @param bool $required
      * @return string
      */
-    public function getOption($optionToFind, $required = false)
+    public function getOption($optionToFind, bool $required = false)
     {
         $optionReturnValue = null;
         if (!empty(input()->getOption('options'))) {
@@ -74,7 +74,7 @@ class ConsoleUtility
         return $optionReturnValue;
     }
 
-    public function getOptionsForCliUsage(array $optionsToSet)
+    public function getOptionsForCliUsage(array $optionsToSet): string
     {
         $getOptionsForCliUsage = '';
         $getOptionsForCliUsageArray = [];
@@ -87,8 +87,8 @@ class ConsoleUtility
             $getOptionsForCliUsageArray[] = $optionToSetKey . ':' . $optionToSetValue;
         }
         return $getOptionsForCliUsage . (!empty($getOptionsForCliUsageArray) ? '--options=' . implode(
-            ',',
-            $getOptionsForCliUsageArray
-        ) : '');
+                    ',',
+                    $getOptionsForCliUsageArray
+                ) : '');
     }
 }

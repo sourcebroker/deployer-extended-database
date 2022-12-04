@@ -55,7 +55,7 @@ class ArrayUtility
      * @param array $haystack
      * @return array
      */
-    public function filterWithRegexp(array $patterns, array $haystack)
+    public function filterWithRegexp(array $patterns, array $haystack): array
     {
         $foundItems = [];
         foreach ($patterns as $pattern) {

@@ -9,11 +9,7 @@ use Deployer\Exception\GracefulShutdownException;
  * @see https://github.com/sourcebroker/deployer-extended-database#db-push
  */
 task('db:push', function () {
-    $targetName = get('argument_stage');
-    if (null === $targetName) {
-        throw new GracefulShutdownException("The target instance is required for media:push command. [Error code: 1488149981776]");
-    }
-
+    $targetName = get('argument_host');
     if ($targetName === get('instance_live_name', 'live')) {
         if (!get('db_allow_push_live', true)) {
             throw new GracefulShutdownException(
@@ -21,14 +17,14 @@ task('db:push', function () {
             );
         }
         if (!get('db_allow_push_live_force', false)) {
-            write("<error>\n\n");
-            write(sprintf(
+            writeln("<error>\n\n");
+            writeln(sprintf(
                 "You going to push database from instance: \"%s\" to top instance: \"%s\". ",
-                get('default_stage'),
+                get('local_host'),
                 $targetName
             ));
-            write("This can be destructive.\n\n");
-            write("</error>");
+            writeln("This can be destructive.\n\n");
+            writeln("</error>");
             if (!askConfirmation('Do you really want to continue?', false)) {
                 throw new GracefulShutdownException('Process aborted.');
             }
@@ -38,11 +34,12 @@ task('db:push', function () {
         }
     }
 
-    $dumpCode = md5(microtime(true) . rand(0, 10000));
+    $dumpCode = md5(microtime(true) . random_int(0, 10000));
     $dl = get('local/bin/deployer');
     $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
     $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]);
-    runLocally($dl . ' db:export ' . $options . ' ' . $verbosity);
+    $local = get('local_host');
+    runLocally($dl . ' db:export ' . $local . ' ' . $options . ' ' . $verbosity);
     runLocally($dl . ' db:upload ' . $targetName . ' ' . $options . ' ' . $verbosity);
     runLocally($dl . ' db:process ' . $targetName . ' ' . $options . ' ' . $verbosity);
     runLocally($dl . ' db:import ' . $targetName . ' ' . $options . ' ' . $verbosity);
