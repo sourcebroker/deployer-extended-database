@@ -34,15 +34,8 @@ Installation
 
       composer require sourcebroker/deployer-extended-database
 
-2) If you are using deployer as composer package then just put following line in your deploy.php:
-   ::
 
-      new \SourceBroker\DeployerLoader\Load([
-          ['path' => 'vendor/sourcebroker/deployer-instance/deployer'],
-          ['path' => 'vendor/sourcebroker/deployer-extended-database/deployer'],
-      ]);
-
-3) If you are using deployer as phar then put following lines in your deploy.php:
+2) Put following lines in your deploy.php:
    ::
 
       require_once(__DIR__ . '/vendor/sourcebroker/deployer-loader/autoload.php');
@@ -58,7 +51,8 @@ Installation
 4) Create ".env" file in your project root (where you store deploy.php file). The .env file should be out of
    git because you need to store here information about instance name. Additionally put there info about database
    you want to synchronise. You can move the info about database data to other file later but for the tests its better
-   to put it in .env file. Remember to protect .env file from downloading with https request.
+   to put it in .env file. Remember to protect .env file from downloading with https request if the root folder
+   is readable from WWW server level.
    ::
 
       INSTANCE="local"
@@ -68,7 +62,7 @@ Installation
       DATABASE_USER="database_user"
       DATABASE_PASSWORD="password"
 
-   The INSTANCE must correspond to host() name. You need to put the .env file with proper INSTANCE name and
+   The INSTANCE must correspond to ``host()`` name. You need to put the .env file with proper INSTANCE name and
    database access data on on each of you instances.
 
 5) Define "local" host and set the "db_databases" for it. Use following code:
@@ -80,7 +74,6 @@ Installation
    ::
 
       host('local')
-          ->hostname('localhost')
           ->set('deploy_path', getcwd())
           ->set('db_databases', [
               'database_default' => [
@@ -92,8 +85,8 @@ Installation
    ::
 
       host('live')
-          ->hostname('my-server.example.com')
-          ->user('deploy')
+          ->setHostname('my-server.example.com')
+          ->setRemoteUser('deploy')
           ->set('deploy_path', '/var/www/myapplication/')
           ->set('db_databases', [
               'database_default' => [
@@ -101,8 +94,8 @@ Installation
               ]
           ])
 
-7) Make sure all instances have the same /vendors folder with deployer-extended-database and the same deploy.php file.
-   Most problems are because of differences in deploy.php file between instances.
+7) Make sure all instances have the same ``/vendors`` folder with ``deployer-extended-database`` and the same ``deploy.php`` file.
+   Most problems are because of differences in ``deploy.php`` file between instances.
 
 8) Run ``dep db:pull live`` to test if all works.
 
@@ -206,8 +199,8 @@ deploy.php file:
    ]);
 
    host('live')
-         ->hostname('my-server.example.com')
-         ->user('deploy')
+         ->setHostname('my-server.example.com')
+         ->setRemoteUser('deploy')
          ->set('deploy_path', '/var/www/myapplication')
          ->set('db_databases',
             [
@@ -219,7 +212,6 @@ deploy.php file:
          );
 
    host('local')
-         ->hostname('localhost')
          ->set('deploy_path', getcwd())
          ->set('db_databases',
             [
@@ -248,12 +240,11 @@ deploy.php file:
    );
 
    host('live')
-       ->hostname('my-server.example.com')
-       ->user('deploy')
+       ->setHostname('my-server.example.com')
+       ->setRemoteUser('deploy')
        ->set('deploy_path', '/var/www/myapplication/');
 
    host('local')
-      ->hostname('localhost')
       ->set('deploy_path', getcwd());
 
 
@@ -291,12 +282,11 @@ deploy.php file:
    );
 
    host('live')
-       ->hostname('my-server.example.com')
-       ->user('deploy')
+       ->setHostname('my-server.example.com')
+       ->setRemoteUser('deploy')
        ->set('deploy_path', '/var/www/myapplication/');
 
    host('local')
-      ->hostname('localhost')
       ->set('deploy_path', getcwd());
 
 The .env file should look then like:
@@ -364,12 +354,11 @@ deploy.php file:
    );
 
    host('live')
-       ->hostname('my-server.example.com')
-       ->user('deploy')
+       ->setHostname('my-server.example.com')
+       ->setRemoteUser('deploy')
        ->set('deploy_path', '/var/www/myapplication/');
 
    host('local')
-      ->hostname('localhost')
       ->set('deploy_path', getcwd());
 
 
@@ -408,10 +397,6 @@ Real life example for CMS TYPO3:
            'sys_file_processedfile',
            'tx_devlog',
        ],
-       'post_sql_in_markers' =>
-            'UPDATE sys_domain SET hidden = 1;
-             UPDATE sys_domain SET sorting = sorting + 100;
-             UPDATE sys_domain SET sorting = 1, hidden = 0 WHERE domainName IN ({{domainsSeparatedByComma}});'
    ]);
 
 
@@ -422,7 +407,7 @@ db:backup
 +++++++++
 
 Backup database. In background, on target instance, two tasks are executed 'db:export' and 'db:compress'. Results are
-stored in "{{deploy_path}}/.dep/databases/dumps/". If no target is given the it will be done on local instance.
+stored in "{{deploy_path}}/.dep/databases/dumps/".
 
 If releases folder will be detected then it adds info about release in dumpcode name like in this example:
 ``2017-12-04_00:20:22#server=live#dbcode=database_default#dumpcode=backup_for_release_160_ec77cb6bc0e941b0ac92e2109ad7b04e#type=structure.sql.gz``
@@ -430,7 +415,7 @@ If releases folder will be detected then it adds info about release in dumpcode 
 **Example**
 ::
 
-   dep db:backup
+   dep db:backup local
    dep db:backup live
    dep db:backup live --options=dumpcode:mycode
 
@@ -438,7 +423,7 @@ db:compress
 +++++++++++
 
 Compress dumps with given dumpcode stored in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
-If no target is given the it will compress dumps on local instance. There is required option ``--options=dumpcode:[value]`` to be passed.
+There is required option ``--options=dumpcode:[value]`` to be passed.
 
 Look for config vars 'db_compress_suffix', 'db_compress_command', 'db_uncompress_command' for possible ways to overwrite
 standard gzip compression with your own.
@@ -458,7 +443,7 @@ This command allows you to copy database between instances.
    dep db:copy [source-instance] --options=target:[target-instance]
 
 In the background it runs several other tasks to accomplish this. Lets assume we want to copy database from live
-to dev instance. We will run following command on you local local (in out exmaple local instance):
+to dev instance. We will run following command on you local instance:
 ::
 
    dep db:copy live --options=target:dev
@@ -470,21 +455,21 @@ In below description:
    * target instance = dev
    * local instance = local
 
-1) First it runs ``dep db:export --options=dumpcode:123456`` task on source instance. The dumps from export task are stored
+1) First it runs ``dep db:export live --options=dumpcode:123456`` task on source instance. The dumps from export task are stored
    in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
 
 2) Then it runs ``db:download live --options=dumpcode:123456`` on local instance to download dump files from live instance from
    folder "{{deploy_path}}/.dep/databases/dumps/" to local instance to folder "{{deploy_path}}/.dep/databases/dumps/".
 
-3) Then it runs ``db:process --options=dumpcode:123456`` on local instance to make some operations directly on SQL dumps files.
+3) Then it runs ``db:process local --options=dumpcode:123456`` on local instance to make some operations directly on SQL dumps files.
 
 4) Then it runs ``db:upload dev --options=dumpcode:123456`` on local instance. This task takes dump files with code:123456
    and send it to dev instance and store it in folder "{{deploy_path}}/.dep/databases/dumps/".
 
-5) Finally it runs ``db:import --options=dumpcode:123456`` on target instance. This task reads dumps with code:123456 from folder
+5) Finally it runs ``db:import dev --options=dumpcode:123456`` on target instance. This task reads dumps with code:123456 from folder
    "{{deploy_path}}/.dep/databases/dumps/" on dev instance and import it to database.
 
-6) At the very end it removes dumps it just imported in step 5 with command ``db:rmdump --options=dumpcode:123456``
+6) At the very end it removes dumps it just imported in step 5 with command ``db:rmdump dev --options=dumpcode:123456``
 
 Copy to instance defined in ``instance_live_name`` (default ``live``) is special case.
 If you copy to highest instance then by default you will be asked twice if you really want to.
@@ -495,7 +480,7 @@ db:decompress
 +++++++++++++
 
 Decompress dumps with given dumpcode stored in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
-If no target is given the it will compress dumps on local instance. There is required option ``--options=dumpcode:[value]`` to be passed.
+There is required option ``--options=dumpcode:[value]`` to be passed.
 
 Look for config vars 'db_compress_suffix', 'db_compress_command', 'db_uncompress_command' for possible ways to overwrite
 standard gzip compression with your own.
@@ -520,8 +505,8 @@ There is required option ``--options=dumpcode:[value]`` to be passed.
 db:dumpclean
 ++++++++++++
 
-Clean database dump storage on target instance (or on local instance if target instance is not set). By default it
-removes all dumps except last five but you can set your values and also change the values depending on instance.
+Clean database dump storage on target instance. By default it removes all dumps except last five but you can set your
+values and also change the values depending on instance.
 
 **Example**
 ::
@@ -549,7 +534,7 @@ json structure.
 Example task call:
 ::
 
-   dep db:export
+   dep db:export live
 
 Example output files located in folder {{deploy_path}}/.dep/databases/dumps/:
 ::
@@ -561,7 +546,7 @@ Example output files located in folder {{deploy_path}}/.dep/databases/dumps/:
 Example task call with own dumpcode=
 ::
 
-   dep db:export --options=dumpcode:mycode
+   dep db:export live --options=dumpcode:mycode
 
 Example output files:
 ::
@@ -578,7 +563,7 @@ There is required option ``--options=dumpcode:[value]`` to be passed.
 **Example**
 ::
 
-   dep db:import --options=dumpcode:0772a8d396911951022db5ea385535f66
+   dep db:import dev --options=dumpcode:0772a8d396911951022db5ea385535f66
 
 db:process
 ++++++++++
@@ -589,7 +574,7 @@ directly on sql file before importing. There is required option ``--options=dump
 **Example**
 ::
 
-   dep db:process --options=dumpcode:0772a8d396911951022db5ea385535f66
+   dep db:process dev --options=dumpcode:0772a8d396911951022db5ea385535f66
 
 db:pull
 +++++++
@@ -597,7 +582,7 @@ db:pull
 This command allows you to pull database from target instance to local instance.
 In the background it runs several other tasks to accomplish this.
 
-Here is the list of tasks that will be done afer "db:pull":
+Here is the list of tasks that will be done when you execute "db:pull":
 
 1) First it runs `db:export`_ task on target instance and get the "dumpcode" as return to use it in next commands.
 2) Then it runs `db:download`_ on local instance (with "dumpcode" value from first task).
@@ -621,7 +606,7 @@ db:push
 This command allows you to push database from local instance to remote instance.
 In the background it runs several other tasks to accomplish this.
 
-Here is the list of tasks that will be done after "db:push":
+Here is the list of tasks that will be done when you execute "db:push":
 
 1) First it runs `db:export`_ task on local instance and get the "dumpcode" as return to use it in next commands.
 2) Then it runs `db:upload`_ on local instance with remote as argument (with "dumpcode" value from first task).

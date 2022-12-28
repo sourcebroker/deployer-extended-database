@@ -3,8 +3,6 @@
 namespace Deployer;
 
 use Closure;
-use Deployer\Host\Localhost;
-use Deployer\Task\Context;
 use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerInstance\Configuration;

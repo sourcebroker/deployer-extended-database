@@ -6,6 +6,7 @@ Changelog
 ~~~~~~
 
 1) [TASK][BREAKING] Bump dependency to ``sourcebroker/deployer-instance``.
+2) [TASK] Code cleanup / update readme.
 
 
 15.0.0

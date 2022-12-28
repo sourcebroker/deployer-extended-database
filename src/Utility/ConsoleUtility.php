@@ -6,18 +6,8 @@ use function Deployer\input;
 use function Deployer\output;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Class ConsoleUtility
- *
- * @package SourceBroker\DeployerExtendedDatabase\Utility
- */
 class ConsoleUtility
 {
-    /**
-     * Returns OutputInterface verbosity as parameter that can be used in cli command
-     *
-     * @return string
-     */
     public function getVerbosityAsParameter(): string
     {
         switch (output()->getVerbosity()) {
@@ -43,11 +33,9 @@ class ConsoleUtility
     /**
      * Check if option is present and return it. If not throw exception.
      *
-     * @param $optionToFind
-     * @param bool $required
-     * @return string
+     * @return bool|mixed|string|null
      */
-    public function getOption($optionToFind, bool $required = false)
+    public function getOption(string $optionToFind, bool $required = false)
     {
         $optionReturnValue = null;
         if (!empty(input()->getOption('options'))) {

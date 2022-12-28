@@ -3,34 +3,19 @@
 namespace SourceBroker\DeployerExtendedDatabase\Utility;
 
 use SourceBroker\DeployerInstance\Configuration;
-use Deployer\Exception\GracefulShutdownException;
 
-/**
- * Class RsyncUtility
- *
- * @package SourceBroker\DeployerExtendedDatabase\Utility
- */
 class RsyncUtility
 {
-    /**
-     * @param $targetStageName
-     * @return string
-     */
-    public function getSshOptions($targetStageName): string
+    public function getSshOptions(string $targetStageName): string
     {
         $host = Configuration::getHost($targetStageName);
         if (!empty($host->connectionOptionsString())) {
             return '-e ' . escapeshellarg('ssh ' . $host->connectionOptionsString());
-        } else {
-            return '';
         }
+        return '';
     }
 
-    /**
-     * @param $targetStageName
-     * @return string
-     */
-    public function getHostWithDbStoragePath($targetStageName): string
+    public function getHostWithDbStoragePath(string $targetStageName): string
     {
         $host = Configuration::getHost($targetStageName);
         return

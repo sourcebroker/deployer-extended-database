@@ -4,35 +4,19 @@ namespace SourceBroker\DeployerExtendedDatabase\Utility;
 
 use function Deployer\runLocally;
 
-/**
- * Class FileUtility
- * @package SourceBroker\DeployerExtendedDatabase\Utility
- */
 class FileUtility
 {
-    /**
-     * @param $filename
-     * @return string
-     */
-    public function normalizeFilename($filename)
+    public function normalizeFilename(string $filename): string
     {
         return preg_replace('/^[^a-zA-Z0-9_]+$/', '', $filename);
     }
 
-    /**
-     * @param $folder
-     * @return string
-     */
-    public function normalizeFolder($folder)
+    public function normalizeFolder(string $folder): string
     {
         return rtrim($folder, '/') . '/';
     }
 
-    /**
-     * @param $name
-     * @return string
-     */
-    public function locateLocalBinaryPath($name)
+    public function locateLocalBinaryPath(string $name): string
     {
         $nameEscaped = escapeshellarg($name);
         // Try `command`, should cover all Bourne-like shells
