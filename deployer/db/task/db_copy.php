@@ -25,14 +25,14 @@ task('db:copy', function () {
         }
         if (!get('db_allow_copy_live_force', false)) {
             $doNotAskAgainForLive = true;
-            write("<error>\n\n");
-            write(sprintf(
+            writeln("<error>\n\n");
+            writeln(sprintf(
                 "You going to copy database form instance: \"%s\" to top instance: \"%s\". ",
                 get('argument_host'),
                 $targetInstanceName
             ));
-            write("This can be destructive.\n\n");
-            write("</error>");
+            writeln("This can be destructive.\n\n");
+            writeln("</error>");
             if (!askConfirmation('Do you really want to continue?', false)) {
                 throw new GracefulShutdownException('Process aborted.');
             }

@@ -7,6 +7,7 @@ Changelog
 
 1) [TASK][BREAKING] Bump dependency to ``sourcebroker/deployer-instance``.
 2) [TASK] Code cleanup / update readme.
+3) [BUGFIX] Fix wrong function used to output text.
 
 
 15.0.0
