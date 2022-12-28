@@ -2,6 +2,12 @@
 Changelog
 ---------
 
+16.0.0
+~~~~~~
+
+1) [TASK][BREAKING] Bump dependency to ``sourcebroker/deployer-instance``.
+
+
 15.0.0
 ~~~~~~
 
