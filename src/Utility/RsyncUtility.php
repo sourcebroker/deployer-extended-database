@@ -8,9 +8,9 @@ class RsyncUtility
 {
     public function getSshOptions(string $targetStageName): string
     {
-        $host = Configuration::getHost($targetStageName);
-        if (!empty($host->connectionOptionsString())) {
-            return '-e ' . escapeshellarg('ssh ' . $host->connectionOptionsString());
+        $connectionOptions = Configuration::getHost($targetStageName)->connectionOptionsString();
+        if ($connectionOptions !== '') {
+            return '-e "ssh ' . $connectionOptions . '"';
         }
         return '';
     }

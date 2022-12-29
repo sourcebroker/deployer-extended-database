@@ -2,6 +2,11 @@
 Changelog
 ---------
 
+16.0.1
+~~~~~~
+
+1) [BUGFIX] Fix connectionOptionsString() is already escapeshellarg'ed on RsyncUtility->getSshOptions.
+
 16.0.0
 ~~~~~~
 
