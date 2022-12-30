@@ -9,7 +9,8 @@ Deployer 6 -> 7
    ``db_databases_overwrite``.  You can also use ``db_databases_overwrite_global`` to overwrite with similar way on
    global level.
 
-    ::
+::
+
     OLD
 
     host('local')
@@ -29,7 +30,6 @@ Deployer 6 -> 7
 
 
 
-    ::
     NEW
 
     host('local')
