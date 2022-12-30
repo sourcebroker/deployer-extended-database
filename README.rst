@@ -192,7 +192,7 @@ Config with one database and database data read from .env file
 deploy.php file:
 ::
 
-   set('db_defaults', [
+   set('db_default', [
       'ignore_tables_out' => [
           'caching_.*'
       ]
@@ -205,7 +205,7 @@ deploy.php file:
          ->set('db_databases',
             [
               'database_foo' => [
-                  get('db_defaults'),
+                  get('db_default'),
                   (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
                ],
             ]
@@ -216,7 +216,7 @@ deploy.php file:
          ->set('db_databases',
             [
               'database_foo' => [
-                  get('db_defaults'),
+                  get('db_default'),
                   (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
                ],
             ]
@@ -320,7 +320,7 @@ In example we will use:
    ``get('db_default')``
 
 3) direct file include which returns array with database options
-   ``__DIR__ . '/databases/conifg/additional_db_config.php``
+   ``__DIR__ . '/.dep/database/config/additional_db_config.php``
 
 4) class/method which returns array with database options
    ``(new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig()``
@@ -340,14 +340,16 @@ deploy.php file:
    set('db_databases',
        [
            'database_foo' => [
-               'ignore_tables_out' => [
-                  'caching_.*'
-               ]
+               [
+                   'ignore_tables_out' => [
+                      'caching_.*'
+                   ]
+               ],
                get('db_default'),
-               __DIR__ . '/databases/conifg/additional_db_config.php
+               __DIR__ . '/databases/config/additional_db_config.php',
                (new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig(),
                function() {
-                  return (new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig()
+                  return (new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig();
                }
             ],
        ]

@@ -38,8 +38,18 @@ set('db_decompress_command', [
 set('db_databases_merged', function () {
     $arrayUtility = new ArrayUtility();
     $dbConfigsMerged = [];
-    foreach (get('db_databases') as $dbIdentifier => $dbConfigs) {
+    $dbDatabases = get('db_databases', []);
+    $dbDatabasesOverwriteGlobal = get('db_databases_overwrite_global');
+    if ($dbDatabasesOverwriteGlobal) {
+        $dbDatabases = $arrayUtility->arrayMergeRecursiveDistinct($dbDatabases, $dbDatabasesOverwriteGlobal);
+    }
+    $dbDatabasesOverwrite = get('db_databases_overwrite');
+    if ($dbDatabasesOverwrite) {
+        $dbDatabases = $arrayUtility->arrayMergeRecursiveDistinct($dbDatabases, $dbDatabasesOverwrite);
+    }
+    foreach ($dbDatabases as $dbIdentifier => $dbConfigs) {
         $dbConfigsMerged[$dbIdentifier] = [];
+
         foreach ($dbConfigs as $dbConfig) {
             if (is_array($dbConfig)) {
                 $dbConfigsMerged[$dbIdentifier]
@@ -66,7 +76,6 @@ set('db_databases_merged', function () {
             }
         }
     }
-
     return $dbConfigsMerged;
 });
 

@@ -2,6 +2,12 @@
 Changelog
 ---------
 
+16.1.1
+~~~~~~
+
+1) [FEATURE] Add possibility to overwrite ``db_databases`` by setting ``db_databases_global`` and ``db_databases``
+   (on host level). See more on UPGRADE file.
+
 16.0.1
 ~~~~~~
 
