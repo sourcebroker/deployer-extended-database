@@ -2,7 +2,7 @@
 Changelog
 ---------
 
-16.1.1
+16.1.0
 ~~~~~~
 
 1) [FEATURE] Add possibility to overwrite ``db_databases`` by setting ``db_databases_global`` and ``db_databases``
