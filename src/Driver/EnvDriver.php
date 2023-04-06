@@ -35,26 +35,14 @@ class EnvDriver
             'dbname' => $this->getenv($prefix . 'DATABASE_NAME'),
             'user' => $this->getenv($prefix . 'DATABASE_USER'),
             'password' => $this->getenv($prefix . 'DATABASE_PASSWORD'),
+            // flags
+            'flags' => $this->getenv($prefix . 'DATABASE_FLAGS'),
             // SSL
             'ssl_key' => $this->getenv($prefix . 'DATABASE_SSL_KEY'),
             'ssl_cert' => $this->getenv($prefix . 'DATABASE_SSL_CERT'),
             'ssl_ca' => $this->getenv($prefix . 'DATABASE_SSL_CA'),
             'ssl_capath' => $this->getenv($prefix . 'DATABASE_SSL_CAPATH'),
             'ssl_cipher' => $this->getenv($prefix . 'DATABASE_SSL_CIPHER'),
-            // options
-            'options' => [
-                MYSQLI_OPT_CONNECT_TIMEOUT => $this->getenv($prefix . 'DATABASE_OPTION_MYSQLI_OPT_CONNECT_TIMEOUT'),
-                MYSQLI_OPT_READ_TIMEOUT => $this->getenv($prefix . 'DATABASE_OPTION_MYSQLI_OPT_READ_TIMEOUT'),
-                MYSQLI_OPT_LOCAL_INFILE => $this->getenv($prefix . 'DATABASE_OPTION_MYSQLI_OPT_LOCAL_INFILE'),
-                MYSQLI_INIT_COMMAND => $this->getenv($prefix . 'DATABASE_OPTION_MYSQLI_INIT_COMMAND'),
-                MYSQLI_SET_CHARSET_NAME => $this->getenv($prefix . 'DATABASE_OPTION_MYSQLI_SET_CHARSET_NAME'),
-                MYSQLI_READ_DEFAULT_GROUP => $this->getenv($prefix . 'DATABASE_OPTION_MYSQLI_READ_DEFAULT_GROUP'),
-                MYSQLI_SERVER_PUBLIC_KEY => $this->getenv($prefix . 'DATABASE_OPTION_MYSQLI_SERVER_PUBLIC_KEY'),
-                MYSQLI_OPT_NET_CMD_BUFFER_SIZE => $this->getenv($prefix . 'DATABASE_OPTION_MYSQLI_OPT_NET_CMD_BUFFER_SIZE'),
-                MYSQLI_OPT_NET_READ_BUFFER_SIZE => $this->getenv($prefix . 'DATABASE_OPTION_MYSQLI_OPT_NET_READ_BUFFER_SIZE'),
-                MYSQLI_OPT_INT_AND_FLOAT_NATIVE => $this->getenv($prefix . 'DATABASE_OPTION_MYSQLI_OPT_INT_AND_FLOAT_NATIVE'),
-                MYSQLI_OPT_SSL_VERIFY_SERVER_CERT => $this->getenv($prefix . 'DATABASE_OPTION_MYSQLI_OPT_SSL_VERIFY_SERVER_CERT'),
-            ],
         ];
     }
 

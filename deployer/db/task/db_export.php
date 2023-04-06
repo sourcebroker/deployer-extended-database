@@ -59,6 +59,7 @@ task('db:export', function () {
             // dump database structure
             $filenameParts['type'] = 'type=structure';
             $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_structure', '');
+            $mysqlDumpArgs['options'] .= DatabaseUtility::getSslCliOptions($databaseConfig);
             $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_local'))
                 . implode('#', $filenameParts) . '.sql');
             runLocally(vsprintf(
@@ -70,6 +71,7 @@ task('db:export', function () {
             // dump database data
             $filenameParts['type'] = 'type=data';
             $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_data', '');
+            $mysqlDumpArgs['options'] .= DatabaseUtility::getSslCliOptions($databaseConfig);
             $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_local'))
                 . implode('#', $filenameParts) . '.sql');
             runLocally(vsprintf(
