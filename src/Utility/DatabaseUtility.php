@@ -23,7 +23,7 @@ class DatabaseUtility
             $dbConf['dbname'],
             $dbConf['port'],
             null,
-            isset($dbConf['flags']) ? (int)$dbConf['flags'] : null
+            isset($dbConf['flags']) ? (int)$dbConf['flags'] : 0
         );
 
         $result = $mysqli->query('SHOW TABLES');
