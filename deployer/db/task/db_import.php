@@ -66,7 +66,7 @@ task('db:import', function () {
                     escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                     escapeshellarg($databaseConfig['user']),
                     escapeshellarg($databaseConfig['dbname']),
-                    escapeshellarg(DatabaseUtility::getSslCliOptions($databaseConfig))
+                    DatabaseUtility::getSslCliOptions($databaseConfig)
                 ));
             }
             // Import dump with database structure.

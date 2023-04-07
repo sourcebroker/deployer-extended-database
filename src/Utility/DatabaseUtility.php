@@ -44,7 +44,7 @@ class DatabaseUtility
 
         foreach (['ssl_key', 'ssl_cert', 'ssl_ca', 'ssl_capath', 'ssl_cipher'] as $option) {
             if (isset($dbConfig[$option])) {
-                $options[] = '--' . str_replace('_', '-', $option) . '=\'' . $dbConfig[$option] . '\'';
+                $options[] = '--' . str_replace('_', '-', $option) . '=' . escapeshellarg($dbConfig[$option]);
             }
         }
 
