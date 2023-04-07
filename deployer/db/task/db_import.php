@@ -60,7 +60,7 @@ task('db:import', function () {
                     escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                     escapeshellarg($databaseConfig['user']),
                     escapeshellarg($databaseConfig['dbname']),
-                    escapeshellarg(DatabaseUtility::getSslCliOptions($databaseConfig)),
+                    DatabaseUtility::getSslCliOptions($databaseConfig),
                     get('local/bin/mysql'),
                     escapeshellarg($databaseConfig['host']),
                     escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
@@ -75,7 +75,7 @@ task('db:import', function () {
                 escapeshellarg($databaseConfig['password']),
                 get('local/bin/mysql'),
                 get('db_import_mysql_options_structure', ''),
-                escapeshellarg(DatabaseUtility::getSslCliOptions($databaseConfig)),
+                DatabaseUtility::getSslCliOptions($databaseConfig),
                 escapeshellarg($databaseConfig['host']),
                 escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                 escapeshellarg($databaseConfig['user']),
@@ -88,7 +88,7 @@ task('db:import', function () {
                 escapeshellarg($databaseConfig['password']),
                 get('local/bin/mysql'),
                 get('db_import_mysql_options_data', ''),
-                escapeshellarg(DatabaseUtility::getSslCliOptions($databaseConfig)),
+                DatabaseUtility::getSslCliOptions($databaseConfig),
                 escapeshellarg($databaseConfig['host']),
                 escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                 escapeshellarg($databaseConfig['user']),
@@ -140,7 +140,7 @@ task('db:import', function () {
                     escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                     escapeshellarg($databaseConfig['user']),
                     escapeshellarg($databaseConfig['dbname']),
-                    escapeshellarg(DatabaseUtility::getSslCliOptions($databaseConfig)),
+                    DatabaseUtility::getSslCliOptions($databaseConfig),
                     escapeshellarg('SOURCE ' . $importSqlFile)
                 ));
                 unlink($importSqlFile);

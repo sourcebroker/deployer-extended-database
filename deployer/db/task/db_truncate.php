@@ -30,7 +30,7 @@ task('db:truncate', function () {
                             escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                             escapeshellarg($databaseConfig['user']),
                             escapeshellarg($databaseConfig['dbname']),
-                            escapeshellarg(DatabaseUtility::getSslCliOptions($databaseConfig)),
+                            DatabaseUtility::getSslCliOptions($databaseConfig),
                             escapeshellarg('TRUNCATE ' . $truncateTable)
                         ));
                     }
