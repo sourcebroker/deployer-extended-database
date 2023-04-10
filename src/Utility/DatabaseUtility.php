@@ -48,6 +48,6 @@ class DatabaseUtility
             }
         }
 
-        return ' ' . implode(' ', $options);
+        return count($options) ? ' ' . implode(' ', $options) : '';
     }
 }

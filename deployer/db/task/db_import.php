@@ -133,15 +133,15 @@ task('db:import', function () {
                 $importSqlFile = $fileUtility->normalizeFolder($localInstanceDatabaseStoragePath) . $dumpCode . '.sql';
                 file_put_contents($importSqlFile, implode(' ', $postSqlInCollected));
                 runLocally(sprintf(
-                    'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s -D%s %s -e%s',
+                    'export MYSQL_PWD=%s && %s %s %s -h%s -P%s -u%s -D%s -e%s',
                     escapeshellarg($databaseConfig['password']),
                     get('local/bin/mysql'),
                     get('db_import_mysql_options_post_sql_in', ''),
+                    DatabaseUtility::getSslCliOptions($databaseConfig),
                     escapeshellarg($databaseConfig['host']),
                     escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                     escapeshellarg($databaseConfig['user']),
                     escapeshellarg($databaseConfig['dbname']),
-                    DatabaseUtility::getSslCliOptions($databaseConfig),
                     escapeshellarg('SOURCE ' . $importSqlFile)
                 ));
                 unlink($importSqlFile);
