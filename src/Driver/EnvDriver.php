@@ -29,11 +29,20 @@ class EnvDriver
             }
         }
         return [
+            // required
             'host' => $this->getenv($prefix . 'DATABASE_HOST'),
             'port' => $this->getenv($prefix . 'DATABASE_PORT') ?: 3306,
             'dbname' => $this->getenv($prefix . 'DATABASE_NAME'),
             'user' => $this->getenv($prefix . 'DATABASE_USER'),
-            'password' => $this->getenv($prefix . 'DATABASE_PASSWORD')
+            'password' => $this->getenv($prefix . 'DATABASE_PASSWORD'),
+            // flags
+            'flags' => $this->getenv($prefix . 'DATABASE_FLAGS'),
+            // SSL
+            'ssl_key' => $this->getenv($prefix . 'DATABASE_SSL_KEY'),
+            'ssl_cert' => $this->getenv($prefix . 'DATABASE_SSL_CERT'),
+            'ssl_ca' => $this->getenv($prefix . 'DATABASE_SSL_CA'),
+            'ssl_capath' => $this->getenv($prefix . 'DATABASE_SSL_CAPATH'),
+            'ssl_cipher' => $this->getenv($prefix . 'DATABASE_SSL_CIPHER'),
         ];
     }
 

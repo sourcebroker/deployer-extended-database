@@ -23,13 +23,14 @@ task('db:truncate', function () {
                 if (!empty($truncateTables)) {
                     foreach ($truncateTables as $truncateTable) {
                         runLocally(sprintf(
-                            'export MYSQL_PWD=%s && %s -h%s -P%s -u%s -D%s -e %s',
+                            'export MYSQL_PWD=%s && %s -h%s -P%s -u%s -D%s %s -e %s',
                             escapeshellarg($databaseConfig['password']),
                             get('local/bin/mysql'),
                             escapeshellarg($databaseConfig['host']),
                             escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                             escapeshellarg($databaseConfig['user']),
                             escapeshellarg($databaseConfig['dbname']),
+                            DatabaseUtility::getSslCliOptions($databaseConfig),
                             escapeshellarg('TRUNCATE ' . $truncateTable)
                         ));
                     }

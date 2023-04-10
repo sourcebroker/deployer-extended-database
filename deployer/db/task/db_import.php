@@ -2,6 +2,7 @@
 
 namespace Deployer;
 
+use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 use Deployer\Exception\GracefulShutdownException;
@@ -51,27 +52,30 @@ task('db:import', function () {
             // Drop all tables.
             if (empty((new ConsoleUtility())->getOption('importTaskDoNotDropAllTablesBeforeImport'))) {
                 runLocally(sprintf(
-                    'export MYSQL_PWD=%s && %s -h%s -P%s -u%s %s --add-drop-table --no-data | ' .
-                    'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s -h%s -P%s -u%s -D%s',
+                    'export MYSQL_PWD=%s && %s -h%s -P%s -u%s %s %s --add-drop-table --no-data | ' .
+                    'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s -h%s -P%s -u%s -D%s %s',
                     escapeshellarg($databaseConfig['password']),
                     get('local/bin/mysqldump'),
                     escapeshellarg($databaseConfig['host']),
                     escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                     escapeshellarg($databaseConfig['user']),
                     escapeshellarg($databaseConfig['dbname']),
+                    DatabaseUtility::getSslCliOptions($databaseConfig),
                     get('local/bin/mysql'),
                     escapeshellarg($databaseConfig['host']),
                     escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                     escapeshellarg($databaseConfig['user']),
-                    escapeshellarg($databaseConfig['dbname'])
+                    escapeshellarg($databaseConfig['dbname']),
+                    DatabaseUtility::getSslCliOptions($databaseConfig)
                 ));
             }
             // Import dump with database structure.
             runLocally(sprintf(
-                'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s -D%s -e%s',
+                'export MYSQL_PWD=%s && %s %s %s -h%s -P%s -u%s -D%s -e%s',
                 escapeshellarg($databaseConfig['password']),
                 get('local/bin/mysql'),
                 get('db_import_mysql_options_structure', ''),
+                DatabaseUtility::getSslCliOptions($databaseConfig),
                 escapeshellarg($databaseConfig['host']),
                 escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                 escapeshellarg($databaseConfig['user']),
@@ -80,10 +84,11 @@ task('db:import', function () {
             ));
             // Import dump with data.
             runLocally(sprintf(
-                'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s -D%s -e%s',
+                'export MYSQL_PWD=%s && %s %s %s -h%s -P%s -u%s -D%s -e%s',
                 escapeshellarg($databaseConfig['password']),
                 get('local/bin/mysql'),
                 get('db_import_mysql_options_data', ''),
+                DatabaseUtility::getSslCliOptions($databaseConfig),
                 escapeshellarg($databaseConfig['host']),
                 escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                 escapeshellarg($databaseConfig['user']),
@@ -128,13 +133,14 @@ task('db:import', function () {
                 $importSqlFile = $fileUtility->normalizeFolder($localInstanceDatabaseStoragePath) . $dumpCode . '.sql';
                 file_put_contents($importSqlFile, implode(' ', $postSqlInCollected));
                 runLocally(sprintf(
-                    'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s -e%s',
+                    'export MYSQL_PWD=%s && %s --default-character-set=utf8 -h%s -P%s -u%s -D%s %s -e%s',
                     escapeshellarg($databaseConfig['password']),
                     get('local/bin/mysql'),
                     escapeshellarg($databaseConfig['host']),
                     escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
                     escapeshellarg($databaseConfig['user']),
                     escapeshellarg($databaseConfig['dbname']),
+                    DatabaseUtility::getSslCliOptions($databaseConfig),
                     escapeshellarg('SOURCE ' . $importSqlFile)
                 ));
                 unlink($importSqlFile);
