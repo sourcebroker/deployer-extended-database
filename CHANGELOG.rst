@@ -2,6 +2,12 @@
 Changelog
 ---------
 
+master
+~~~~~~
+
+1) [FEATURE] Add support for SSL connection to database.
+2) [FEATURE] Add missing variable for mysql options for post sql import ``db_import_mysql_options_post_sql_in``.
+
 16.1.0
 ~~~~~~
 
