@@ -2,7 +2,7 @@
 Changelog
 ---------
 
-master
+17.0.0
 ~~~~~~
 
 1) [FEATURE] Add support for SSL connection to database.
