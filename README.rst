@@ -1,9 +1,6 @@
 deployer-extended-database
 ==========================
 
-.. image:: https://scrutinizer-ci.com/g/sourcebroker/deployer-extended-database/badges/quality-score.png?b=master
-   :target: https://scrutinizer-ci.com/g/sourcebroker/deployer-extended-database/?branch=master
-
 .. image:: https://poser.pugx.org/sourcebroker/deployer-extended-database/v/stable
    :target: https://packagist.org/packages/sourcebroker/deployer-extended-database
 
