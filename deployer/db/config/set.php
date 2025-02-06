@@ -8,16 +8,16 @@ use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerInstance\Configuration;
 use Deployer\Exception\GracefulShutdownException;
 
-set('db_export_mysqldump_options_structure', '--no-data=true --default-character-set=utf8 --no-tablespaces');
+set('db_export_mysqldump_options_structure', '--no-data=true --default-character-set=utf8mb4 --no-tablespaces');
 
 set('db_export_mysqldump_options_data',
-    '--opt --skip-lock-tables --single-transaction --no-create-db --default-character-set=utf8 --no-tablespaces');
+    '--opt --skip-lock-tables --single-transaction --no-create-db --default-character-set=utf8mb4 --no-tablespaces');
 
-set('db_import_mysql_options_structure', '--default-character-set=utf8');
+set('db_import_mysql_options_structure', '--default-character-set=utf8mb4');
 
-set('db_import_mysql_options_data', '--default-character-set=utf8');
+set('db_import_mysql_options_data', '--default-character-set=utf8mb4');
 
-set('db_import_mysql_options_post_sql_in', '--default-character-set=utf8');
+set('db_import_mysql_options_post_sql_in', '--default-character-set=utf8mb4');
 
 set('db_process_commands', [
     // @see http://stackoverflow.com/a/38595160/1588346

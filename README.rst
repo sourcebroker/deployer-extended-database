@@ -111,6 +111,39 @@ Options
   |
   | Path relative to "deploy_path" where you want to store database dumps produced during database synchro commands.
 
+  |
+- | **db_export_mysqldump_options_structure**
+  | *default value:* --no-data=true --default-character-set=utf8mb4 --no-tablespaces
+  |
+  | Options `mysqldump` used for exporting the database structure.
+
+  |
+- | **db_export_mysqldump_options_data**
+  | *default value:* --opt --skip-lock-tables --single-transaction --no-create-db --default-character-set=utf8mb4 --no-tablespaces
+  |
+  | Options `mysqldump` used for exporting the database data.
+
+  |
+- | **db_import_mysql_options_structure**
+  | *default value:* --default-character-set=utf8mb4
+  |
+  | Options `mysql` used for importing the database structure.
+
+  |
+- | **db_import_mysql_options_data**
+  | *default value:* --default-character-set=utf8mb4
+  |
+  | Options `mysql` used for importing the database data.
+
+  |
+- | **db_import_mysql_options_post_sql_in**
+  | *default value:* --default-character-set=utf8mb4
+  |
+  | Options `mysql` used for importing the additional SQL from ``post_sql_in``.
+
+
+NOTE: watch that ``utf8mb4`` is forced for all mysql/mysqldump operations.
+
 
 .. _db\_databases:
 
