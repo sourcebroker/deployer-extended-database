@@ -144,6 +144,35 @@ task('db:import', function () {
                         runLocally($postCommand . ' ' . $options);
                     }
                 }
+
+                $databaseUtility = new DatabaseUtility();
+                $bigTableSizeThreshold = get('db_import_big_table_size_threshold', 50);
+                $bigTables = $databaseUtility->getBigTables($databaseConfig, $bigTableSizeThreshold);
+
+                if (!empty($bigTables)) {
+                    output()->writeln($consoleUtility->formattingTaskOutputHeader('Big tables:'));
+                    $bigTablesText = '';
+                    $line = '';
+                    $lineLength = 0;
+                    $maxLineLength = get('db_import_show_ignore_tables_output_max_line_length', 120);
+
+                    foreach ($bigTables as $tableInfo) {
+                        $tableSizeText = $tableInfo['Table'] . ' (' . $tableInfo['Size (MB)'] . ' MB) | ';
+                        $tableSizeTextLength = strlen($tableSizeText);
+
+                        if ($lineLength + $tableSizeTextLength > $maxLineLength) {
+                            $bigTablesText .= rtrim($line, ' |') . "\n";
+                            $line = '';
+                            $lineLength = 0;
+                        }
+                        $line .= $tableSizeText;
+                        $lineLength += $tableSizeTextLength;
+                    }
+                    $bigTablesText .= rtrim($line, ' |');
+
+                    output()->write($consoleUtility->formattingTaskOutputContent($bigTablesText));
+                }
+
             } catch (\Exception $exception) {
                 throw new GracefulShutdownException(
                     'Error during import dump with dumpcode: ' . $dumpCode . '. ' . $exception->getMessage(),

@@ -4,7 +4,7 @@ namespace SourceBroker\DeployerExtendedDatabase\Utility;
 
 class DatabaseUtility
 {
-    public function getTables(array $dbConf): array
+    private function connect(array $dbConf): \mysqli
     {
         $mysqli = mysqli_init();
 
@@ -26,12 +26,43 @@ class DatabaseUtility
             isset($dbConf['flags']) ? (int)$dbConf['flags'] : 0
         );
 
+        if ($mysqli->connect_error) {
+            throw new \RuntimeException('Connection error: ' . $mysqli->connect_error);
+        }
+
+        return $mysqli;
+    }
+
+    public function getTables(array $dbConf): array
+    {
+        $mysqli = $this->connect($dbConf);
         $result = $mysqli->query('SHOW TABLES');
         $allTables = [];
         while ($row = $result->fetch_row()) {
             $allTables[] = array_shift($row);
         }
         return $allTables;
+    }
+
+    public function getBigTables(array $dbConf, float $bigTableSizeThreshold): array
+    {
+        $mysqli = $this->connect($dbConf);
+        $bigTablesQuery = 'SELECT table_name AS `Table`,
+                                  round(((data_length + index_length) / 1024 / 1024), 2) `Size (MB)`
+                           FROM information_schema.TABLES
+                           WHERE table_schema = \'' . $mysqli->real_escape_string($dbConf['dbname']) . '\'
+                           AND ((data_length + index_length) / 1024 / 1024) > ' . $mysqli->real_escape_string($bigTableSizeThreshold) . '
+                           ORDER BY (data_length + index_length) DESC
+                           LIMIT 100;';
+        $result = $mysqli->query($bigTablesQuery);
+        if (!$result) {
+            throw new \RuntimeException('Query error: ' . $mysqli->error);
+        }
+        $bigTables = [];
+        while ($row = $result->fetch_assoc()) {
+            $bigTables[] = $row;
+        }
+        return $bigTables;
     }
 
     public static function getSslCliOptions(array $dbConfig): string

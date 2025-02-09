@@ -14,6 +14,8 @@ master
     with --options=dumpcode:mydumpcode
 7) [TASK] Move db credentials to temporary file and use it with ``--defaults-file=``. Reason is edge case that ``MYSQL_PWD``
     was overwritten by ``~/.my.cnf`` files. For example: https://github.com/ddev/ddev/pull/6851
+8) [FEATURE] Add info about big tables on db:import. Useful to fast check if we import some not needed big tables.
+   Default limit is 50MB. You can change it to your value in ``db_import_big_table_size_threshold``.
 
 17.0.0
 ~~~~~~
