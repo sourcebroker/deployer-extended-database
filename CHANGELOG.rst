@@ -18,6 +18,9 @@ master
    Default limit is 50MB. You can change it to your value in ``db_import_big_table_size_threshold``.
 9) [FEATURE] Add info about ignored tables on mysqldump in db:export. You can configure max_line in
    ``db_export_mysqldump_show_ignore_tables_out_max_line_length``.
+10) [TASK][BREAKING] Change bahaviour of ``db:download`` and ``db:upload``. Option ``--remove-source-files`` has been
+    removed from rsync and downloaded, uploaded files are not longer automatically removed. Add short info about size
+    of downloaded or uploaded file.
 
 17.0.0
 ~~~~~~

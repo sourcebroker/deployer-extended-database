@@ -5,20 +5,34 @@ namespace Deployer;
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\RsyncUtility;
-use Deployer\Exception\GracefulShutdownException;
 
 /*
  * @see https://github.com/sourcebroker/deployer-extended-database#db-upload
  */
 task('db:upload', function () {
-    $dumpCode = (new ConsoleUtility())->getOption('dumpcode', true);
     $rsyncUtility = new RsyncUtility();
     $fileUtility = new FileUtility();
+    $consoleUtility = new ConsoleUtility();
+    $dumpCode = $consoleUtility->getOption('dumpcode', true);
+    $localPath = $fileUtility->normalizeFolder(get('db_storage_path_local'));
+
     runLocally(sprintf(
-        'rsync -rz --remove-source-files %s --include=%s --exclude=* %s %s',
+        'rsync -rz %s --include=%s --exclude=* %s %s',
         $rsyncUtility->getSshOptions(get('argument_host')),
         escapeshellarg('*dumpcode=' . $dumpCode . '*'),
-        escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_local'))),
+        escapeshellarg($localPath),
         escapeshellarg($rsyncUtility->getHostWithDbStoragePath(get('argument_host')))
     ));
+
+    $filePathPattern = $fileUtility->normalizeFolder(get('db_storage_path')) . '/*dumpcode=' . $dumpCode . '*';
+    $files = run('ls ' . $filePathPattern);
+    $files = explode("\n", trim($files));
+    if (!empty($files)) {
+        $filePath = $files[0];
+        $fileSizeBytes = run('stat -c%s ' . escapeshellarg($filePath));
+        $fileSizeMB = number_format($fileSizeBytes / (1024 * 1024), 2);
+        output()->write($consoleUtility->formattingTaskOutputHeader("Sql file size: "));
+        output()->write($consoleUtility->formattingTaskOutputContent(sprintf("%s MB", $fileSizeMB), false));
+    }
+
 })->desc('Upload the database dump for given dumpcode from local to remote database dumps storage');
