@@ -4,7 +4,9 @@ namespace SourceBroker\DeployerExtendedDatabase\Utility;
 
 use function Deployer\input;
 use function Deployer\output;
+use function Deployer\get;
 use Symfony\Component\Console\Output\OutputInterface;
+use Deployer\Exception\GracefulShutdownException;
 
 class ConsoleUtility
 {
@@ -47,6 +49,12 @@ class ConsoleUtility
                         $optionValue = $optionParts[1];
                     }
                     if ($optionToFind === $optionParts[0]) {
+                        $pregMatchRequired = get('db_pregmatch_' . $optionToFind, '');
+                        if ($pregMatchRequired !== '' && !empty($optionValue)
+                            && !preg_match($pregMatchRequired, $optionValue)) {
+                            throw new GracefulShutdownException('Option value does not match the required pattern: ' . $pregMatchRequired,
+                                1458937128561);
+                        }
                         if (!empty($optionValue)) {
                             $optionReturnValue = $optionValue;
                         } else {
@@ -57,7 +65,7 @@ class ConsoleUtility
             }
         }
         if ($required && $optionReturnValue === null) {
-            throw new \InvalidArgumentException('No `--options=' . $optionToFind . ':value` set.', 1458937128560);
+            throw new GracefulShutdownException('No `--options=' . $optionToFind . ':value` set.', 1458937128560);
         }
         return $optionReturnValue;
     }
