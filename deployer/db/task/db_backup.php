@@ -14,12 +14,13 @@ task('db:backup', function () {
         $latest = run('cd {{deploy_path}} && cat .dep/latest_release || echo 0');
     }
 
+    $consoleUtility = new ConsoleUtility();
     $dumpCodeRelease = (int)$latest ? '_for_release_' . $latest : '';
-    $dumpCode = 'backup' . $dumpCodeRelease . '_' . md5(microtime(true) . random_int(0, 10000));
+    $dumpCode = 'backup' . $dumpCodeRelease . '_' . $consoleUtility->getDumpCode();
     $params = [
         get('argument_host'),
-        (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]),
-        (new ConsoleUtility())->getVerbosityAsParameter(),
+        $consoleUtility->getOptionsForCliUsage(['dumpcode' => $dumpCode]),
+        $consoleUtility->getVerbosityAsParameter(),
     ];
 
     if (get('is_argument_host_the_same_as_local_host')) {

@@ -108,11 +108,15 @@ class ConsoleUtility
     public function formattingTaskOutputTab($output): string
     {
         $outputLines = explode("\n", $output);
-        $formattedLines = array_map(function($line) {
+        $formattedLines = array_map(function ($line) {
             $out = "\033[32;1m" . $line . "\033[0m";
             return preg_replace('/^/m', '  │   ', $out);
         }, $outputLines);
         return implode("\n", $formattedLines);
     }
 
+    public function getDumpCode(): string
+    {
+        return md5(microtime(true) . random_int(0, 10000));
+    }
 }
