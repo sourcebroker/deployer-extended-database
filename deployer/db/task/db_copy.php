@@ -9,7 +9,8 @@ use Deployer\Exception\GracefulShutdownException;
  * @see https://github.com/sourcebroker/deployer-extended-database#db-copy
  */
 task('db:copy', function () {
-    $targetInstanceName = (new ConsoleUtility())->getOption('target');
+    $consoleUtility = new ConsoleUtility();
+    $targetInstanceName = $consoleUtility->getOption('target');
     if (null === $targetInstanceName) {
         throw new GracefulShutdownException(
             "The target instance is not set in options. You must set the target instance as '--options=target:[target-name]'"
@@ -58,28 +59,24 @@ task('db:copy', function () {
         );
     }
 
-    $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
+    $verbosity = $consoleUtility->getVerbosityAsParameter();
     $sourceInstance = get('argument_host');
     $dl = get('local/bin/deployer');
-    $options = (new ConsoleUtility())->getOptionsForCliUsage([
-        'dumpcode' => md5(microtime(true) . random_int(0, 10000))
-    ]);
+    $options = $consoleUtility->getOptionsForCliUsage(['dumpcode' => $consoleUtility->getDumpCode()]);
     $local = get('local_host');
     if (get('is_argument_host_the_same_as_local_host')) {
-        // TODO $local
-        runLocally($dl . ' db:export ' . $local . ' ' . $options . ' ' . $verbosity);
+        output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:export ' . $local . ' ' . $options . ' ' . $verbosity)));
     } else {
-        runLocally($dl . ' db:export ' . $sourceInstance . ' ' . $options . ' ' . $verbosity);
-        runLocally($dl . ' db:download ' . $sourceInstance . ' ' . $options . ' ' . $verbosity);
+        output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:export ' . $sourceInstance . ' ' . $options . ' ' . $verbosity)));
+        output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:download ' . $sourceInstance . ' ' . $options . ' ' . $verbosity)));
+        runLocally($dl . ' db:rmdump ' . $sourceInstance . ' ' . $options . ' ' . $verbosity);
     }
-    runLocally($dl . ' db:process ' . $local . ' ' . $options . ' ' . $verbosity);
-    if (get('is_argument_host_the_same_as_local_host')) {
-        // TODO $local
-        runLocally($dl . ' db:import ' . $local . ' ' . $options . ' ' . $verbosity);
-        runLocally($dl . ' db:rmdump ' . $local . ' ' . $options . ' ' . $verbosity);
-    } else {
-        runLocally($dl . ' db:upload ' . $targetInstanceName . ' ' . $options . ' ' . $verbosity);
-        runLocally($dl . ' db:import ' . $targetInstanceName . ' ' . $options . ' ' . $verbosity);
-        runLocally($dl . ' db:rmdump ' . $targetInstanceName . ' ' . $options . ' ' . $verbosity);
-    }
+    output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:upload ' . $targetInstanceName . ' ' . $options . ' ' . $verbosity)));
+    runLocally($dl . ' db:rmdump ' . $local . ' ' . $options . ' ' . $verbosity);
+    output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:process ' . $targetInstanceName . ' ' . $options . ' ' . $verbosity)));
+
+    // TODO: make backup before import, compress and rotate
+    $importOutput = runLocally($dl . ' db:import ' . $targetInstanceName . ' ' . $options . ' ' . $verbosity);
+    output()->writeln($consoleUtility->formattingSubtaskTree(str_replace("task db:import\n", '', $importOutput)));
+    runLocally($dl . ' db:rmdump ' . $targetInstanceName . ' ' . $options . ' ' . $verbosity);
 })->desc('Synchronize database between instances');

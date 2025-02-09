@@ -37,16 +37,16 @@ task('db:pull', function () {
             }
         }
     }
-
-    $dumpCode = md5(microtime(true) . random_int(0, 10000));
-    $dl = get('local/bin/deployer');
-    $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
-    $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]);
     $local = get('local_host');
-    runLocally($dl . ' db:export ' . $sourceName . ' ' . $options . ' ' . $verbosity);
-    runLocally($dl . ' db:download ' . $sourceName . ' ' . $options . ' ' . $verbosity);
-    runLocally($dl . ' db:process ' . $local . ' ' . $options . ' ' . $verbosity);
-    runLocally($dl . ' db:import ' . $local . ' ' . $options . ' ' . $verbosity);
-    runLocally($dl . ' db:compress ' . $local . ' ' . $options . ' ' . $verbosity);
-    runLocally($dl . ' db:dumpclean ' . $local . ' ' . $verbosity);
-})->desc('Copy database from remote to local');
+    $dl = get('local/bin/deployer');
+    $consoleUtility = new ConsoleUtility();
+    $verbosity = $consoleUtility->getVerbosityAsParameter();
+    $options = $consoleUtility->getOptionsForCliUsage(['dumpcode' => $consoleUtility->getDumpCode()]);
+    output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:export ' . $sourceName . ' ' . $options . ' ' . $verbosity)));
+    output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:download ' . $sourceName . ' ' . $options . ' ' . $verbosity)));
+    runLocally($dl . ' db:rmdump ' . $sourceName . ' ' . $options . ' ' . $verbosity);
+    output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:process ' . $local . ' ' . $options . ' ' . $verbosity)));
+    // TODO: make backup before import, compress and rotate
+    output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:import ' . $local . ' ' . $options . ' ' . $verbosity)));
+    runLocally($dl . ' db:rmdump ' . $local . ' ' . $options . ' ' . $verbosity);
+})->desc('Pull database from remote to local');

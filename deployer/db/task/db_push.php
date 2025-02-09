@@ -33,15 +33,17 @@ task('db:push', function () {
             }
         }
     }
-
-    $dumpCode = md5(microtime(true) . random_int(0, 10000));
-    $dl = get('local/bin/deployer');
-    $verbosity = (new ConsoleUtility())->getVerbosityAsParameter();
-    $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]);
     $local = get('local_host');
-    runLocally($dl . ' db:export ' . $local . ' ' . $options . ' ' . $verbosity);
-    runLocally($dl . ' db:upload ' . $targetName . ' ' . $options . ' ' . $verbosity);
-    runLocally($dl . ' db:process ' . $targetName . ' ' . $options . ' ' . $verbosity);
-    runLocally($dl . ' db:import ' . $targetName . ' ' . $options . ' ' . $verbosity);
+    $dl = get('local/bin/deployer');
+    $consoleUtility = new ConsoleUtility();
+    $verbosity = $consoleUtility->getVerbosityAsParameter();
+    $options = $consoleUtility->getOptionsForCliUsage(['dumpcode' => $consoleUtility->getDumpCode()]);
+    output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:export ' . $local . ' ' . $options . ' ' . $verbosity)));
+    output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:upload ' . $targetName . ' ' . $options . ' ' . $verbosity)));
+    runLocally($dl . ' db:rmdump ' . $local . ' ' . $options . ' ' . $verbosity);
+    output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:process ' . $targetName . ' ' . $options . ' ' . $verbosity)));
+    // TODO: make backup before import
+    $importOutput = runLocally($dl . ' db:import ' . $targetName . ' ' . $options . ' ' . $verbosity);
+    output()->writeln($consoleUtility->formattingSubtaskTree(str_replace("task db:import\n", '', $importOutput)));
     runLocally($dl . ' db:rmdump ' . $targetName . ' ' . $options . ' ' . $verbosity);
-})->desc('Copy database from local to remote');
+})->desc('Push database from local to remote');
