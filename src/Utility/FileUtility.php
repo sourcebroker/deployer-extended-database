@@ -3,6 +3,7 @@
 namespace SourceBroker\DeployerExtendedDatabase\Utility;
 
 use function Deployer\runLocally;
+use function Deployer\run;
 
 class FileUtility
 {
@@ -28,5 +29,21 @@ class FileUtility
             return trim(str_replace("$name is", "", $path));
         }
         throw new \RuntimeException("Can't locate [$nameEscaped] on instance '" . get('local_host') . "' - neither of [command|which|type] commands are available");
+    }
+
+    public function resolveHomeDirectory(string $path): string
+    {
+        if (str_starts_with($path, '~')) {
+            $path = run('echo ${HOME:-${USERPROFILE}}' . escapeshellarg(substr($path, 1)));
+        }
+        return $path;
+    }
+
+    public function resolveHomeDirectoryLocal(string $path): string
+    {
+        if (str_starts_with($path, '~')) {
+            $path = runLocally('echo ${HOME:-${USERPROFILE}}' . escapeshellarg(substr($path, 1)));
+        }
+        return $path;
     }
 }

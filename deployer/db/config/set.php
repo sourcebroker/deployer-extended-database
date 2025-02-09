@@ -91,8 +91,8 @@ set('db_storage_path_local', function () {
         $dbStoragePathLocal = Configuration::getLocalHost()->get('deploy_path') . '/'
             . Configuration::getLocalHost()->get('db_storage_path_relative');
     }
+    $dbStoragePathLocal = (new FileUtility())->resolveHomeDirectoryLocal($dbStoragePathLocal);
     runLocally('[ -d ' . $dbStoragePathLocal . ' ] || mkdir -p ' . $dbStoragePathLocal);
-
     return $dbStoragePathLocal;
 });
 
@@ -103,6 +103,7 @@ set('db_storage_path', function () {
     } else {
         $dbStoragePath = get('deploy_path') . '/' . get('db_storage_path_relative');
     }
+    $dbStoragePath = (new FileUtility())->resolveHomeDirectory($dbStoragePath);
     run('[ -d ' . $dbStoragePath . ' ] || mkdir -p ' . $dbStoragePath);
 
     return $dbStoragePath;
@@ -110,7 +111,7 @@ set('db_storage_path', function () {
 
 set('bin/deployer', function () {
     $deployerBin = get('release_or_current_path') . '/vendor/bin/dep';
-    if (!test('[ -e ' . escapeshellarg($deployerBin) . ' ]')) {
+    if (!test('[ -e ' . $deployerBin . ' ]')) {
         throw new GracefulShutdownException('There must be ' . $deployerBin . ' phar file, but it could not be found.');
     }
 

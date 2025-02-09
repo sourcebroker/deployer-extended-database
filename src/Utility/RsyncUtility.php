@@ -21,6 +21,6 @@ class RsyncUtility
         return
             ($host->getRemoteUser() ? $host->getRemoteUser() . '@' : '') .
             $host->getHostname() .
-            ':/' . trim(Configuration::getHost($targetStageName)->get('db_storage_path'), '/') . '/';
+            ':' . rtrim(Configuration::getHost($targetStageName)->get('db_storage_path'), '/') . '/';
     }
 }

@@ -9,6 +9,7 @@ master
 2) [TASK] Add output formatting helper functions in ConsoleUtility.
 3) [FEATURE] Add way to validate value of single ``--options`` with preg_match in ConsoleUtility->getOption.
 4) [TASK][BREAKING] Add preg_match for dumpcode ``/^[a-zA-Z0-9_]+$/``
+5) [TASK] Add support for resolving home in deploy_path
 
 
 17.0.0
