@@ -80,12 +80,9 @@ class ConsoleUtility
                 ) : '');
     }
 
-    public function formattingSubtaskTree(string $content, string $type = ''): string
+    public function formattingSubtaskTree(string $content): string
     {
-        return match ($type) {
-            'end' => '  └──╸' . $content,
-            default => '  ├──╸' . $content,
-        };
+        return '  ├──╸' . $content;
     }
 
     public function formattingTaskOutputHeader(string $output, bool $tab = true): string
