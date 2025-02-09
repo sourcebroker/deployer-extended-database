@@ -50,4 +50,20 @@ class DatabaseUtility
 
         return count($options) ? ' ' . implode(' ', $options) : '';
     }
+
+    public static function getTemporaryMyCnfFile(
+        array $dbConfig,
+        string $localInstanceDatabaseStoragePathNormalised
+    ): string {
+        $tmpMyCnfFile = $localInstanceDatabaseStoragePathNormalised . 'tmp_mysql_defaults_file_' . date('YmdHis') . '.cnf';
+        $content = "[client]\n";
+        $content .= "host=\"{$dbConfig['host']}\"\n";
+        $content .= "port=\"" . ((isset($dbConfig['port']) && $dbConfig['port']) ? $dbConfig['port'] : 3306) . "\"\n";
+        $content .= "user=\"{$dbConfig['user']}\"\n";
+        $content .= "password=\"{$dbConfig['password']}\"\n";
+        file_put_contents($tmpMyCnfFile, $content);
+
+        return $tmpMyCnfFile;
+    }
+
 }

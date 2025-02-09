@@ -12,6 +12,8 @@ master
 5) [TASK] Add support for resolving home in deploy_path
 6) [TASK][BREAKING] Remove autocreation of dumpcode on db:export. Since now you need to add your dumpcode
     with --options=dumpcode:mydumpcode
+7) [TASK] Move db credentials to temporary file and use it with ``--defaults-file=``. Reason is edge case that ``MYSQL_PWD``
+    was overwritten by ``~/.my.cnf`` files. For example: https://github.com/ddev/ddev/pull/6851
 
 17.0.0
 ~~~~~~

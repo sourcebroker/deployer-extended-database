@@ -26,13 +26,15 @@ task('db:export', function () {
                 'dumpcode' => 'dumpcode=' . $fileUtility->normalizeFilename($dumpCode),
                 'type' => '',
             ];
+            $databaseStoragePathLocalNormalised = $fileUtility->normalizeFolder(get('db_storage_path_local'));
+            $tmpMyCnfFile = DatabaseUtility::getTemporaryMyCnfFile(
+                $databaseConfig,
+                $databaseStoragePathLocalNormalised
+            );
             $mysqlDumpArgs = [
-                'password' => escapeshellarg($databaseConfig['password']),
                 'local/bin/mysqldump' => get('local/bin/mysqldump'),
+                escapeshellarg($tmpMyCnfFile),
                 'options' => '',
-                'host' => escapeshellarg($databaseConfig['host']),
-                'port' => escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
-                'user' => escapeshellarg($databaseConfig['user']),
                 'dbname' => escapeshellarg($databaseConfig['dbname']),
                 'absolutePath' => '',
                 'ignore-tables' => '',
@@ -44,40 +46,55 @@ task('db:export', function () {
                     $databaseUtility->getTables($databaseConfig)
                 );
                 if (!empty($ignoreTables)) {
-                    $mysqlDumpArgs['ignore-tables'] = '--ignore-table=' . $databaseConfig['dbname'] . '.' .
-                        implode(' --ignore-table=' . $databaseConfig['dbname'] . '.', $ignoreTables);
+                    $mysqlDumpArgs['ignore-tables'] = implode(' ', array_map(function ($table) use ($databaseConfig) {
+                        return '--ignore-table=' . escapeshellarg($databaseConfig['dbname'] . '.' . $table);
+                    }, $ignoreTables));
                 }
             }
-            // dump database structure
-            $filenameParts['type'] = 'type=structure';
-            $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_structure', '');
-            $mysqlDumpArgs['options'] .= DatabaseUtility::getSslCliOptions($databaseConfig);
-            $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_local'))
-                . implode('#', $filenameParts) . '.sql');
-            runLocally(vsprintf(
-                'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r%s'
-                . ((new ConsoleUtility())->getOption('exportTaskAddIgnoreTablesToStructureDump') ? ' %s' : ''),
-                $mysqlDumpArgs
-            ));
 
-            // dump database data
-            $filenameParts['type'] = 'type=data';
-            $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_data', '');
-            $mysqlDumpArgs['options'] .= DatabaseUtility::getSslCliOptions($databaseConfig);
-            $mysqlDumpArgs['absolutePath'] = escapeshellarg($fileUtility->normalizeFolder(get('db_storage_path_local'))
-                . implode('#', $filenameParts) . '.sql');
-            runLocally(vsprintf(
-                'export MYSQL_PWD=%s && %s %s -h%s -P%s -u%s %s -r%s %s',
-                $mysqlDumpArgs
-            ));
+            try {
+                // dump database structure
+                $filenameParts['type'] = 'type=structure';
+                $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_structure', '');
+                $mysqlDumpArgs['options'] .= DatabaseUtility::getSslCliOptions($databaseConfig);
+                $mysqlDumpArgs['absolutePath'] = escapeshellarg($databaseStoragePathLocalNormalised . implode('#',
+                        $filenameParts) . '.sql');
+
+                runLocally(vsprintf(
+                    '%s --defaults-file=%s %s %s -r%s'
+                    . ($consoleUtility->getOption('exportTaskAddIgnoreTablesToStructureDump') ? ' %s' : ''),
+                    $mysqlDumpArgs
+                ));
+
+                // dump database data
+                $filenameParts['type'] = 'type=data';
+                $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_data', '');
+                $mysqlDumpArgs['options'] .= DatabaseUtility::getSslCliOptions($databaseConfig);
+                $mysqlDumpArgs['absolutePath'] = escapeshellarg($databaseStoragePathLocalNormalised . implode('#',
+                        $filenameParts) . '.sql');
+                runLocally(vsprintf(
+                    '%s --defaults-file=%s %s %s -r%s %s',
+                    $mysqlDumpArgs
+                ));
+            } catch (\Exception $exception) {
+                throw new GracefulShutdownException(
+                    'Error during import dump with dumpcode: ' . $dumpCode . '. ' . $exception->getMessage(),
+                    1500722095323
+                );
+            } finally {
+                unlink($tmpMyCnfFile);
+            }
         }
+
     } else {
         $params = [
             get('argument_host'),
-            (new ConsoleUtility())->getVerbosityAsParameter(),
+            $consoleUtility->getVerbosityAsParameter(),
             input()->getOption('options') ? '--options=' . input()->getOption('options') : '',
         ];
-        run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:export ' . implode(' ', $params));
+        $output = run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:export ' . implode(' ',
+                $params));
+        output()->write(str_replace("task db:export\n", '', $output));
     }
-
 })->desc('Dump database and store it in database dumps storage');
+

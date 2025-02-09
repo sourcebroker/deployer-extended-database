@@ -11,12 +11,13 @@ use Deployer\Exception\GracefulShutdownException;
  * @see https://github.com/sourcebroker/deployer-extended-database#db-import
  */
 task('db:import', function () {
-    $dumpCode = (new ConsoleUtility())->getOption('dumpcode', true);
+    $consoleUtility = new ConsoleUtility();
+    $dumpCode = $consoleUtility->getOption('dumpcode', true);
     $fileUtility = new FileUtility();
     if (get('is_argument_host_the_same_as_local_host')) {
-        $localInstanceDatabaseStoragePath = get('db_storage_path_local');
+        $databaseStoragePathLocalNormalised = $fileUtility->normalizeFolder(get('db_storage_path_local'));
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
-            $globStart = $fileUtility->normalizeFolder($localInstanceDatabaseStoragePath)
+            $globStart = $databaseStoragePathLocalNormalised
                 . '*dbcode=' . $fileUtility->normalizeFilename($databaseCode)
                 . '*dumpcode=' . $dumpCode;
 
@@ -49,116 +50,118 @@ task('db:import', function () {
                     1500722095323
                 );
             }
-            // Drop all tables.
-            if (empty((new ConsoleUtility())->getOption('importTaskDoNotDropAllTablesBeforeImport'))) {
+            $tmpMyCnfFile = DatabaseUtility::getTemporaryMyCnfFile(
+                $databaseConfig,
+                $databaseStoragePathLocalNormalised
+            );
+
+            try {
+                // Drop all tables.
+                if (empty($consoleUtility->getOption('importTaskDoNotDropAllTablesBeforeImport'))) {
+                    runLocally(sprintf(
+                        '%s --defaults-file=%s %s --add-drop-table --no-data | ' .
+                        'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s --defaults-file=%s %s -D%s %s',
+                        get('local/bin/mysqldump'),
+                        escapeshellarg($tmpMyCnfFile),
+                        escapeshellarg($databaseConfig['dbname']),
+                        get('local/bin/mysql'),
+                        escapeshellarg($tmpMyCnfFile),
+                        DatabaseUtility::getSslCliOptions($databaseConfig),
+                        escapeshellarg($databaseConfig['dbname']),
+                        DatabaseUtility::getSslCliOptions($databaseConfig)
+                    ));
+                }
+                // Import dump with database structure.
                 runLocally(sprintf(
-                    'export MYSQL_PWD=%s && %s -h%s -P%s -u%s %s %s --add-drop-table --no-data | ' .
-                    'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s -h%s -P%s -u%s -D%s %s',
-                    escapeshellarg($databaseConfig['password']),
-                    get('local/bin/mysqldump'),
-                    escapeshellarg($databaseConfig['host']),
-                    escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
-                    escapeshellarg($databaseConfig['user']),
-                    escapeshellarg($databaseConfig['dbname']),
-                    DatabaseUtility::getSslCliOptions($databaseConfig),
+                    '%s --defaults-file=%s %s %s -D%s -e%s',
                     get('local/bin/mysql'),
-                    escapeshellarg($databaseConfig['host']),
-                    escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
-                    escapeshellarg($databaseConfig['user']),
+                    escapeshellarg($tmpMyCnfFile),
+                    get('db_import_mysql_options_structure', ''),
+                    DatabaseUtility::getSslCliOptions($databaseConfig),
                     escapeshellarg($databaseConfig['dbname']),
-                    DatabaseUtility::getSslCliOptions($databaseConfig)
+                    escapeshellarg('SOURCE ' . $structureSqlFile[0])
                 ));
-            }
-            // Import dump with database structure.
-            runLocally(sprintf(
-                'export MYSQL_PWD=%s && %s %s %s -h%s -P%s -u%s -D%s -e%s',
-                escapeshellarg($databaseConfig['password']),
-                get('local/bin/mysql'),
-                get('db_import_mysql_options_structure', ''),
-                DatabaseUtility::getSslCliOptions($databaseConfig),
-                escapeshellarg($databaseConfig['host']),
-                escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
-                escapeshellarg($databaseConfig['user']),
-                escapeshellarg($databaseConfig['dbname']),
-                escapeshellarg('SOURCE ' . $structureSqlFile[0])
-            ));
-            // Import dump with data.
-            runLocally(sprintf(
-                'export MYSQL_PWD=%s && %s %s %s -h%s -P%s -u%s -D%s -e%s',
-                escapeshellarg($databaseConfig['password']),
-                get('local/bin/mysql'),
-                get('db_import_mysql_options_data', ''),
-                DatabaseUtility::getSslCliOptions($databaseConfig),
-                escapeshellarg($databaseConfig['host']),
-                escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
-                escapeshellarg($databaseConfig['user']),
-                escapeshellarg($databaseConfig['dbname']),
-                escapeshellarg('SOURCE ' . $dataSqlFile[0])
-            ));
-            $postSqlInCollected = [];
-            if (isset($databaseConfig['post_sql_in_markers'])) {
-                // Prepare some markers to use in post_sql_in_markers:
-                $markersArray = [];
-                if (!empty(get('public_urls', []))) {
-                    $publicUrlCollected = [];
-                    foreach (get('public_urls') as $publicUrl) {
-                        if (parse_url($publicUrl, PHP_URL_SCHEME) && parse_url($publicUrl, PHP_URL_HOST)) {
-                            $port = '';
-                            if (parse_url($publicUrl, PHP_URL_PORT)) {
-                                $port = ':' . parse_url($publicUrl, PHP_URL_PORT);
-                            }
-                            $publicUrlCollected[] = parse_url($publicUrl, PHP_URL_HOST) . $port;
-                        } else {
-                            throw new GracefulShutdownException('The configuration setting "public_urls" should have full url like
+                // Import dump with data.
+                runLocally(sprintf(
+                    '%s --defaults-file=%s %s -D%s -e%s',
+                    get('local/bin/mysql'),
+                    escapeshellarg($tmpMyCnfFile),
+                    get('db_import_mysql_options_data', ''),
+                    escapeshellarg($databaseConfig['dbname']),
+                    escapeshellarg('SOURCE ' . $dataSqlFile[0])
+                ));
+                $postSqlInCollected = [];
+                if (isset($databaseConfig['post_sql_in_markers'])) {
+                    // Prepare some markers to use in post_sql_in_markers:
+                    $markersArray = [];
+                    if (!empty(get('public_urls', []))) {
+                        $publicUrlCollected = [];
+                        foreach (get('public_urls') as $publicUrl) {
+                            if (parse_url($publicUrl, PHP_URL_SCHEME) && parse_url($publicUrl, PHP_URL_HOST)) {
+                                $port = '';
+                                if (parse_url($publicUrl, PHP_URL_PORT)) {
+                                    $port = ':' . parse_url($publicUrl, PHP_URL_PORT);
+                                }
+                                $publicUrlCollected[] = parse_url($publicUrl, PHP_URL_HOST) . $port;
+                            } else {
+                                throw new GracefulShutdownException('The configuration setting "public_urls" should have full url like
                         "https://www.example.com" but the value is only "' . $publicUrl . '"', 1491384103020);
+                            }
                         }
+                        $markersArray['{{domainsSeparatedByComma}}'] = '"' . implode(
+                                '","',
+                                $publicUrlCollected
+                            ) . '"';
+                        $markersArray['{{firstDomainWithScheme}}'] = get('public_urls')[0];
+                        $markersArray['{{firstDomainWithSchemeAndEndingSlash}}'] = rtrim(get('public_urls')[0],
+                                '/') . '/';
                     }
-                    $markersArray['{{domainsSeparatedByComma}}'] = '"' . implode(
-                            '","',
-                            $publicUrlCollected
-                        ) . '"';
-                    $markersArray['{{firstDomainWithScheme}}'] = get('public_urls')[0];
-                    $markersArray['{{firstDomainWithSchemeAndEndingSlash}}'] = rtrim(get('public_urls')[0], '/') . '/';
+                    $postSqlInCollected[] = str_replace(
+                        array_keys($markersArray),
+                        $markersArray,
+                        $databaseConfig['post_sql_in_markers']
+                    );
                 }
-                $postSqlInCollected[] = str_replace(
-                    array_keys($markersArray),
-                    $markersArray,
-                    $databaseConfig['post_sql_in_markers']
+                if (isset($databaseConfig['post_sql_in'])) {
+                    $postSqlInCollected[] = $databaseConfig['post_sql_in'];
+                }
+                if (!empty($postSqlInCollected)) {
+                    $importSqlFile = $databaseStoragePathLocalNormalised . $dumpCode . '.sql';
+                    file_put_contents($importSqlFile, implode(' ', $postSqlInCollected));
+                    runLocally(sprintf(
+                        ' %s --defaults-file=%s %s -D%s -e%s',
+                        get('local/bin/mysql'),
+                        escapeshellarg($tmpMyCnfFile),
+                        get('db_import_mysql_options_post_sql_in', ''),
+                        escapeshellarg($databaseConfig['dbname']),
+                        escapeshellarg('SOURCE ' . $importSqlFile)
+                    ));
+                    unlink($importSqlFile);
+                }
+                if (isset($databaseConfig['post_command']) && is_array($databaseConfig['post_command'])) {
+                    foreach ($databaseConfig['post_command'] as $postCommand) {
+                        $options = $consoleUtility->getOptionsForCliUsage(['dumpcode' => $dumpCode]);
+                        runLocally($postCommand . ' ' . $options);
+                    }
+                }
+            } catch (\Exception $exception) {
+                throw new GracefulShutdownException(
+                    'Error during import dump with dumpcode: ' . $dumpCode . '. ' . $exception->getMessage(),
+                    1500722095323
                 );
-            }
-            if (isset($databaseConfig['post_sql_in'])) {
-                $postSqlInCollected[] = $databaseConfig['post_sql_in'];
-            }
-            if (!empty($postSqlInCollected)) {
-                $importSqlFile = $fileUtility->normalizeFolder($localInstanceDatabaseStoragePath) . $dumpCode . '.sql';
-                file_put_contents($importSqlFile, implode(' ', $postSqlInCollected));
-                runLocally(sprintf(
-                    'export MYSQL_PWD=%s && %s %s %s -h%s -P%s -u%s -D%s -e%s',
-                    escapeshellarg($databaseConfig['password']),
-                    get('local/bin/mysql'),
-                    get('db_import_mysql_options_post_sql_in', ''),
-                    DatabaseUtility::getSslCliOptions($databaseConfig),
-                    escapeshellarg($databaseConfig['host']),
-                    escapeshellarg((isset($databaseConfig['port']) && $databaseConfig['port']) ? $databaseConfig['port'] : 3306),
-                    escapeshellarg($databaseConfig['user']),
-                    escapeshellarg($databaseConfig['dbname']),
-                    escapeshellarg('SOURCE ' . $importSqlFile)
-                ));
-                unlink($importSqlFile);
-            }
-            if (isset($databaseConfig['post_command']) && is_array($databaseConfig['post_command'])) {
-                foreach ($databaseConfig['post_command'] as $postCommand) {
-                    $options = (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]);
-                    runLocally($postCommand . ' ' . $options);
-                }
+            } finally {
+                unlink($tmpMyCnfFile);
             }
         }
     } else {
         $params = [
             get('argument_host'),
-            (new ConsoleUtility())->getVerbosityAsParameter(),
+            $consoleUtility->getVerbosityAsParameter(),
             input()->getOption('options') ? '--options=' . input()->getOption('options') : '',
         ];
-        run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:import ' . implode(' ', $params));
+
+        $output = run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:import ' . implode(' ',
+                $params));
+        output()->write(str_replace("task db:import\n", '', $output));
     }
 })->desc('Import dump with given dumpcode from database dumps storage to database');
