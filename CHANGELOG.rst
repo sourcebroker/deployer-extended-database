@@ -16,6 +16,8 @@ master
     was overwritten by ``~/.my.cnf`` files. For example: https://github.com/ddev/ddev/pull/6851
 8) [FEATURE] Add info about big tables on db:import. Useful to fast check if we import some not needed big tables.
    Default limit is 50MB. You can change it to your value in ``db_import_big_table_size_threshold``.
+9) [FEATURE] Add info about ignored tables on mysqldump in db:export. You can configure max_line in
+   ``db_export_mysqldump_show_ignore_tables_out_max_line_length``.
 
 17.0.0
 ~~~~~~

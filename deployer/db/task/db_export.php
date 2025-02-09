@@ -46,6 +46,27 @@ task('db:export', function () {
                     $databaseUtility->getTables($databaseConfig)
                 );
                 if (!empty($ignoreTables)) {
+                    if (get('db_export_mysqldump_show_ignore_tables_out', true)) {
+                        $ignoredTablesText = '';
+                        $line = '';
+                        $lineLength = 0;
+                        $maxLineLength = get('db_export_mysqldump_show_ignore_tables_out_max_line_length', 120);
+
+                        foreach ($ignoreTables as $table) {
+                            $tableLength = strlen($table) + 3;
+                            if ($lineLength + $tableLength > $maxLineLength) {
+                                $ignoredTablesText .= rtrim($line, ' |') . "\n";
+                                $line = '';
+                                $lineLength = 0;
+                            }
+                            $line .= $table . ' | ';
+                            $lineLength += $tableLength;
+                        }
+                        $ignoredTablesText = rtrim($ignoredTablesText);
+
+                        output()->writeln($consoleUtility->formattingTaskOutputHeader('Ignored tables:'));
+                        output()->write($consoleUtility->formattingTaskOutputContent($ignoredTablesText));
+                    }
                     $mysqlDumpArgs['ignore-tables'] = implode(' ', array_map(function ($table) use ($databaseConfig) {
                         return '--ignore-table=' . escapeshellarg($databaseConfig['dbname'] . '.' . $table);
                     }, $ignoreTables));
