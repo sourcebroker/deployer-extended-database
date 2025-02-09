@@ -79,4 +79,35 @@ class ConsoleUtility
                     $getOptionsForCliUsageArray
                 ) : '');
     }
+
+    public function formattingSubtaskTree(string $content, string $type = ''): string
+    {
+        return match ($type) {
+            'end' => '  └──╸' . $content,
+            default => '  ├──╸' . $content,
+        };
+    }
+
+    public function formattingTaskOutputHeader(string $output, bool $tab = true): string
+    {
+        $content = "\033[35;1m" . $output . "\033[0m";
+        return $tab ? $this->formattingTaskOutputTab($content) : $content;
+    }
+
+    public function formattingTaskOutputContent(string $output, bool $tab = true): string
+    {
+        $content = "\033[32;1m" . $output . "\033[0m";
+        return $tab ? $this->formattingTaskOutputTab($content) : $content;
+    }
+
+    public function formattingTaskOutputTab($output): string
+    {
+        $outputLines = explode("\n", $output);
+        $formattedLines = array_map(function($line) {
+            $out = "\033[32;1m" . $line . "\033[0m";
+            return preg_replace('/^/m', '  │   ', $out);
+        }, $outputLines);
+        return implode("\n", $formattedLines);
+    }
+
 }

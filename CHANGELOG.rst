@@ -6,6 +6,7 @@ master
 ------
 
 1) [TASK][BREAKING] Change the default charset for mysql/mysqldump operations from utf8 to utf8mb4.
+2) [TASK] Add output formatting helper functions in ConsoleUtility.
 
 
 17.0.0
