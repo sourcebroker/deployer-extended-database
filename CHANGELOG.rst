@@ -8,6 +8,7 @@ master
 1) [TASK][BREAKING] Change the default charset for mysql/mysqldump operations from utf8 to utf8mb4.
 2) [TASK] Add output formatting helper functions in ConsoleUtility.
 3) [FEATURE] Add way to validate value of single ``--options`` with preg_match in ConsoleUtility->getOption.
+4) [TASK][BREAKING] Add preg_match for dumpcode ``/^[a-zA-Z0-9_]+$/``
 
 
 17.0.0

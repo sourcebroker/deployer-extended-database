@@ -19,6 +19,8 @@ set('db_import_mysql_options_data', '--default-character-set=utf8mb4');
 
 set('db_import_mysql_options_post_sql_in', '--default-character-set=utf8mb4');
 
+set('db_pregmatch_dumpcode', '/^[a-zA-Z0-9_]+$/');
+
 set('db_process_commands', [
     // @see http://stackoverflow.com/a/38595160/1588346
 //    'remove_definer' => 'sed --version >/dev/null 2>&1 ' .
