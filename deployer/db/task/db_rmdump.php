@@ -10,8 +10,7 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 task('db:rmdump', function () {
     $dumpCode = (new ConsoleUtility())->getOption('dumpcode', true);
     if (get('is_argument_host_the_same_as_local_host')) {
-        runLocally('cd ' . get('db_storage_path_local') .
-            ' && rm -f *dumpcode=' . $dumpCode . '*');
+        runLocally('cd ' . escapeshellarg(get('db_storage_path_local')) . ' && rm -f *dumpcode=' . $dumpCode . '*');
     } else {
         $params = [
             get('argument_host'),
