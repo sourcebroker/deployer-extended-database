@@ -4,6 +4,7 @@ namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /*
  * @see https://github.com/sourcebroker/deployer-extended-database#db-dumpclean
@@ -16,11 +17,11 @@ task('db:dumpclean', function () {
         foreach (array_reverse($files) as $file) {
             $dumpcode = $instance = null;
             foreach (explode('#', $file) as $metaPart) {
-                if (strpos($metaPart, 'server') === 0) {
+                if (str_starts_with($metaPart, 'server')) {
                     $instanceParts = explode('=', $metaPart);
                     $instance = $instanceParts[1] ?? null;
                 }
-                if (strpos($metaPart, 'dumpcode') === 0) {
+                if (str_starts_with($metaPart, 'dumpcode')) {
                     $dumpcodeParts = explode('=', $metaPart);
                     $dumpcode = $dumpcodeParts[1] ?? null;
                 }
@@ -44,7 +45,7 @@ task('db:dumpclean', function () {
             if (count($instanceDumps) > $dbDumpCleanKeep) {
                 $instanceDumpsCount = count($instanceDumps);
                 for ($i = $dbDumpCleanKeep; $i < $instanceDumpsCount; $i++) {
-                    writeln('Removing old dump with code: ' . $instanceDumps[$i]);
+                    writeln('Removing old dump with code: ' . $instanceDumps[$i], OutputInterface::VERBOSITY_VERBOSE);
                     runLocally('cd ' . escapeshellarg(get('db_storage_path_local'))
                         . ' && rm ' . '*dumpcode=' . $instanceDumps[$i] . '*');
                 }

@@ -21,6 +21,7 @@ master
 10) [TASK][BREAKING] Change bahaviour of ``db:download`` and ``db:upload``. Option ``--remove-source-files`` has been
     removed from rsync and downloaded, uploaded files are not longer automatically removed. Add short info about size
     of downloaded or uploaded file.
+11) [TASK] Show ``db:dumpclean`` output only when verbosity higher than regular.
 
 17.0.0
 ~~~~~~
