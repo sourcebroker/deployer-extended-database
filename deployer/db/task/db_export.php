@@ -12,16 +12,8 @@ use Deployer\Exception\GracefulShutdownException;
  * @see https://github.com/sourcebroker/deployer-extended-database#db-export
  */
 task('db:export', function () {
-    if (!empty((new ConsoleUtility())->getOption('dumpcode'))) {
-        $returnDumpCode = false;
-        $dumpCode = (new ConsoleUtility())->getOption('dumpcode');
-        if (!preg_match('/^[a-zA-Z0-9_]+$/', $dumpCode)) {
-            throw new GracefulShutdownException('dumpcode can be only a-z, A-Z, 0-9', 1582316535496);
-        }
-    } else {
-        $returnDumpCode = true;
-        $dumpCode = md5(microtime(true) . random_int(0, 10000));
-    }
+    $consoleUtility = new ConsoleUtility();
+    $dumpCode = $consoleUtility->getOption('dumpcode', true);
     $fileUtility = new FileUtility();
     $arrayUtility = new ArrayUtility();
     $databaseUtility = new DatabaseUtility();
@@ -87,7 +79,5 @@ task('db:export', function () {
         ];
         run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:export ' . implode(' ', $params));
     }
-    if ($returnDumpCode) {
-        writeln(json_encode(['dumpCode' => $dumpCode], JSON_THROW_ON_ERROR));
-    }
+
 })->desc('Dump database and store it in database dumps storage');

@@ -10,7 +10,8 @@ master
 3) [FEATURE] Add way to validate value of single ``--options`` with preg_match in ConsoleUtility->getOption.
 4) [TASK][BREAKING] Add preg_match for dumpcode ``/^[a-zA-Z0-9_]+$/``
 5) [TASK] Add support for resolving home in deploy_path
-
+6) [TASK][BREAKING] Remove autocreation of dumpcode on db:export. Since now you need to add your dumpcode
+    with --options=dumpcode:mydumpcode
 
 17.0.0
 ~~~~~~
