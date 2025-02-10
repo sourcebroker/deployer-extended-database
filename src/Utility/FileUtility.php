@@ -46,4 +46,25 @@ class FileUtility
         }
         return $path;
     }
+
+    public function getDumpFilenamePart(string $filename, string $part): mixed
+    {
+        $filename = basename($filename);
+        if ($part === 'dateTime' || $part === 'dateTimeRaw') {
+            $pattern = '/^(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})/';
+            if (preg_match($pattern, $filename, $matches)) {
+                if ($part === 'dateTime') {
+                    return \DateTime::createFromFormat('Y-m-d_H-i-s', $matches[1]);
+                } else {
+                    return $matches[1];
+                }
+            }
+        } else {
+            $pattern = '/#' . preg_quote($part, '/') . '=([^#]*)/';
+            if (preg_match($pattern, $filename, $matches)) {
+                return $matches[1];
+            }
+        }
+        return null;
+    }
 }

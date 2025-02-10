@@ -597,6 +597,24 @@ There is required option ``--options=dumpcode:[value]`` to be passed.
 
    dep db:import dev --options=dumpcode:0772a8d396911951022db5ea385535f66
 
+db:import:last
+++++++++++++++
+
+Import last database dump file from local instance folder "{{deploy_path}}/.dep/databases/dumps/" to local database(s).
+Useful to repeat import of database (for example to test upgrade process) without getting it again and again from
+remote instance. Can be used only on instance where you are currently logged.
+
+**Example**
+::
+
+    dep db:import:last local
+
+    # You must be on host live
+    dep db:import:last live
+
+    # With auto confirmation for question "Are you sure you want to import last dump file?"
+    dep db:import:last local -n
+
 db:process
 ++++++++++
 

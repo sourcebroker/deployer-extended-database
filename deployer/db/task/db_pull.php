@@ -48,5 +48,6 @@ task('db:pull', function () {
     output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:process ' . $local . ' ' . $options . ' ' . $verbosity)));
     // TODO: make backup before import, compress and rotate
     output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:import ' . $local . ' ' . $options . ' ' . $verbosity)));
-    runLocally($dl . ' db:rmdump ' . $local . ' ' . $options . ' ' . $verbosity);
+    runLocally($dl . ' db:compress ' . $local . ' ' . $options . ' ' . $verbosity);
+    runLocally($dl . ' db:dumpclean ' . $local . ' ' . $verbosity);
 })->desc('Pull database from remote to local');

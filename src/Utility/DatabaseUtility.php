@@ -97,4 +97,18 @@ class DatabaseUtility
         return $tmpMyCnfFile;
     }
 
+    public function getLastDumpFilename(string $localInstanceDatabaseStoragePathNormalised): ?string
+    {
+        $dumpFiles = glob($localInstanceDatabaseStoragePathNormalised . '*.{sql,gz}', GLOB_BRACE);
+        if ($dumpFiles) {
+            $fileUtility = new FileUtility();
+            usort($dumpFiles, function ($a, $b) use ($fileUtility) {
+                $dateTimeA = $fileUtility->getDumpFilenamePart(basename($a), 'dateTime');
+                $dateTimeB = $fileUtility->getDumpFilenamePart(basename($b), 'dateTime');
+                return $dateTimeA <=> $dateTimeB;
+            });
+            return end($dumpFiles);
+        }
+        return null;
+    }
 }

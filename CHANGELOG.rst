@@ -25,6 +25,8 @@ master
 12) [TASK][BREAKING] Change behaviour of ``db:copy``, ``db:pull``, ``db:push``. No longer copy of imported database is
     kept in database storage. This is clean up before implementing a backup of replaced database. Add nice formatting
     of tasks with info about ignored tables, size od downloaded/uploaded database and too big tables.
+13) [FEATURE] Add command ``db:import:last`` to import last downloaded database. Bring back keeping last imported databases
+    and rotation of those.
 
 17.0.0
 ~~~~~~
