@@ -11,9 +11,9 @@ master
 4) [TASK][BREAKING] Add preg_match for dumpcode ``/^[a-zA-Z0-9_]+$/``
 5) [TASK] Add support for resolving home in deploy_path
 6) [TASK][BREAKING] Remove autocreation of dumpcode on db:export. Since now you need to add your dumpcode
-    with --options=dumpcode:mydumpcode
+   with --options=dumpcode:mydumpcode
 7) [TASK] Move db credentials to temporary file and use it with ``--defaults-file=``. Reason is edge case that ``MYSQL_PWD``
-    was overwritten by ``~/.my.cnf`` files. For example: https://github.com/ddev/ddev/pull/6851
+   was overwritten by ``~/.my.cnf`` files. For example: https://github.com/ddev/ddev/pull/6851
 8) [FEATURE] Add info about big tables on db:import. Useful to fast check if we import some not needed big tables.
    Default limit is 50MB. You can change it to your value in ``db_import_big_table_size_threshold``.
 9) [FEATURE] Add info about ignored tables on mysqldump in db:export. You can configure max_line in
