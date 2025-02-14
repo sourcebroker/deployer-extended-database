@@ -10,6 +10,14 @@ use Deployer\Exception\GracefulShutdownException;
 
 class ConsoleUtility
 {
+    public const AVAILABLE_OPTIONS = [
+        'dumpcode',
+        'target',
+        'fromLocalStorage',
+        'exportTaskAddIgnoreTablesToStructureDump',
+        'importTaskDoNotDropAllTablesBeforeImport',
+    ];
+
     public function getVerbosityAsParameter(): string
     {
         switch (output()->getVerbosity()) {
@@ -45,6 +53,9 @@ class ConsoleUtility
             if (is_array($options)) {
                 foreach ($options as $option) {
                     $optionParts = explode(':', $option);
+                    if (!in_array($optionParts[0], self::AVAILABLE_OPTIONS, true)) {
+                        throw new GracefulShutdownException('Option `' . $optionParts[0] . '` is not available for --options=.', 1458937128562);
+                    }
                     if (!empty($optionParts[1])) {
                         $optionValue = $optionParts[1];
                     }
@@ -52,7 +63,7 @@ class ConsoleUtility
                         $pregMatchRequired = get('db_pregmatch_' . $optionToFind, '');
                         if ($pregMatchRequired !== '' && !empty($optionValue)
                             && !preg_match($pregMatchRequired, $optionValue)) {
-                            throw new GracefulShutdownException('Option value does not match the required pattern: ' . $pregMatchRequired,
+                            throw new GracefulShutdownException('Value of option `' . $optionToFind . '` does not match the required pattern: ' . $pregMatchRequired,
                                 1458937128561);
                         }
                         if (!empty($optionValue)) {

@@ -27,6 +27,7 @@ master
     of tasks with info about ignored tables, size od downloaded/uploaded database and too big tables.
 13) [FEATURE] Add command ``db:import:last`` to import last downloaded database. Bring back keeping last imported databases
     and rotation of those.
+14) [FEATURE] Add validation for name of options. If name is wrong task will stop.
 
 17.0.0
 ~~~~~~
