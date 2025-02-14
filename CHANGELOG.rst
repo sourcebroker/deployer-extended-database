@@ -28,6 +28,8 @@ master
 13) [FEATURE] Add command ``db:import:last`` to import last downloaded database. Bring back keeping last imported databases
     and rotation of those.
 14) [FEATURE] Add validation for name of options. If name is wrong task will stop.
+15) [TASK][BREAKING] Move normalizeFolder functionality into 'db_storage_path_local' function as it was used only in
+    this context. Remove FileUtility->normalizeFolder
 
 17.0.0
 ~~~~~~

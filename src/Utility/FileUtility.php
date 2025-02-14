@@ -12,11 +12,6 @@ class FileUtility
         return preg_replace('/^[^a-zA-Z0-9_]+$/', '', $filename);
     }
 
-    public function normalizeFolder(string $folder): string
-    {
-        return rtrim($folder, '/') . '/';
-    }
-
     public function locateLocalBinaryPath(string $name): string
     {
         $nameEscaped = escapeshellarg($name);

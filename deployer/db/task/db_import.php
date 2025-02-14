@@ -15,9 +15,9 @@ task('db:import', function () {
     $dumpCode = $consoleUtility->getOption('dumpcode', true);
     $fileUtility = new FileUtility();
     if (get('is_argument_host_the_same_as_local_host')) {
-        $databaseStoragePathLocalNormalised = $fileUtility->normalizeFolder(get('db_storage_path_local'));
+        $databaseStoragePathLocal = get('db_storage_path_local');
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
-            $globStart = $databaseStoragePathLocalNormalised
+            $globStart = $databaseStoragePathLocal
                 . '*dbcode=' . $fileUtility->normalizeFilename($databaseCode)
                 . '*dumpcode=' . $dumpCode;
 
@@ -52,7 +52,7 @@ task('db:import', function () {
             }
             $tmpMyCnfFile = DatabaseUtility::getTemporaryMyCnfFile(
                 $databaseConfig,
-                $databaseStoragePathLocalNormalised
+                $databaseStoragePathLocal
             );
 
             try {
@@ -126,7 +126,7 @@ task('db:import', function () {
                     $postSqlInCollected[] = $databaseConfig['post_sql_in'];
                 }
                 if (!empty($postSqlInCollected)) {
-                    $importSqlFile = $databaseStoragePathLocalNormalised . $dumpCode . '.sql';
+                    $importSqlFile = $databaseStoragePathLocal . $dumpCode . '.sql';
                     file_put_contents($importSqlFile, implode(' ', $postSqlInCollected));
                     runLocally(sprintf(
                         ' %s --defaults-file=%s %s -D%s -e%s',

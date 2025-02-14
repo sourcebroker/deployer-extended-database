@@ -6,7 +6,6 @@ use Deployer\Exception\GracefulShutdownException;
 use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
-use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /*
@@ -16,7 +15,6 @@ task('db:truncate', function () {
     $arrayUtility = new ArrayUtility();
     $databaseUtility = new DatabaseUtility();
     if (get('is_argument_host_the_same_as_local_host')) {
-        $fileUtility = new FileUtility();
         foreach (get('db_databases_merged') as $databaseConfig) {
             if (isset($databaseConfig['truncate_tables']) && is_array($databaseConfig['truncate_tables'])) {
                 $truncateTables = $arrayUtility->filterWithRegexp(
@@ -25,11 +23,11 @@ task('db:truncate', function () {
                 );
 
                 if (!empty($truncateTables)) {
-                    $databaseStoragePathLocalNormalised = $fileUtility->normalizeFolder(get('db_storage_path_local'));
+                    $databaseStoragePathLocal = get('db_storage_path_local');
 
                     $tmpMyCnfFile = DatabaseUtility::getTemporaryMyCnfFile(
                         $databaseConfig,
-                        $databaseStoragePathLocalNormalised
+                        $databaseStoragePathLocal
                     );
 
                     try {

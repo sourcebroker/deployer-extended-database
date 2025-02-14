@@ -26,10 +26,10 @@ task('db:export', function () {
                 'dumpcode' => 'dumpcode=' . $fileUtility->normalizeFilename($dumpCode),
                 'type' => '',
             ];
-            $databaseStoragePathLocalNormalised = $fileUtility->normalizeFolder(get('db_storage_path_local'));
+            $databaseStoragePathLocal = get('db_storage_path_local');
             $tmpMyCnfFile = DatabaseUtility::getTemporaryMyCnfFile(
                 $databaseConfig,
-                $databaseStoragePathLocalNormalised
+                $databaseStoragePathLocal
             );
             $mysqlDumpArgs = [
                 'local/bin/mysqldump' => get('local/bin/mysqldump'),
@@ -78,7 +78,7 @@ task('db:export', function () {
                 $filenameParts['type'] = 'type=structure';
                 $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_structure', '');
                 $mysqlDumpArgs['options'] .= DatabaseUtility::getSslCliOptions($databaseConfig);
-                $mysqlDumpArgs['absolutePath'] = escapeshellarg($databaseStoragePathLocalNormalised . implode('#',
+                $mysqlDumpArgs['absolutePath'] = escapeshellarg($databaseStoragePathLocal . implode('#',
                         $filenameParts) . '.sql');
 
                 runLocally(vsprintf(
@@ -91,7 +91,7 @@ task('db:export', function () {
                 $filenameParts['type'] = 'type=data';
                 $mysqlDumpArgs['options'] = get('db_export_mysqldump_options_data', '');
                 $mysqlDumpArgs['options'] .= DatabaseUtility::getSslCliOptions($databaseConfig);
-                $mysqlDumpArgs['absolutePath'] = escapeshellarg($databaseStoragePathLocalNormalised . implode('#',
+                $mysqlDumpArgs['absolutePath'] = escapeshellarg($databaseStoragePathLocal . implode('#',
                         $filenameParts) . '.sql');
                 runLocally(vsprintf(
                     '%s --defaults-file=%s %s %s -r%s %s',

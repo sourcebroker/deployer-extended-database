@@ -3,7 +3,6 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
-use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\RsyncUtility;
 
 /*
@@ -11,10 +10,9 @@ use SourceBroker\DeployerExtendedDatabase\Utility\RsyncUtility;
  */
 task('db:download', function () {
     $rsyncUtility = new RsyncUtility();
-    $fileUtility = new FileUtility();
     $consoleUtility = new ConsoleUtility();
     $dumpCode = $consoleUtility->getOption('dumpcode', true);
-    $localPath = $fileUtility->normalizeFolder(get('db_storage_path_local'));
+    $localPath = get('db_storage_path_local');
 
     runLocally(sprintf(
         'rsync -rz %s --include=%s --exclude=* %s %s',

@@ -93,7 +93,8 @@ set('db_storage_path_local', function () {
     }
     $dbStoragePathLocal = (new FileUtility())->resolveHomeDirectoryLocal($dbStoragePathLocal);
     runLocally('[ -d ' . $dbStoragePathLocal . ' ] || mkdir -p ' . $dbStoragePathLocal);
-    return $dbStoragePathLocal;
+
+    return rtrim($dbStoragePathLocal, '/') . '/';
 });
 
 // Returns path to store database dumps on remote stage.
@@ -106,7 +107,7 @@ set('db_storage_path', function () {
     $dbStoragePath = (new FileUtility())->resolveHomeDirectory($dbStoragePath);
     run('[ -d ' . $dbStoragePath . ' ] || mkdir -p ' . $dbStoragePath);
 
-    return $dbStoragePath;
+    return rtrim($dbStoragePath, '/') . '/';
 });
 
 set('bin/deployer', function () {
