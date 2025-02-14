@@ -84,9 +84,9 @@ class DatabaseUtility
 
     public static function getTemporaryMyCnfFile(
         array $dbConfig,
-        string $localInstanceDatabaseStoragePathNormalised
+        string $localInstanceDatabaseStoragePath
     ): string {
-        $tmpMyCnfFile = $localInstanceDatabaseStoragePathNormalised . 'tmp_mysql_defaults_file_' . date('YmdHis') . '.cnf';
+        $tmpMyCnfFile = $localInstanceDatabaseStoragePath . 'tmp_mysql_defaults_file_' . date('YmdHis') . '.cnf';
         $content = "[client]\n";
         $content .= "host=\"{$dbConfig['host']}\"\n";
         $content .= "port=\"" . ((isset($dbConfig['port']) && $dbConfig['port']) ? $dbConfig['port'] : 3306) . "\"\n";
@@ -97,18 +97,66 @@ class DatabaseUtility
         return $tmpMyCnfFile;
     }
 
-    public function getLastDumpFilename(string $localInstanceDatabaseStoragePathNormalised): ?string
-    {
-        $dumpFiles = glob($localInstanceDatabaseStoragePathNormalised . '*.{sql,gz}', GLOB_BRACE);
+    public function getDumpFiles(
+        string $localInstanceDatabaseStoragePath,
+        array $filters = [],
+        array $fileTypes = ['sql', 'gz'],
+        array $sort = []
+    ): array {
+        $fileTypesPattern = implode(',', array_map(function ($type) {
+            return "*.$type";
+        }, $fileTypes));
+
+        $dumpFiles = glob($localInstanceDatabaseStoragePath . '{' . $fileTypesPattern . '}', GLOB_BRACE);
         if ($dumpFiles) {
             $fileUtility = new FileUtility();
-            usort($dumpFiles, function ($a, $b) use ($fileUtility) {
-                $dateTimeA = $fileUtility->getDumpFilenamePart(basename($a), 'dateTime');
-                $dateTimeB = $fileUtility->getDumpFilenamePart(basename($b), 'dateTime');
-                return $dateTimeA <=> $dateTimeB;
-            });
-            return end($dumpFiles);
+
+            foreach ($filters as $key => $value) {
+                $dumpFiles = array_filter($dumpFiles, function ($file) use ($fileUtility, $key, $value) {
+                    return $fileUtility->getDumpFilenamePart(basename($file), $key) === $value;
+                });
+            }
+
+            if (isset($sort['dateTime'])) {
+                usort($dumpFiles, function ($a, $b) use ($fileUtility, $sort) {
+                    $dateTimeA = $fileUtility->getDumpFilenamePart(basename($a), 'dateTime');
+                    $dateTimeB = $fileUtility->getDumpFilenamePart(basename($b), 'dateTime');
+                    return $sort['dateTime'] === 'asc' ? $dateTimeA <=> $dateTimeB : $dateTimeB <=> $dateTimeA;
+                });
+            }
         }
-        return null;
+        return $dumpFiles;
     }
+
+    public function getDumpFile(
+        string $localInstanceDatabaseStoragePath,
+        array $filters = [],
+        array $fileTypes = ['sql', 'gz']
+    ): ?string {
+        $dumpFiles = $this->getDumpFiles($localInstanceDatabaseStoragePath, $filters, $fileTypes);
+        return !empty($dumpFiles) ? reset($dumpFiles) : null;
+    }
+
+    public function getLastDumpFile(
+        string $localInstanceDatabaseStoragePath,
+        array $filters = [],
+        array $fileTypes = ['sql', 'gz']
+    ): ?string {
+        $dumpFiles = $this->getDumpFiles($localInstanceDatabaseStoragePath, $filters, $fileTypes,
+            ['dateTime' => 'asc']);
+        return !empty($dumpFiles) ? end($dumpFiles) : null;
+    }
+
+    public function removeDumpFiles(
+        string $localInstanceDatabaseStoragePath,
+        array $filters = [],
+        array $fileTypes = ['sql', 'gz'],
+        array $sort = []
+    ): void {
+        $dumpFiles = $this->getDumpFiles($localInstanceDatabaseStoragePath, $filters, $fileTypes, $sort);
+        foreach ($dumpFiles as $file) {
+            unlink($file);
+        }
+    }
+
 }

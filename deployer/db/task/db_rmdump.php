@@ -3,6 +3,7 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
+use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 
 /*
  * @see https://github.com/sourcebroker/deployer-extended-database#db-rmdump
@@ -10,7 +11,8 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 task('db:rmdump', function () {
     $dumpCode = (new ConsoleUtility())->getOption('dumpcode', true);
     if (get('is_argument_host_the_same_as_local_host')) {
-        runLocally('cd ' . escapeshellarg(get('db_storage_path_local')) . ' && rm -f *dumpcode=' . $dumpCode . '*');
+        $databaseUtility = new DatabaseUtility();
+        $databaseUtility->removeDumpFiles(get('db_storage_path_local'), ['dumpcode' => $dumpCode]);
     } else {
         $params = [
             get('argument_host'),

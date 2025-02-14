@@ -3,6 +3,7 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
+use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -11,43 +12,49 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 task('db:dumpclean', function () {
     if (get('is_argument_host_the_same_as_local_host')) {
-        $files = explode("\n", runLocally('ls -1t ' . get('db_storage_path_local')));
+        $fileUtility = new FileUtility();
+        $databaseUtility = new DatabaseUtility();
+        $dumpFiles = (new DatabaseUtility())->getDumpFiles(
+            get('db_storage_path_local'), [], ['sql', 'gz'], ['dateTime' => 'desc']
+        );
+
         $dumpsStorage = [];
-        natsort($files);
-        foreach (array_reverse($files) as $file) {
-            $dumpcode = $instance = null;
-            foreach (explode('#', $file) as $metaPart) {
-                if (str_starts_with($metaPart, 'server')) {
-                    $instanceParts = explode('=', $metaPart);
-                    $instance = $instanceParts[1] ?? null;
-                }
-                if (str_starts_with($metaPart, 'dumpcode')) {
-                    $dumpcodeParts = explode('=', $metaPart);
-                    $dumpcode = $dumpcodeParts[1] ?? null;
-                }
-            }
-            if (empty($instance) || empty($dumpcode)) {
+        foreach ($dumpFiles as $file) {
+            $dumpcode = $fileUtility->getDumpFilenamePart($file, 'dumpcode');
+            $server = $fileUtility->getDumpFilenamePart($file, 'server');
+
+            if (empty($server) || empty($dumpcode)) {
                 writeln('Note: "server" or "dumpcode" can not be detected for file dump: "'
-                    . (new FileUtility())->normalizeFolder(get('db_storage_path_local'))
+                    . get('db_storage_path_local')
                     . $file);
                 writeln('Seems like this file was not created by deployer-extended-database or was created by previous version of deployer-extended-database. Please remove this file manually to get rid of this notice.');
                 writeln('');
                 continue;
             }
-            $dumpsStorage[$instance][$dumpcode] = $dumpcode;
+            $dumpsStorage[$server][$dumpcode] = $dumpcode;
         }
+
         $dbDumpCleanKeep = get('db_dumpclean_keep', 5);
-        foreach ($dumpsStorage as $instance => $instanceDumps) {
-            $instanceDumps = array_values($instanceDumps);
+        foreach ($dumpsStorage as $server => $serverDumps) {
+            $serverDumps = array_values($serverDumps);
+
             if (is_array($dbDumpCleanKeep)) {
-                $dbDumpCleanKeep = !empty($dbDumpCleanKeep[$instance]) ? $dbDumpCleanKeep[$instance] : (!empty($dbDumpCleanKeep['*']) ? $dbDumpCleanKeep['*'] : 5);
+                if (!empty($dbDumpCleanKeep[$server])) {
+                    $keepCount = $dbDumpCleanKeep[$server];
+                } elseif (!empty($dbDumpCleanKeep['*'])) {
+                    $keepCount = $dbDumpCleanKeep['*'];
+                } else {
+                    $keepCount = 5;
+                }
+            } else {
+                $keepCount = $dbDumpCleanKeep;
             }
-            if (count($instanceDumps) > $dbDumpCleanKeep) {
-                $instanceDumpsCount = count($instanceDumps);
-                for ($i = $dbDumpCleanKeep; $i < $instanceDumpsCount; $i++) {
-                    writeln('Removing old dump with code: ' . $instanceDumps[$i], OutputInterface::VERBOSITY_VERBOSE);
-                    runLocally('cd ' . escapeshellarg(get('db_storage_path_local'))
-                        . ' && rm ' . '*dumpcode=' . $instanceDumps[$i] . '*');
+
+            if (count($serverDumps) > $keepCount) {
+                $serverDumpsCount = count($serverDumps);
+                for ($i = $keepCount; $i < $serverDumpsCount; $i++) {
+                    writeln('Removing old dump with code: ' . $serverDumps[$i], OutputInterface::VERBOSITY_VERBOSE);
+                    $databaseUtility->removeDumpFiles(get('db_storage_path_local'), ['dumpcode' => $serverDumps[$i]]);
                 }
             }
         }
