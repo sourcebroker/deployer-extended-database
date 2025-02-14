@@ -3,6 +3,8 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
+use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /*
  * @see https://github.com/sourcebroker/deployer-extended-database#db-decompress
@@ -10,6 +12,15 @@ use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 task('db:decompress', function () {
     $dumpCode = (new ConsoleUtility())->getOption('dumpcode', true);
     if (get('is_argument_host_the_same_as_local_host')) {
+        $decompressedDumpFile = (new DatabaseUtility())->getLastDumpFile(get('db_storage_path_local'), [], ['sql']);
+        if ($decompressedDumpFile !== null) {
+            writeln(
+                'The .sql file with the given dumpCode already exists, skipping decompression.',
+                OutputInterface::VERBOSITY_VERBOSE
+            );
+            return;
+        }
+
         $markersArray = [];
         $markersArray['{{databaseStorageAbsolutePath}}'] = get('db_storage_path_local');
         $markersArray['{{dumpcode}}'] = $dumpCode;

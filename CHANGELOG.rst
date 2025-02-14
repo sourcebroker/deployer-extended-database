@@ -30,6 +30,7 @@ master
 14) [FEATURE] Add validation for name of options. If name is wrong task will stop.
 15) [TASK][BREAKING] Move normalizeFolder functionality into 'db_storage_path_local' function as it was used only in
     this context. Remove FileUtility->normalizeFolder
+16) [TASK][BREAKING] Do not throw error in db:decompress task if dump is already decompressed.
 
 17.0.0
 ~~~~~~
