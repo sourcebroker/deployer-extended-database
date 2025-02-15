@@ -103,7 +103,7 @@ class DatabaseUtility
         array $fileTypes = ['sql', 'gz'],
         array $sort = []
     ): array {
-        $fileTypesPattern = implode(',', array_map(function ($type) {
+        $fileTypesPattern = implode(',', array_map(static function ($type) {
             return "*.$type";
         }, $fileTypes));
 
@@ -112,13 +112,21 @@ class DatabaseUtility
             $fileUtility = new FileUtility();
 
             foreach ($filters as $key => $value) {
-                $dumpFiles = array_filter($dumpFiles, function ($file) use ($fileUtility, $key, $value) {
+                $dumpFiles = array_filter($dumpFiles, static function ($file) use ($fileUtility, $key, $value) {
                     return $fileUtility->getDumpFilenamePart(basename($file), $key) === $value;
                 });
             }
 
+            if (isset($filters['tags'])) {
+                $tags = explode('+', $filters['tags']);
+                $dumpFiles = array_filter($dumpFiles, static function ($file) use ($fileUtility, $tags) {
+                    $fileTags = explode('+', $fileUtility->getDumpFilenamePart(basename($file), 'tags'));
+                    return !array_diff($tags, $fileTags);
+                });
+            }
+
             if (isset($sort['dateTime'])) {
-                usort($dumpFiles, function ($a, $b) use ($fileUtility, $sort) {
+                usort($dumpFiles, static function ($a, $b) use ($fileUtility, $sort) {
                     $dateTimeA = $fileUtility->getDumpFilenamePart(basename($a), 'dateTime');
                     $dateTimeB = $fileUtility->getDumpFilenamePart(basename($b), 'dateTime');
                     return $sort['dateTime'] === 'asc' ? $dateTimeA <=> $dateTimeB : $dateTimeB <=> $dateTimeA;

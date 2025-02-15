@@ -5,6 +5,7 @@ namespace Deployer;
 use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
+use SourceBroker\DeployerExtendedDatabase\Utility\OptionUtility;
 use Deployer\Exception\GracefulShutdownException;
 
 /*
@@ -12,8 +13,9 @@ use Deployer\Exception\GracefulShutdownException;
  */
 task('db:import', function () {
     $consoleUtility = new ConsoleUtility();
-    $dumpCode = $consoleUtility->getOption('dumpcode', true);
     $fileUtility = new FileUtility();
+    $optionUtility = new OptionUtility(input()->getOption('options'));
+    $dumpCode = $optionUtility->getOption('dumpcode', true);
     if (get('is_argument_host_the_same_as_local_host')) {
         $databaseStoragePathLocal = get('db_storage_path_local');
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
@@ -57,7 +59,7 @@ task('db:import', function () {
 
             try {
                 // Drop all tables.
-                if (empty($consoleUtility->getOption('importTaskDoNotDropAllTablesBeforeImport'))) {
+                if (empty($optionUtility->getOption('importTaskDoNotDropAllTablesBeforeImport'))) {
                     runLocally(sprintf(
                         '%s --defaults-file=%s %s --add-drop-table --no-data | ' .
                         'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s --defaults-file=%s %s -D%s %s',
@@ -140,8 +142,7 @@ task('db:import', function () {
                 }
                 if (isset($databaseConfig['post_command']) && is_array($databaseConfig['post_command'])) {
                     foreach ($databaseConfig['post_command'] as $postCommand) {
-                        $options = $consoleUtility->getOptionsForCliUsage(['dumpcode' => $dumpCode]);
-                        runLocally($postCommand . ' ' . $options);
+                        runLocally($postCommand . ' ' . $optionUtility->getOptionsString());
                     }
                 }
 
@@ -186,11 +187,11 @@ task('db:import', function () {
         $params = [
             get('argument_host'),
             $consoleUtility->getVerbosityAsParameter(),
-            input()->getOption('options') ? '--options=' . input()->getOption('options') : '',
+            $optionUtility->getOptionsString(),
         ];
 
-        $output = run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:import ' . implode(' ',
-                $params));
+        $output = run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:import '
+            . implode(' ', $params));
         output()->write(str_replace("task db:import\n", '', $output));
     }
 })->desc('Import dump with given dumpcode from database dumps storage to database');

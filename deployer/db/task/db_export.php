@@ -7,16 +7,20 @@ use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 use Deployer\Exception\GracefulShutdownException;
+use SourceBroker\DeployerExtendedDatabase\Utility\OptionUtility;
 
 /*
  * @see https://github.com/sourcebroker/deployer-extended-database#db-export
  */
 task('db:export', function () {
-    $consoleUtility = new ConsoleUtility();
-    $dumpCode = $consoleUtility->getOption('dumpcode', true);
     $fileUtility = new FileUtility();
     $arrayUtility = new ArrayUtility();
     $databaseUtility = new DatabaseUtility();
+    $consoleUtility = new ConsoleUtility();
+    $optionUtility = new OptionUtility(input()->getOption('options'));
+    $dumpCode = $optionUtility->getOption('dumpcode', true);
+    $tags = $optionUtility->getOption('tags');
+
     if (get('is_argument_host_the_same_as_local_host')) {
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
             $filenameParts = [
@@ -24,8 +28,11 @@ task('db:export', function () {
                 'server' => 'server=' . $fileUtility->normalizeFilename(get('local_host')),
                 'dbcode' => 'dbcode=' . $fileUtility->normalizeFilename($databaseCode),
                 'dumpcode' => 'dumpcode=' . $fileUtility->normalizeFilename($dumpCode),
-                'type' => '',
             ];
+            if (is_array($tags) && count($tags) > 0) {
+                $filenameParts['tags'] = 'tags='
+                    . $fileUtility->normalizeFilename(implode(OptionUtility::ARRAY_OPTIONS_IMPLODE_CHAR, $tags));
+            }
             $databaseStoragePathLocal = get('db_storage_path_local');
             $tmpMyCnfFile = DatabaseUtility::getTemporaryMyCnfFile(
                 $databaseConfig,
@@ -67,9 +74,10 @@ task('db:export', function () {
                         output()->writeln($consoleUtility->formattingTaskOutputHeader('Ignored tables:'));
                         output()->write($consoleUtility->formattingTaskOutputContent($ignoredTablesText));
                     }
-                    $mysqlDumpArgs['ignore-tables'] = implode(' ', array_map(function ($table) use ($databaseConfig) {
-                        return '--ignore-table=' . escapeshellarg($databaseConfig['dbname'] . '.' . $table);
-                    }, $ignoreTables));
+                    $mysqlDumpArgs['ignore-tables'] = implode(' ',
+                        array_map(static function ($table) use ($databaseConfig) {
+                            return '--ignore-table=' . escapeshellarg($databaseConfig['dbname'] . '.' . $table);
+                        }, $ignoreTables));
                 }
             }
 
@@ -83,7 +91,7 @@ task('db:export', function () {
 
                 runLocally(vsprintf(
                     '%s --defaults-file=%s %s %s -r%s'
-                    . ($consoleUtility->getOption('exportTaskAddIgnoreTablesToStructureDump') ? ' %s' : ''),
+                    . ($optionUtility->getOption('exportTaskAddIgnoreTablesToStructureDump') ? ' %s' : ''),
                     $mysqlDumpArgs
                 ));
 
@@ -111,11 +119,10 @@ task('db:export', function () {
         $params = [
             get('argument_host'),
             $consoleUtility->getVerbosityAsParameter(),
-            input()->getOption('options') ? '--options=' . input()->getOption('options') : '',
+            $optionUtility->getOptionsString(),
         ];
-        $output = run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:export ' . implode(' ',
-                $params));
+        $output = run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:export '
+            . implode(' ', $params));
         output()->write(str_replace("task db:export\n", '', $output));
     }
 })->desc('Dump database and store it in database dumps storage');
-

@@ -4,13 +4,15 @@ namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
+use SourceBroker\DeployerExtendedDatabase\Utility\OptionUtility;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /*
  * @see https://github.com/sourcebroker/deployer-extended-database#db-decompress
  */
 task('db:decompress', function () {
-    $dumpCode = (new ConsoleUtility())->getOption('dumpcode', true);
+    $optionUtility = new OptionUtility(input()->getOption('options'));
+    $dumpCode = $optionUtility->getOption('dumpcode', true);
     if (get('is_argument_host_the_same_as_local_host')) {
         $decompressedDumpFile = (new DatabaseUtility())->getLastDumpFile(get('db_storage_path_local'), [], ['sql']);
         if ($decompressedDumpFile !== null) {
@@ -37,7 +39,7 @@ task('db:decompress', function () {
         $params = [
             get('argument_host'),
             (new ConsoleUtility())->getVerbosityAsParameter(),
-            (new ConsoleUtility())->getOptionsForCliUsage(['dumpcode' => $dumpCode]),
+            $optionUtility->getOptionsString(),
         ];
         run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:decompress ' . implode(' ', $params));
     }

@@ -31,6 +31,7 @@ master
 15) [TASK][BREAKING] Move normalizeFolder functionality into 'db_storage_path_local' function as it was used only in
     this context. Remove FileUtility->normalizeFolder
 16) [TASK][BREAKING] Do not throw error in db:decompress task if dump is already decompressed.
+17) [TASK] Add new OptionUtility for managing "--options". Add new option "tags" that allow to set tags for dump filename.
 
 17.0.0
 ~~~~~~

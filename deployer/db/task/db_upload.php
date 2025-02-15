@@ -3,6 +3,7 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
+use SourceBroker\DeployerExtendedDatabase\Utility\OptionUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\RsyncUtility;
 
 /*
@@ -11,7 +12,8 @@ use SourceBroker\DeployerExtendedDatabase\Utility\RsyncUtility;
 task('db:upload', function () {
     $rsyncUtility = new RsyncUtility();
     $consoleUtility = new ConsoleUtility();
-    $dumpCode = $consoleUtility->getOption('dumpcode', true);
+    $optionUtility = new OptionUtility(input()->getOption('options'));
+    $dumpCode = $optionUtility->getOption('dumpcode', true);
     $localPath = get('db_storage_path_local');
 
     runLocally(sprintf(

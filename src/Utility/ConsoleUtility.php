@@ -2,22 +2,11 @@
 
 namespace SourceBroker\DeployerExtendedDatabase\Utility;
 
-use function Deployer\input;
 use function Deployer\output;
-use function Deployer\get;
 use Symfony\Component\Console\Output\OutputInterface;
-use Deployer\Exception\GracefulShutdownException;
 
 class ConsoleUtility
 {
-    public const AVAILABLE_OPTIONS = [
-        'dumpcode',
-        'target',
-        'fromLocalStorage',
-        'exportTaskAddIgnoreTablesToStructureDump',
-        'importTaskDoNotDropAllTablesBeforeImport',
-    ];
-
     public function getVerbosityAsParameter(): string
     {
         switch (output()->getVerbosity()) {
@@ -38,65 +27,6 @@ class ConsoleUtility
                 $verbosity = '';
         }
         return $verbosity;
-    }
-
-    /**
-     * Check if option is present and return it. If not throw exception.
-     *
-     * @return bool|mixed|string|null
-     */
-    public function getOption(string $optionToFind, bool $required = false)
-    {
-        $optionReturnValue = null;
-        if (!empty(input()->getOption('options'))) {
-            $options = explode(',', input()->getOption('options'));
-            if (is_array($options)) {
-                foreach ($options as $option) {
-                    $optionParts = explode(':', $option);
-                    if (!in_array($optionParts[0], self::AVAILABLE_OPTIONS, true)) {
-                        throw new GracefulShutdownException('Option `' . $optionParts[0] . '` is not available for --options=.', 1458937128562);
-                    }
-                    if (!empty($optionParts[1])) {
-                        $optionValue = $optionParts[1];
-                    }
-                    if ($optionToFind === $optionParts[0]) {
-                        $pregMatchRequired = get('db_pregmatch_' . $optionToFind, '');
-                        if ($pregMatchRequired !== '' && !empty($optionValue)
-                            && !preg_match($pregMatchRequired, $optionValue)) {
-                            throw new GracefulShutdownException('Value of option `' . $optionToFind . '` does not match the required pattern: ' . $pregMatchRequired,
-                                1458937128561);
-                        }
-                        if (!empty($optionValue)) {
-                            $optionReturnValue = $optionValue;
-                        } else {
-                            $optionReturnValue = true;
-                        }
-                    }
-                }
-            }
-        }
-        if ($required && $optionReturnValue === null) {
-            throw new GracefulShutdownException('No `--options=' . $optionToFind . ':value` set.', 1458937128560);
-        }
-        return $optionReturnValue;
-    }
-
-    public function getOptionsForCliUsage(array $optionsToSet): string
-    {
-        $getOptionsForCliUsage = '';
-        $getOptionsForCliUsageArray = [];
-        foreach ($optionsToSet as $optionToSetKey => $optionToSetValue) {
-            if ($optionToSetValue === true) {
-                $optionToSetValue = 'true';
-            } elseif ($optionToSetValue === false) {
-                $optionToSetValue = 'false';
-            }
-            $getOptionsForCliUsageArray[] = $optionToSetKey . ':' . $optionToSetValue;
-        }
-        return $getOptionsForCliUsage . (!empty($getOptionsForCliUsageArray) ? '--options=' . implode(
-                    ',',
-                    $getOptionsForCliUsageArray
-                ) : '');
     }
 
     public function formattingSubtaskTree(string $content): string
@@ -130,4 +60,5 @@ class ConsoleUtility
     {
         return md5(microtime(true) . random_int(0, 10000));
     }
+
 }

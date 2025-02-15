@@ -9,7 +9,7 @@ class FileUtility
 {
     public function normalizeFilename(string $filename): string
     {
-        return preg_replace('/^[^a-zA-Z0-9_]+$/', '', $filename);
+        return preg_replace('/^[^a-zA-Z0-9_+]+$/', '', $filename);
     }
 
     public function locateLocalBinaryPath(string $name): string
@@ -57,7 +57,11 @@ class FileUtility
         } else {
             $pattern = '/#' . preg_quote($part, '/') . '=([^#]*)/';
             if (preg_match($pattern, $filename, $matches)) {
-                return $matches[1];
+                $value = $matches[1];
+                if (in_array($part, OptionUtility::ARRAY_OPTIONS, true)) {
+                    return explode(OptionUtility::ARRAY_OPTIONS_IMPLODE_CHAR, $value);
+                }
+                return $value;
             }
         }
         return null;
