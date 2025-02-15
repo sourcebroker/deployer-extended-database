@@ -4,6 +4,7 @@ namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 use Deployer\Exception\GracefulShutdownException;
+use SourceBroker\DeployerExtendedDatabase\Utility\OptionUtility;
 
 /*
  * @see https://github.com/sourcebroker/deployer-extended-database#db-pull
@@ -38,15 +39,25 @@ task('db:pull', function () {
         }
     }
     $local = get('local_host');
-    $dl = get('local/bin/deployer');
+    $dl = host(get('local_host'))->get('bin/php') . ' ' . get('local/bin/deployer');
     $consoleUtility = new ConsoleUtility();
     $verbosity = $consoleUtility->getVerbosityAsParameter();
-    $options = $consoleUtility->getOptionsForCliUsage(['dumpcode' => $consoleUtility->getDumpCode()]);
+    $optionUtility = new OptionUtility(input()->getOption('options'));
+    $optionUtility->setOption('dumpcode', $consoleUtility->getDumpCode());
+    $optionUtility->setOption('tags', ['pull']);
+    $options = $optionUtility->getOptionsString();
+
     output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:export ' . $sourceName . ' ' . $options . ' ' . $verbosity)));
     output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:download ' . $sourceName . ' ' . $options . ' ' . $verbosity)));
     runLocally($dl . ' db:rmdump ' . $sourceName . ' ' . $options . ' ' . $verbosity);
-    output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:process ' . $local . ' ' . $options . ' ' . $verbosity)));
-    // TODO: make backup before import, compress and rotate
+    runLocally($dl . ' db:process ' . $local . ' ' . $options . ' ' . $verbosity);
+
+    // Make backup of local database before import
+    $backupOptions = new OptionUtility();
+    $backupOptions->setOption('dumpcode', $consoleUtility->getDumpCode());
+    $backupOptions->setOption('tags', ['pull', 'import_backup']);
+    runLocally($dl . ' db:backup ' . $local . ' ' . $backupOptions->getOptionsString() . ' ' . $verbosity);
+
     output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:import ' . $local . ' ' . $options . ' ' . $verbosity)));
     runLocally($dl . ' db:compress ' . $local . ' ' . $options . ' ' . $verbosity);
     runLocally($dl . ' db:dumpclean ' . $local . ' ' . $verbosity);

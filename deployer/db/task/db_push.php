@@ -4,6 +4,7 @@ namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 use Deployer\Exception\GracefulShutdownException;
+use SourceBroker\DeployerExtendedDatabase\Utility\OptionUtility;
 
 /*
  * @see https://github.com/sourcebroker/deployer-extended-database#db-push
@@ -34,16 +35,27 @@ task('db:push', function () {
         }
     }
     $local = get('local_host');
-    $dl = get('local/bin/deployer');
+    $dl = host(get('local_host'))->get('bin/php') . ' ' . get('local/bin/deployer');
     $consoleUtility = new ConsoleUtility();
+    $optionUtility = new OptionUtility(input()->getOption('options'));
+    $optionUtility->setOption('dumpcode', $consoleUtility->getDumpCode());
+    $optionUtility->setOption('tags', ['push']);
     $verbosity = $consoleUtility->getVerbosityAsParameter();
-    $options = $consoleUtility->getOptionsForCliUsage(['dumpcode' => $consoleUtility->getDumpCode()]);
+    $options = $optionUtility->getOptionsString();
     output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:export ' . $local . ' ' . $options . ' ' . $verbosity)));
     output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:upload ' . $targetName . ' ' . $options . ' ' . $verbosity)));
     runLocally($dl . ' db:rmdump ' . $local . ' ' . $options . ' ' . $verbosity);
-    output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:process ' . $targetName . ' ' . $options . ' ' . $verbosity)));
-    // TODO: make backup before import
+    runLocally($dl . ' db:process ' . $targetName . ' ' . $options . ' ' . $verbosity);
+
+    // Make backup of target database before import
+    $backupOptions = new OptionUtility();
+    $backupOptions->setOption('dumpcode', $consoleUtility->getDumpCode());
+    $backupOptions->setOption('tags', ['push', 'import_backup']);
+    runLocally($dl . ' db:backup ' . $targetName . ' ' . $backupOptions->getOptionsString() . ' ' . $verbosity);
+
     $importOutput = runLocally($dl . ' db:import ' . $targetName . ' ' . $options . ' ' . $verbosity);
     output()->writeln($consoleUtility->formattingSubtaskTree(str_replace("task db:import\n", '', $importOutput)));
-    runLocally($dl . ' db:rmdump ' . $targetName . ' ' . $options . ' ' . $verbosity);
+    runLocally($dl . ' db:compress ' . $targetName . ' ' . $options . ' ' . $verbosity);
+    runLocally($dl . ' db:dumpclean ' . $targetName . ' ' . $verbosity);
+
 })->desc('Push database from local to remote');
