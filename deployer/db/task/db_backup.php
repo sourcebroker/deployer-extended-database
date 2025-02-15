@@ -3,33 +3,42 @@
 namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
+use SourceBroker\DeployerExtendedDatabase\Utility\OptionUtility;
 
 /*
  * @see https://github.com/sourcebroker/deployer-extended-database#db-backup
  */
 task('db:backup', function () {
-    if (get('is_argument_host_the_same_as_local_host')) {
-        $latest = runLocally('cd {{deploy_path}} && cat .dep/latest_release || echo 0');
-    } else {
-        $latest = run('cd {{deploy_path}} && cat .dep/latest_release || echo 0');
+    $consoleUtility = new ConsoleUtility();
+    $optionUtility = new OptionUtility(input()->getOption('options'));
+    $dumpCode = $optionUtility->getOption('dumpcode', false);
+    if (!$dumpCode) {
+        $optionUtility->setOption('dumpcode', $consoleUtility->getDumpCode());
     }
 
-    $consoleUtility = new ConsoleUtility();
-    $dumpCodeRelease = (int)$latest ? '_for_release_' . $latest : '';
-    $dumpCode = 'backup' . $dumpCodeRelease . '_' . $consoleUtility->getDumpCode();
     $params = [
-        get('argument_host'),
-        $consoleUtility->getOptionsForCliUsage(['dumpcode' => $dumpCode]),
-        $consoleUtility->getVerbosityAsParameter(),
+        'argument_host' => get('argument_host'),
+        'verbose' => $consoleUtility->getVerbosityAsParameter(),
     ];
 
     if (get('is_argument_host_the_same_as_local_host')) {
-        runLocally('{{local/bin/deployer}} db:export ' . implode(' ', $params));
-        runLocally('{{local/bin/deployer}} db:compress  ' . implode(' ', $params));
-        runLocally('{{local/bin/deployer}} db:dumpclean ' . implode(' ', $params));
+        if (testLocally('cd {{deploy_path}} && [ -d .dep/releases ]')) {
+            $latestRelease = (int)runLocally('cd {{deploy_path}} && cat .dep/latest_release || echo 0');
+            $tags = $optionUtility->getOption('tags', false);
+            if ($latestRelease > 0) {
+                $tags[] = 'release';
+                $tags[] = 'release_' . $latestRelease;
+                $optionUtility->setOption('tags', $tags);
+            }
+        }
+        $params['options'] = $optionUtility->getOptionsString();
+        $dl = host(get('local_host'))->get('bin/php') . ' ' . get('local/bin/deployer');
+        runLocally($dl . ' db:export ' . implode(' ', $params));
+        runLocally($dl . ' db:compress  ' . implode(' ', $params));
+        runLocally($dl . ' db:dumpclean ' . implode(' ', $params));
     } else {
-        run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:export ' . implode(' ', $params));
-        run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:compress ' . implode(' ', $params));
-        run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:dumpclean ' . implode(' ', $params));
+        $params['options'] = $optionUtility->getOptionsString();
+        run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:backup '
+            . implode(' ', array_values($params)));
     }
-})->desc('Do backup of database (export and compress)');
+})->desc('Do backup of database (export, compress, dumpclean)');
