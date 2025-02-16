@@ -2,7 +2,7 @@
 Changelog
 ---------
 
-master
+18.0.0
 ------
 
 1) [TASK][BREAKING] Change the default charset for mysql/mysqldump operations from utf8 to utf8mb4.
