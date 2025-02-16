@@ -34,15 +34,13 @@ class OptionUtility
     private function parseOptionsString(string $optionsString): void
     {
         $options = explode(',', $optionsString);
+
         foreach ($options as $option) {
             $optionParts = explode(':', $option);
-            if (count($optionParts) === 2) {
-                if (in_array($optionParts[0], self::ARRAY_OPTIONS, true)) {
-                    $this->options[$optionParts[0]] = explode('+', $optionParts[1]);
-                } else {
-                    $this->options[$optionParts[0]] = $optionParts[1];
-                }
-            }
+            $optionKey = $optionParts[0];
+            $optionValue = count($optionParts) === 2 ? $optionParts[1] : true;
+
+            $this->setOption($optionKey, $optionValue);
         }
     }
 
@@ -50,16 +48,7 @@ class OptionUtility
     {
         $optionReturnValue = null;
         foreach ($this->options as $key => $value) {
-            if (!in_array($key, self::AVAILABLE_OPTIONS, true)) {
-                throw new GracefulShutdownException('Option `' . $key . '` is not available for --options=.',
-                    1458937128562);
-            }
             if ($optionName === $key) {
-                $pregMatchRequired = get('db_pregmatch_' . $optionName, '');
-                if ($pregMatchRequired !== '' && !empty($value) && !preg_match($pregMatchRequired, $value)) {
-                    throw new GracefulShutdownException('Value of option `' . $optionName . '` does not match the required pattern: ' . $pregMatchRequired,
-                        1458937128561);
-                }
                 if (!empty($value)) {
                     $optionReturnValue = $value;
                 } else {
@@ -77,11 +66,24 @@ class OptionUtility
 
     public function setOption(string $optionName, $optionValue): void
     {
+        if (!in_array($optionName, self::AVAILABLE_OPTIONS, true)) {
+            throw new GracefulShutdownException(
+                "Option $optionName is not available for '--options='. \nAvailable options are: " . implode(', ', self::AVAILABLE_OPTIONS),
+                1458937128562
+            );
+        }
+
+        $pregMatchRequired = get('db_pregmatch_' . $optionName, '');
+        if ($pregMatchRequired !== '' && !empty($optionValue) && !preg_match($pregMatchRequired, $optionValue)) {
+            throw new GracefulShutdownException('Value of option \'' . $optionName . '\' does not match the required pattern: ' . $pregMatchRequired,
+                1458937128561);
+        }
+
         if (in_array($optionName, self::ARRAY_OPTIONS, true)) {
             if (is_array($optionValue)) {
                 $this->options[$optionName] = $optionValue;
             } else {
-                $this->options[$optionName][] = $optionValue;
+                $this->options[$optionName] = explode(self::ARRAY_OPTIONS_IMPLODE_CHAR, $optionValue);
             }
         } else {
             $this->options[$optionName] = $optionValue;
