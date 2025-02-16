@@ -68,7 +68,8 @@ class OptionUtility
     {
         if (!in_array($optionName, self::AVAILABLE_OPTIONS, true)) {
             throw new GracefulShutdownException(
-                "Option $optionName is not available for '--options='. \nAvailable options are: " . implode(', ', self::AVAILABLE_OPTIONS),
+                "Option $optionName is not available for '--options='. \nAvailable options are: "
+                . implode(', ', self::AVAILABLE_OPTIONS),
                 1458937128562
             );
         }
