@@ -14,7 +14,9 @@ task('db:decompress', function () {
     $optionUtility = new OptionUtility(input()->getOption('options'));
     $dumpCode = $optionUtility->getOption('dumpcode', true);
     if (get('is_argument_host_the_same_as_local_host')) {
-        $decompressedDumpFile = (new DatabaseUtility())->getLastDumpFile(get('db_storage_path_local'), [], ['sql']);
+        $decompressedDumpFile = (new DatabaseUtility())->getDumpFile(
+            get('db_storage_path_local'), ['dumpcode' => $dumpCode], ['sql']
+        );
         if ($decompressedDumpFile !== null) {
             writeln(
                 'The .sql file with the given dumpCode already exists, skipping decompression.',
