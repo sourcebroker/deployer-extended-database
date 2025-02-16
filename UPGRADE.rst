@@ -2,9 +2,13 @@
 Upgrades
 --------
 
-Deployer 6 -> 7
+1) **17.0.0 -> 18.0.0**
 
-1) If you were modifying ``db_databases`` on host level with ``array_merge_recursive`` and in ``db_databases`` there
+   Change definitions of local host from ``host("local")`` to ``localhost("local")``.
+
+2) **Deployer 6 -> 7**
+
+   If you were modifying ``db_databases`` on host level with ``array_merge_recursive`` and in ``db_databases`` there
    were some closures then since Deployer 7 this will no longer work. You can get the same result when using
    ``db_databases_overwrite``.  You can also use ``db_databases_overwrite_global`` to overwrite with similar way on
    global level.

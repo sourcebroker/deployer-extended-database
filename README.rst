@@ -15,7 +15,7 @@ What does it do?
 ----------------
 
 The package provides additional tasks for deployer (deployer.org) for synchronizing databases between instances.
-Most useful are two tasks:
+Most useful are tasks:
 
 1. task "`db:pull`_ [source-instance]" task which allows you to pull database from remote instance to local instance,
 
@@ -62,7 +62,7 @@ Installation
    The INSTANCE must correspond to ``host()`` name. You need to put the .env file with proper INSTANCE name and
    database access data on on each of you instances.
 
-5) Define "local" host and set the "db_databases" for it. Use following code:
+5) Define "local" localhost and set the "db_databases" for it. Use following code:
    ::
 
       (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
@@ -70,7 +70,7 @@ Installation
    which will read database data from .env file.
    ::
 
-      host('local')
+      localhost('local')
           ->set('deploy_path', getcwd())
           ->set('db_databases', [
               'database_default' => [
@@ -241,7 +241,7 @@ deploy.php file:
             ]
          );
 
-   host('local')
+   localhost('local')
          ->set('deploy_path', getcwd())
          ->set('db_databases',
             [
@@ -274,7 +274,7 @@ deploy.php file:
        ->setRemoteUser('deploy')
        ->set('deploy_path', '/var/www/myapplication/');
 
-   host('local')
+   localhost('local')
       ->set('deploy_path', getcwd());
 
 
@@ -316,7 +316,7 @@ deploy.php file:
        ->setRemoteUser('deploy')
        ->set('deploy_path', '/var/www/myapplication/');
 
-   host('local')
+   localhost('local')
       ->set('deploy_path', getcwd());
 
 The .env file should look then like:
@@ -390,7 +390,7 @@ deploy.php file:
        ->setRemoteUser('deploy')
        ->set('deploy_path', '/var/www/myapplication/');
 
-   host('local')
+   localhost('local')
       ->set('deploy_path', getcwd());
 
 
