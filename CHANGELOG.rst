@@ -2,6 +2,11 @@
 Changelog
 ---------
 
+18.0.1
+------
+
+1) [BUGFIX] PHP 7.4 compatibility fixes.
+
 18.0.0
 ------
 

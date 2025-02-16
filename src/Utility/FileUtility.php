@@ -28,7 +28,7 @@ class FileUtility
 
     public function resolveHomeDirectory(string $path): string
     {
-        if (str_starts_with($path, '~')) {
+        if ($path[0] === '~') {
             $path = run('echo ${HOME:-${USERPROFILE}}' . escapeshellarg(substr($path, 1)));
         }
         return $path;
@@ -36,13 +36,16 @@ class FileUtility
 
     public function resolveHomeDirectoryLocal(string $path): string
     {
-        if (str_starts_with($path, '~')) {
+        if ($path[0] === '~') {
             $path = runLocally('echo ${HOME:-${USERPROFILE}}' . escapeshellarg(substr($path, 1)));
         }
         return $path;
     }
 
-    public function getDumpFilenamePart(string $filename, string $part): mixed
+    /**
+     * @return \DateTime|false|string|string[]|null
+     */
+    public function getDumpFilenamePart(string $filename, string $part)
     {
         $filename = basename($filename);
         if ($part === 'dateTime' || $part === 'dateTimeRaw') {
