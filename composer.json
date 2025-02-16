@@ -16,7 +16,6 @@
   ],
   "require": {
     "deployer/deployer": "^7.0.0",
-    "symfony/dotenv": "^3.3 || ^4 || ^5 || ^6",
     "sourcebroker/deployer-instance": "^6.0.0 || dev-master",
     "sourcebroker/deployer-loader": "^4.0.0 || dev-master"
   },
