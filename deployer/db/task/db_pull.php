@@ -4,6 +4,8 @@ namespace Deployer;
 
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
 use Deployer\Exception\GracefulShutdownException;
+use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
+use SourceBroker\DeployerExtendedDatabase\Utility\FileUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\OptionUtility;
 
 /*
@@ -43,20 +45,48 @@ task('db:pull', function () {
     $consoleUtility = new ConsoleUtility();
     $verbosity = $consoleUtility->getVerbosityAsParameter();
     $optionUtility = new OptionUtility(input()->getOption('options'));
-    $optionUtility->setOption('dumpcode', $consoleUtility->getDumpCode());
     $optionUtility->setOption('tags', ['pull']);
-    $options = $optionUtility->getOptionsString();
 
-    output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:export ' . $sourceName . ' ' . $options . ' ' . $verbosity)));
-    output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:download ' . $sourceName . ' ' . $options . ' ' . $verbosity)));
-    runLocally($dl . ' db:rmdump ' . $sourceName . ' ' . $options . ' ' . $verbosity);
-    runLocally($dl . ' db:process ' . $local . ' ' . $options . ' ' . $verbosity);
+    $fromStorage = $optionUtility->getOption('fromLocalStorage');
+    if ($fromStorage) {
+        $databaseUtility = new DatabaseUtility();
+        $lastDumpFilename = $databaseUtility->getLastDumpFile(
+            get('db_storage_path_local'), ['server' => get('argument_host')]
+        );
+        if ($lastDumpFilename === null) {
+            output()->writeln($consoleUtility->formattingTaskOutputHeader('No database dumps found for `' . get('argument_host') . '` in local database storage.'));
+            return;
+        }
+        $fileUtility = new FileUtility();
+        $optionUtility->setOption('dumpcode', $fileUtility->getDumpFilenamePart($lastDumpFilename, 'dumpcode'));
+        $optionUtility->removeOption('fromLocalStorage');
+        $options = $optionUtility->getOptionsString();
 
-    // Make backup of local database before import
-    $backupOptions = new OptionUtility();
-    $backupOptions->setOption('dumpcode', $consoleUtility->getDumpCode());
-    $backupOptions->setOption('tags', ['pull', 'import_backup']);
-    runLocally($dl . ' db:backup ' . $local . ' ' . $backupOptions->getOptionsString() . ' ' . $verbosity);
+        $dumpCode = $fileUtility->getDumpFilenamePart($lastDumpFilename, 'dumpcode');
+        $dateTime = $fileUtility->getDumpFilenamePart($lastDumpFilename, 'dateTime');
+        $server = $fileUtility->getDumpFilenamePart($lastDumpFilename, 'server');
+
+        output()->writeln($consoleUtility->formattingTaskOutputHeader('Last dump found:'));
+        output()->writeln($consoleUtility->formattingTaskOutputContent('- dumpcode: ' . $dumpCode));
+        output()->writeln($consoleUtility->formattingTaskOutputContent('- date: ' . $dateTime->format('Y-m-d H:i:s')));
+        output()->writeln($consoleUtility->formattingTaskOutputContent('- from host: ' . $server));
+
+        runLocally($dl . ' db:decompress ' . $local . ' ' . $options . ' ' . $verbosity);
+    } else {
+        $optionUtility->setOption('dumpcode', $consoleUtility->getDumpCode());
+        $options = $optionUtility->getOptionsString();
+
+        output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:export ' . $sourceName . ' ' . $options . ' ' . $verbosity)));
+        output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:download ' . $sourceName . ' ' . $options . ' ' . $verbosity)));
+        runLocally($dl . ' db:rmdump ' . $sourceName . ' ' . $options . ' ' . $verbosity);
+        runLocally($dl . ' db:process ' . $local . ' ' . $options . ' ' . $verbosity);
+
+        // Make backup of local database before import. No backup if $from Storage=true as it expect to be fast repeatable last downloaded db import.
+        $backupOptions = new OptionUtility();
+        $backupOptions->setOption('dumpcode', $consoleUtility->getDumpCode());
+        $backupOptions->setOption('tags', ['pull', 'import_backup']);
+        runLocally($dl . ' db:backup ' . $local . ' ' . $backupOptions->getOptionsString() . ' ' . $verbosity);
+    }
 
     output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:import ' . $local . ' ' . $options . ' ' . $verbosity)));
     runLocally($dl . ' db:compress ' . $local . ' ' . $options . ' ' . $verbosity);

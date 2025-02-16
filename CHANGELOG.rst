@@ -34,6 +34,7 @@ master
 17) [TASK] Add new OptionUtility for managing "--options". Add new option "tags" that allow to set tags for dump filename.
 18) [TASK] Refactor db:copy, db:pull, db:push. Store copies of dumps that will be imported and store dump of local database
     before import. This will allow to recover when database overwritten by accident. Add tags to dumps.
+19) [TASK][BREAKING] Remove db:import:last task in favour of option for db:pull.
 
 17.0.0
 ~~~~~~

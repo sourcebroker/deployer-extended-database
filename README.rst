@@ -589,7 +589,7 @@ Example output files:
 db:import
 +++++++++
 
-Import database dump files from local instance folder "{{deploy_path}}/.dep/databases/dumps/" to local database(s).
+Import database dump files from local instance folder ``{{deploy_path}}/.dep/databases/dumps/`` to local database(s).
 There is required option ``--options=dumpcode:[value]`` to be passed.
 
 **Example**
@@ -597,23 +597,7 @@ There is required option ``--options=dumpcode:[value]`` to be passed.
 
    dep db:import dev --options=dumpcode:0772a8d396911951022db5ea385535f66
 
-db:import:last
-++++++++++++++
 
-Import last database dump file from local instance folder "{{deploy_path}}/.dep/databases/dumps/" to local database(s).
-Useful to repeat import of database (for example to test upgrade process) without getting it again and again from
-remote instance. Can be used only on instance where you are currently logged.
-
-**Example**
-::
-
-    dep db:import:last local
-
-    # You must be on host live
-    dep db:import:last live
-
-    # With auto confirmation for question "Are you sure you want to import last dump file?"
-    dep db:import:last local -n
 
 db:process
 ++++++++++
@@ -632,23 +616,23 @@ db:pull
 This command allows you to pull database from target instance to local instance.
 In the background it runs several other tasks to accomplish this.
 
-Here is the list of tasks that will be done when you execute "db:pull":
-
-1) First it runs `db:export`_ task on target instance and get the "dumpcode" as return to use it in next commands.
-2) Then it runs `db:download`_ on local instance (with "dumpcode" value from first task).
-3) Then it runs `db:process`_ on local instance (with "dumpcode" value from first task).
-4) Then it runs `db:import`_ on local instance (with "dumpcode" value from first task).
-
 Pull to instance defined in ``instance_live_name`` (default ``live``) is special case.
 If you pull to highest instance then by default you will be asked twice if you really want to.
 You can disable asking by setting ``db_allow_pull_live_force`` to ``true``.
 You can also forbid pull to live instance by setting ``db_allow_pull_live`` to ``false``.
 
+When option ``--options=fromLocalStorage`` is set the it does not export from remote host but use local files from
+``{{deploy_path}}/.dep/databases/dumps/`` folder. Useful to repeat import of database (for example to test upgrade process)
+without getting it again and again from remote host.
+
 **Example**
 ::
 
+   # export from live and import on current host
    dep db:pull live
 
+   # import from database storage of current host
+   dep db:pull live --options=fromLocalStorage
 
 db:push
 +++++++
