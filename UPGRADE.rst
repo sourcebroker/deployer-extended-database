@@ -5,6 +5,20 @@ Upgrades
 1) **17.0.0 -> 18.0.0**
 
    Change definitions of local host from ``host("local")`` to ``localhost("local")``.
+   Add "bin/php" to localhost.
+
+   ::
+
+       OLD
+
+       host('local')
+           ->set('deploy_path', getcwd());
+
+       NEW
+
+       localhost('local')
+           ->set('deploy_path', getcwd())
+           ->set('bin/php', 'php');
 
 2) **Deployer 6 -> 7**
 
@@ -13,7 +27,7 @@ Upgrades
    ``db_databases_overwrite``.  You can also use ``db_databases_overwrite_global`` to overwrite with similar way on
    global level.
 
-::
+   ::
 
     OLD
 
