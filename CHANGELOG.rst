@@ -2,6 +2,12 @@
 Changelog
 ---------
 
+18.0.2
+------
+
+1) [BUGFIX] Fix wrong condition on ``db:backup``. After this fix tags "release" and "release_X" will be automatically added
+   when task ``db:backup`` is run during deploy before ``deploy:symlink``.
+
 18.0.1
 ------
 

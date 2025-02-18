@@ -22,7 +22,7 @@ task('db:backup', function () {
     ];
 
     if (get('is_argument_host_the_same_as_local_host')) {
-        if (testLocally('cd {{deploy_path}} && [ -d .dep/releases ]')) {
+        if (testLocally('[ -d {{release_path}} ]')) {
             $latestRelease = (int)runLocally('cd {{deploy_path}} && cat .dep/latest_release || echo 0');
             $tags = $optionUtility->getOption('tags', false);
             if ($latestRelease > 0) {
