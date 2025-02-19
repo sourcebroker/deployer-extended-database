@@ -7,6 +7,8 @@ Changelog
 
 1) [BUGFIX] The constant GLOB_BRACE is not defined on all systems, like fe Alpine Linux. After this fix GLOB_BRACE
    is no longer used.
+2) [BUGFIX] Fix the condition for checking if release_path exists. It was failing when ``db:backup`` at localhost was
+   invoked because ``release_path`` is not set then. Replace with usage of ``deploy_path`` and hardcoded ``release``.
 
 18.0.2
 ------
