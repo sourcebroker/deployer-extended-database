@@ -103,11 +103,10 @@ class DatabaseUtility
         array $fileTypes = ['sql', 'gz'],
         array $sort = []
     ): array {
-        $fileTypesPattern = implode(',', array_map(static function ($type) {
-            return "*.$type";
-        }, $fileTypes));
-
-        $dumpFiles = glob($localInstanceDatabaseStoragePath . '{' . $fileTypesPattern . '}', GLOB_BRACE);
+        $dumpFiles = [];
+        foreach ($fileTypes as $type) {
+            $dumpFiles = [...$dumpFiles, ...glob($localInstanceDatabaseStoragePath . '*.' . $type)];
+        }
         if ($dumpFiles) {
             $fileUtility = new FileUtility();
 

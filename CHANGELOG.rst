@@ -2,6 +2,12 @@
 Changelog
 ---------
 
+18.0.3
+------
+
+1) [BUGFIX] The constant GLOB_BRACE is not defined on all systems, like fe Alpine Linux. After this fix GLOB_BRACE
+   is no longer used.
+
 18.0.2
 ------
 
