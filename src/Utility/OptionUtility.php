@@ -66,10 +66,10 @@ class OptionUtility
 
     public function setOption(string $optionName, $optionValue): void
     {
-        if (!in_array($optionName, self::AVAILABLE_OPTIONS, true)) {
+        if (!in_array($optionName, self::AVAILABLE_OPTIONS, true) && strpos($optionName, 'tx') !== 0) {
             throw new GracefulShutdownException(
                 "Option $optionName is not available for '--options='. \nAvailable options are: "
-                . implode(', ', self::AVAILABLE_OPTIONS),
+                . implode(', ', self::AVAILABLE_OPTIONS) . "\nOr use 'tx' prefix for custom options (e.g. txMyOption)",
                 1458937128562
             );
         }

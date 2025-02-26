@@ -2,6 +2,11 @@
 Changelog
 ---------
 
+18.1.0
+------
+1) [FEATURE] Allow to add custom options to ``--options=``. If option has prefix ``tx`` is not validated.
+   For example ``--options=txMyOption:myValue``.
+
 18.0.3
 ------
 
