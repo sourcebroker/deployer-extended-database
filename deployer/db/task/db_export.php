@@ -54,22 +54,31 @@ task('db:export', function () {
                 );
                 if (!empty($ignoreTables)) {
                     if (get('db_export_mysqldump_show_ignore_tables_out', true)) {
-                        $ignoredTablesText = '';
-                        $line = '';
-                        $lineLength = 0;
-                        $maxLineLength = get('db_export_mysqldump_show_ignore_tables_out_max_line_length', 120);
+                        $maxLineLength = get('db_export_mysqldump_show_ignore_tables_out_max_line_length', 250);
+
+                        $chunks = [];
+                        $currentLine = '';
+                        $currentLength = 0;
 
                         foreach ($ignoreTables as $table) {
-                            $tableLength = strlen($table) + 3;
-                            if ($lineLength + $tableLength > $maxLineLength) {
-                                $ignoredTablesText .= rtrim($line, ' |') . "\n";
-                                $line = '';
-                                $lineLength = 0;
+                            $tableWithSeparator = $table . ' | ';
+                            $tableLength = strlen($tableWithSeparator);
+
+                            if ($currentLength + $tableLength > $maxLineLength && $currentLength > 0) {
+                                $chunks[] = rtrim($currentLine, ' |');
+                                $currentLine = '';
+                                $currentLength = 0;
                             }
-                            $line .= $table . ' | ';
-                            $lineLength += $tableLength;
+
+                            $currentLine .= $tableWithSeparator;
+                            $currentLength += $tableLength;
                         }
-                        $ignoredTablesText = rtrim($ignoredTablesText);
+
+                        if ($currentLine !== '') {
+                            $chunks[] = rtrim($currentLine, ' |');
+                        }
+
+                        $ignoredTablesText = implode("\n", $chunks);
 
                         output()->writeln($consoleUtility->formattingTaskOutputHeader('Ignored tables:'));
                         output()->write($consoleUtility->formattingTaskOutputContent($ignoredTablesText));

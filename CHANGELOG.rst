@@ -2,6 +2,10 @@
 Changelog
 ---------
 
+18.1.1
+------
+1) [BUGFIX] Last line of ignored tables at db:export task was not shown. This change fix this and also make refactor for this part.
+
 18.1.0
 ------
 1) [FEATURE] Allow to add custom options to ``--options=``. If option has prefix ``tx`` is not validated.
