@@ -35,21 +35,18 @@ Installation
 2) Put following lines in your deploy.php:
    ::
 
-      require_once(__DIR__ . '/vendor/sourcebroker/deployer-loader/autoload.php');
+      require_once(__DIR__ . '/vendor/autoload.php');
       new \SourceBroker\DeployerLoader\Load([
           ['path' => 'vendor/sourcebroker/deployer-instance/deployer'],
           ['path' => 'vendor/sourcebroker/deployer-extended-database/deployer'],
       ]);
 
-   | IMPORTANT NOTE!
-   | Do not put ``require('/vendor/autoload.php')`` inside your deploy.php because you can have dependency problems.
-     Use ``require_once(__DIR__ . '/vendor/sourcebroker/deployer-loader/autoload.php');`` instead as suggested.
 
 4) Create ".env" file in your project root (where you store deploy.php file). The .env file should be out of
    git because you need to store here information about instance name. Additionally put there info about database
    you want to synchronise. You can move the info about database data to other file later but for the tests its better
-   to put it in .env file. Remember to protect .env file from downloading with https request if the root folder
-   is readable from WWW server level.
+   to put it in .env file. Remember to protect .env file from downloading with https request (if the root folder
+   is readable from WWW server level).
    ::
 
       INSTANCE="local"
@@ -72,6 +69,7 @@ Installation
 
       localhost('local')
           ->set('deploy_path', getcwd())
+          ->set('bin/php', 'php')
           ->set('db_databases', [
               'database_default' => [
                   (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
@@ -84,6 +82,7 @@ Installation
       host('live')
           ->setHostname('my-server.example.com')
           ->setRemoteUser('deploy')
+          ->set('bin/php', '/usr/bin/php82')
           ->set('deploy_path', '/var/www/myapplication/')
           ->set('db_databases', [
               'database_default' => [
@@ -231,6 +230,7 @@ deploy.php file:
    host('live')
          ->setHostname('my-server.example.com')
          ->setRemoteUser('deploy')
+         ->set('bin/php', '/usr/bin/php82')
          ->set('deploy_path', '/var/www/myapplication')
          ->set('db_databases',
             [
@@ -243,6 +243,7 @@ deploy.php file:
 
    localhost('local')
          ->set('deploy_path', getcwd())
+         ->set('bin/php', 'php')
          ->set('db_databases',
             [
               'database_foo' => [
@@ -272,9 +273,11 @@ deploy.php file:
    host('live')
        ->setHostname('my-server.example.com')
        ->setRemoteUser('deploy')
+       ->set('bin/php', '/usr/bin/php82')
        ->set('deploy_path', '/var/www/myapplication/');
 
    localhost('local')
+      ->set('bin/php', 'php')
       ->set('deploy_path', getcwd());
 
 
@@ -314,9 +317,11 @@ deploy.php file:
    host('live')
        ->setHostname('my-server.example.com')
        ->setRemoteUser('deploy')
+       ->set('bin/php', '/usr/bin/php82')
        ->set('deploy_path', '/var/www/myapplication/');
 
    localhost('local')
+      ->set('bin/php', 'php')
       ->set('deploy_path', getcwd());
 
 The .env file should look then like:
@@ -388,9 +393,11 @@ deploy.php file:
    host('live')
        ->setHostname('my-server.example.com')
        ->setRemoteUser('deploy')
+       ->set('bin/php', '/usr/bin/php82')
        ->set('deploy_path', '/var/www/myapplication/');
 
    localhost('local')
+      ->set('bin/php', 'php')
       ->set('deploy_path', getcwd());
 
 
@@ -438,11 +445,15 @@ Tasks
 db:backup
 +++++++++
 
-Backup database. In background, on target instance, two tasks are executed 'db:export' and 'db:compress'. Results are
-stored in "{{deploy_path}}/.dep/databases/dumps/".
+Backup database. In background, on target instance, three tasks are executed `db:export`_, `db:compress`_ and `db:dumpclean`_.
+Results are stored in ``{{deploy_path}}/.dep/databases/dumps/``.
 
-If releases folder will be detected then it adds info about release in dumpcode name like in this example:
-``2017-12-04_00:20:22#server=live#dbcode=database_default#dumpcode=backup_for_release_160_ec77cb6bc0e941b0ac92e2109ad7b04e#type=structure.sql.gz``
+If ``release`` folder will be detected on ``deploy_path`` (means we are in process of deploy) then it adds two tags to dump name:
+``release`` and ``release_[number]`` like in example below:
+``2025-03-01_23-36-25#server=local#dbcode=database_default#dumpcode=e8cd33191dffe1642d3e9fb6bf99090f#tags=release+release_91#type=structure.sql.gz``
+
+You can add you own tags with ``--options=tags:tag1+tag2``. Example:
+``2025-03-01_23-36-25#server=local#dbcode=database_default#dumpcode=e8cd33191dffe1642d3e9fb6bf99090f#tags=tag1+tag2#type=structure.sql.gz``
 
 **Example**
 ::
@@ -450,14 +461,15 @@ If releases folder will be detected then it adds info about release in dumpcode 
    dep db:backup local
    dep db:backup live
    dep db:backup live --options=dumpcode:mycode
+   dep db:backup live --options=dumpcode:mycode,tags:tag1+tag2
 
 db:compress
 +++++++++++
 
-Compress dumps with given dumpcode stored in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
+Compress dumps with given dumpcode stored in folder ``{{deploy_path}}/.dep/databases/dumps/``"`` on target instance.
 There is required option ``--options=dumpcode:[value]`` to be passed.
 
-Look for config vars 'db_compress_suffix', 'db_compress_command', 'db_uncompress_command' for possible ways to overwrite
+Look for config vars ``db_compress_suffix``, ``db_compress_command``, ``db_uncompress_command`` for possible ways to overwrite
 standard gzip compression with your own.
 
 **Example**
@@ -476,6 +488,7 @@ This command allows you to copy database between instances.
 
 In the background it runs several other tasks to accomplish this. Lets assume we want to copy database from live
 to dev instance. We will run following command on you local instance:
+
 ::
 
    dep db:copy live --options=target:dev
@@ -488,20 +501,24 @@ In below description:
    * local instance = local
 
 1) First it runs ``dep db:export live --options=dumpcode:123456`` task on source instance. The dumps from export task are stored
-   in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
+   in folder ``{{deploy_path}}/.dep/databases/dumps/`` on target instance.
 
 2) Then it runs ``db:download live --options=dumpcode:123456`` on local instance to download dump files from live instance from
-   folder "{{deploy_path}}/.dep/databases/dumps/" to local instance to folder "{{deploy_path}}/.dep/databases/dumps/".
+   folder ``{{deploy_path}}/.dep/databases/dumps/`` to local instance to folder ``{{deploy_path}}/.dep/databases/dumps/``. The dump at
+   source instance is deleted at this point because already downloaded.
 
 3) Then it runs ``db:process local --options=dumpcode:123456`` on local instance to make some operations directly on SQL dumps files.
 
-4) Then it runs ``db:upload dev --options=dumpcode:123456`` on local instance. This task takes dump files with code:123456
-   and send it to dev instance and store it in folder "{{deploy_path}}/.dep/databases/dumps/".
+4) Then it runs ``db:upload dev --options=dumpcode:123456`` on local instance. This task takes dump files with ``code:123456``
+   and send it to dev instance and store it in folder ``{{deploy_path}}/.dep/databases/dumps/``. The dump at
+   local instance is deleted at this point because already uploaded to target instance.
 
-5) Finally it runs ``db:import dev --options=dumpcode:123456`` on target instance. This task reads dumps with code:123456 from folder
-   "{{deploy_path}}/.dep/databases/dumps/" on dev instance and import it to database.
+5) Then it make backup of target database before importing the dump.
 
-6) At the very end it removes dumps it just imported in step 5 with command ``db:rmdump dev --options=dumpcode:123456``
+6) Finally it runs ``db:import dev --options=dumpcode:123456`` on target instance. This task reads dumps with ``code:123456`` from folder
+   ``{{deploy_path}}/.dep/databases/dumps/`` on dev instance and import it to database.
+
+7) At the very end it runs `db:dumpclean`_ to clean up old dumps on target instance.
 
 Copy to instance defined in ``instance_live_name`` (default ``live``) is special case.
 If you copy to highest instance then by default you will be asked twice if you really want to.
@@ -511,10 +528,10 @@ You can also forbid copy to live instance by setting ``db_allow_copy_live`` to `
 db:decompress
 +++++++++++++
 
-Decompress dumps with given dumpcode stored in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
+Decompress dumps with given dumpcode stored in folder ``{{deploy_path}}/.dep/databases/dumps/`` on target instance.
 There is required option ``--options=dumpcode:[value]`` to be passed.
 
-Look for config vars 'db_compress_suffix', 'db_compress_command', 'db_uncompress_command' for possible ways to overwrite
+Look for config vars ``db_compress_suffix``, ``db_compress_command``, ``db_uncompress_command`` for possible ways to overwrite
 standard gzip compression with your own.
 
 **Example**
@@ -525,8 +542,8 @@ standard gzip compression with your own.
 db:download
 +++++++++++
 
-Download database dumps with selected dumpcode from folder "{{deploy_path}}/.dep/databases/dumps/" on target instance
-and store it in folder "{{deploy_path}}/.dep/databases/dumps/" on local instance.
+Download database dumps with selected dumpcode from folder ``{{deploy_path}}/.dep/databases/dumps/`` on target instance
+and store it in folder ``{{deploy_path}}/.dep/databases/dumps/`` on local instance.
 There is required option ``--options=dumpcode:[value]`` to be passed.
 
 **Example**
@@ -556,41 +573,29 @@ values and also change the values depending on instance.
 db:export
 +++++++++
 
-Dump database to folder on local instance located by default in "{{deploy_path}}/.dep/databases/dumps/".
+Dump database to folder on local instance located by default in ``{{deploy_path}}/.dep/databases/dumps/``.
 Dumps will be stored in two separate files. One with tables structure. The second with data only.
-There is option ``--options=dumpcode:[value]`` that can be passed. If there is no dumpcode then its created and returned as
-json structure.
+There is required option ``--options=dumpcode:[value]`` to be passed.
 
 **Example**
 
 Example task call:
 ::
 
-   dep db:export live
+   dep db:export live --options=dumpcode:362d7ca0ff065f489c9b79d0a73720f5
 
 Example output files located in folder {{deploy_path}}/.dep/databases/dumps/:
 ::
 
-   2017-02-26_14:56:08#server=live#dbcode=database_default#type=data#dumpcode=362d7ca0ff065f489c9b79d0a73720f5.sql
-   2017-02-26_14:56:08#server=live#dbcode=database_default#type=structure#dumpcode=362d7ca0ff065f489c9b79d0a73720f5.sql
+   2025-02-26_14:56:08#server=live#dbcode=database_default#type=data#dumpcode=362d7ca0ff065f489c9b79d0a73720f5.sql
+   2025-02-26_14:56:08#server=live#dbcode=database_default#type=structure#dumpcode=362d7ca0ff065f489c9b79d0a73720f5.sql
 
-
-Example task call with own dumpcode=
-::
-
-   dep db:export live --options=dumpcode:mycode
-
-Example output files:
-::
-
-   2017-02-26_14:56:08#server=live#dbcode=database_default#type=data#dumpcode=mycode.sql
-   2017-02-26_14:56:08#server=live#dbcode=database_default#type=structure#dumpcode=mycode.sql
 
 db:import
 +++++++++
 
-Import database dump files from local instance folder ``{{deploy_path}}/.dep/databases/dumps/`` to local database(s).
-There is required option ``--options=dumpcode:[value]`` to be passed.
+Import database dump files to target database(s). Files are taken from folder ``{{deploy_path}}/.dep/databases/dumps/``
+on target instance. There is required option ``--options=dumpcode:[value]`` to be passed.
 
 **Example**
 ::
@@ -608,7 +613,7 @@ directly on sql file before importing. There is required option ``--options=dump
 **Example**
 ::
 
-   dep db:process dev --options=dumpcode:0772a8d396911951022db5ea385535f66
+   dep db:process local --options=dumpcode:0772a8d396911951022db5ea385535f66
 
 db:pull
 +++++++
@@ -642,10 +647,11 @@ In the background it runs several other tasks to accomplish this.
 
 Here is the list of tasks that will be done when you execute "db:push":
 
-1) First it runs `db:export`_ task on local instance and get the "dumpcode" as return to use it in next commands.
-2) Then it runs `db:upload`_ on local instance with remote as argument (with "dumpcode" value from first task).
-3) Then it runs `db:process`_ on remote instance (with "dumpcode" value from first task).
-4) Then it runs `db:import`_ on remote instance (with "dumpcode" value from first task).
+1) First it runs `db:export`_ task on local instance.
+2) Then it runs `db:upload`_ on local instance with remote as argument.
+3) Then it runs `db:process`_ on remote instance.
+4) Then it runs `db:backup`_ on remote instance to make backup before import.
+5) Then it runs `db:import`_ on remote instance.
 
 Push to instance defined in ``instance_live_name`` (default ``live``) is special case.
 If you push to highest instance then by default you will be asked twice if you really want to.
@@ -688,8 +694,8 @@ Truncate live instance databases tables.
 db:upload
 +++++++++
 
-Upload database dumps with selected dumpcode from folder "{{deploy_path}}/.dep/databases/dumps/" on local instance and
-store it in folder "{{deploy_path}}/.dep/databases/dumps/" on target instance.
+Upload database dumps with selected dumpcode from folder ``{{deploy_path}}/.dep/databases/dumps/`` on local instance and
+store it in folder ``{{deploy_path}}/.dep/databases/dumps/`` on target instance.
 There is required option ``--options=dumpcode:[value]`` to be passed.
 
 **Example**
