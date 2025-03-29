@@ -53,8 +53,8 @@ task('db:export', function () {
                     $databaseUtility->getTables($databaseConfig)
                 );
                 if (!empty($ignoreTables)) {
-                    if (get('db_export_mysqldump_show_ignore_tables_out', true)) {
-                        $maxLineLength = get('db_export_mysqldump_show_ignore_tables_out_max_line_length', 250);
+                    if (get('db_export_mysqldump_show_ignore_tables_out_info_enable', true)) {
+                        $maxLineLength = get('db_export_mysqldump_show_ignore_tables_out_max_line_length', 120);
 
                         $chunks = [];
                         $currentLine = '';
