@@ -86,7 +86,7 @@ task('db:copy', function () {
     runLocally($dl . ' db:backup ' . $targetInstanceName . ' ' . $backupOptions->getOptionsString() . ' ' . $verbosity);
 
     $importOutput = runLocally($dl . ' db:import ' . $targetInstanceName . ' ' . $options . ' ' . $verbosity);
-    output()->writeln($consoleUtility->formattingSubtaskTree(str_replace("task db:import\n", '', $importOutput)));
+    output()->writeln($consoleUtility->formattingSubtaskTree(preg_replace('/^task db:export\n?/', '', $importOutput)));
     runLocally($dl . ' db:compress ' . $targetInstanceName . ' ' . $options . ' ' . $verbosity);
     runLocally($dl . ' db:dumpclean ' . $targetInstanceName . ' ' . $verbosity);
 

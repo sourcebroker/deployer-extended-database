@@ -192,6 +192,6 @@ task('db:import', function () {
 
         $output = run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:import '
             . implode(' ', $params));
-        output()->write(str_replace("task db:import\n", '', $output));
+        output()->write(preg_replace('/^task db:import\n?/', '', $output));
     }
 })->desc('Import dump with given dumpcode from database dumps storage to database');

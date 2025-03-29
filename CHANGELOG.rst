@@ -11,6 +11,8 @@ master
     php version. If php version is found the binary will be searched first for X.Y (like 8.4) and then for XY (84).
     Finally if `php_version` or `composer.json` do not give answer about php version it will fallback just to search `php` binary.
 
+2) [BUGFIX] Fix some edge cases for replacing the task names in nested outputs.
+
 18.2.0
 ------
 

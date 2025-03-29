@@ -54,7 +54,7 @@ task('db:push', function () {
     runLocally($dl . ' db:backup ' . $targetName . ' ' . $backupOptions->getOptionsString() . ' ' . $verbosity);
 
     $importOutput = runLocally($dl . ' db:import ' . $targetName . ' ' . $options . ' ' . $verbosity);
-    output()->writeln($consoleUtility->formattingSubtaskTree(str_replace("task db:import\n", '', $importOutput)));
+    output()->writeln($consoleUtility->formattingSubtaskTree(preg_replace('/^task db:export\n?/', '', $importOutput)));
     runLocally($dl . ' db:compress ' . $targetName . ' ' . $options . ' ' . $verbosity);
     runLocally($dl . ' db:dumpclean ' . $targetName . ' ' . $verbosity);
 

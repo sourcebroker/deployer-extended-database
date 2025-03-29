@@ -132,6 +132,6 @@ task('db:export', function () {
         ];
         $output = run('cd {{release_or_current_path}} && {{bin/php}} {{bin/deployer}} db:export '
             . implode(' ', $params));
-        output()->write(str_replace("task db:export\n", '', $output));
+        output()->write(preg_replace('/^task db:export\n?/', '', $output));
     }
 })->desc('Dump database and store it in database dumps storage');
