@@ -2,6 +2,15 @@
 Changelog
 ---------
 
+master
+------
+
+1) [BUGFIX] Fix using `bin/php` for local context. Deployer `bin/php`, when not a explicitly set as string, is using `which()`
+    function, that is using `run()` in background, which is trying to make connection to local ssh. This fix uses `local/bin/php`
+    instead which will check locally: first `php_version` setting of host, then if not found it will check `composer.json` for the
+    php version. If php version is found the binary will be searched first for X.Y (like 8.4) and then for XY (84).
+    Finally if `php_version` or `composer.json` do not give answer about php version it will fallback just to search `php` binary.
+
 18.2.0
 ------
 

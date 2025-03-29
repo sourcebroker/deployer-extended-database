@@ -63,7 +63,7 @@ task('db:copy', function () {
 
     $verbosity = $consoleUtility->getVerbosityAsParameter();
     $sourceInstance = get('argument_host');
-    $dl = host(get('local_host'))->get('bin/php') . ' ' . get('local/bin/deployer');
+    $dl = get('local/bin/php') . ' ' . get('local/bin/deployer');
     $optionUtility->setOption('dumpcode', $consoleUtility->getDumpCode());
     $optionUtility->setOption('tags', ['copy']);
     $options = $optionUtility->getOptionsString();

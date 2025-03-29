@@ -32,7 +32,7 @@ task('db:backup', function () {
             }
         }
         $params['options'] = $optionUtility->getOptionsString();
-        $dl = host(get('local_host'))->get('bin/php') . ' ' . get('local/bin/deployer');
+        $dl = get('local/bin/php') . ' ' . get('local/bin/deployer');
         runLocally($dl . ' db:export ' . implode(' ', $params));
         runLocally($dl . ' db:compress  ' . implode(' ', $params));
         runLocally($dl . ' db:dumpclean ' . implode(' ', $params));

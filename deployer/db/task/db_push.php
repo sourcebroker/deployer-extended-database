@@ -35,7 +35,7 @@ task('db:push', function () {
         }
     }
     $local = get('local_host');
-    $dl = host(get('local_host'))->get('bin/php') . ' ' . get('local/bin/deployer');
+    $dl = get('local/bin/php') . ' ' . get('local/bin/deployer');
     $consoleUtility = new ConsoleUtility();
     $optionUtility = new OptionUtility(input()->getOption('options'));
     $optionUtility->setOption('dumpcode', $consoleUtility->getDumpCode());
