@@ -66,11 +66,12 @@ task('db:pull', function () {
         $dateTime = $fileUtility->getDumpFilenamePart($lastDumpFilename, 'dateTime');
         $server = $fileUtility->getDumpFilenamePart($lastDumpFilename, 'server');
 
-        output()->writeln($consoleUtility->formattingTaskOutputHeader('Last dump found:'));
-        output()->writeln($consoleUtility->formattingTaskOutputContent('- dumpcode: ' . $dumpCode));
-        output()->writeln($consoleUtility->formattingTaskOutputContent('- date: ' . $dateTime->format('Y-m-d H:i:s')));
-        output()->writeln($consoleUtility->formattingTaskOutputContent('- from host: ' . $server));
-
+        if (get('db_pull_from_local_storage_info_enable', true)) {
+            output()->writeln($consoleUtility->formattingTaskOutputHeader('Last dump found:'));
+            output()->writeln($consoleUtility->formattingTaskOutputContent('- dumpcode: ' . $dumpCode));
+            output()->writeln($consoleUtility->formattingTaskOutputContent('- date: ' . $dateTime->format('Y-m-d H:i:s')));
+            output()->writeln($consoleUtility->formattingTaskOutputContent('- from host: ' . $server));
+        }
         runLocally($dl . ' db:decompress ' . $local . ' ' . $options . ' ' . $verbosity);
     } else {
         $optionUtility->setOption('dumpcode', $consoleUtility->getDumpCode());

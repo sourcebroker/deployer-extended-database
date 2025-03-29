@@ -16,6 +16,9 @@ master
 3) [BUGFIX] Remove using "stat" as db:download and db:upload commands because not available on some systems. Use filesize()
    from php as command is run locally, use glob() instead of "ls" as for the same reason. Fix the files size calculation.
 
+4) [FEATURE] Add options to disable task infos: db_download_info_enable, db_upload_info_enable,
+   db_import_big_table_info_enable, db_pull_from_local_storage_info_enable. By default, they all are enabled.
+
 18.2.0
 ------
 

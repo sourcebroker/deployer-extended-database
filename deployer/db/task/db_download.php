@@ -24,16 +24,18 @@ task('db:download', function () {
         escapeshellarg($localPath)
     ));
 
-    $filePathPattern = $localPath . '/*dumpcode=' . $dumpCode . '*';
-    $files = glob($filePathPattern);
-    if (!empty($files)) {
-        $totalSizeBytes = 0;
-        foreach ($files as $filePath) {
-            $totalSizeBytes += filesize($filePath);
+    if (get('db_download_info_enable', true)) {
+        $filePathPattern = $localPath . '/*dumpcode=' . $dumpCode . '*';
+        $files = glob($filePathPattern);
+        if (!empty($files)) {
+            $totalSizeBytes = 0;
+            foreach ($files as $filePath) {
+                $totalSizeBytes += filesize($filePath);
+            }
+            $totalSizeMB = number_format($totalSizeBytes / (1024 * 1024), 2);
+            output()->write($consoleUtility->formattingTaskOutputHeader("Transferred files size: "));
+            output()->write($consoleUtility->formattingTaskOutputContent(sprintf("%s MB", $totalSizeMB), false));
         }
-        $totalSizeMB = number_format($totalSizeBytes / (1024 * 1024), 2);
-        output()->write($consoleUtility->formattingTaskOutputHeader("Transferred files size: "));
-        output()->write($consoleUtility->formattingTaskOutputContent(sprintf("%s MB", $totalSizeMB), false));
     }
 
 })->desc('Download the database dumps with given dumpcode from remote to local database dumps storage');

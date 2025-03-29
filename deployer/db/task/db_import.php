@@ -146,9 +146,10 @@ task('db:import', function () {
                     }
                 }
 
-                $databaseUtility = new DatabaseUtility();
-                $bigTableSizeThreshold = get('db_import_big_table_size_threshold', 50);
-                $bigTables = $databaseUtility->getBigTables($databaseConfig, $bigTableSizeThreshold);
+                if (get('db_import_big_table_info_enable', true)) {
+                    $databaseUtility = new DatabaseUtility();
+                    $bigTableSizeThreshold = get('db_import_big_table_size_threshold', 50);
+                    $bigTables = $databaseUtility->getBigTables($databaseConfig, $bigTableSizeThreshold);
 
                 if (!empty($bigTables)) {
                     output()->writeln($consoleUtility->formattingTaskOutputHeader('Big tables:'));
@@ -171,7 +172,8 @@ task('db:import', function () {
                     }
                     $bigTablesText .= rtrim($line, ' |');
 
-                    output()->write($consoleUtility->formattingTaskOutputContent($bigTablesText));
+                        output()->write($consoleUtility->formattingTaskOutputContent($bigTablesText));
+                    }
                 }
 
             } catch (\Exception $exception) {
