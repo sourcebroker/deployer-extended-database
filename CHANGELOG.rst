@@ -13,6 +13,9 @@ master
 
 2) [BUGFIX] Fix some edge cases for replacing the task names in nested outputs.
 
+3) [BUGFIX] Remove using "stat" as db:download and db:upload commands because not available on some systems. Use filesize()
+   from php as command is run locally, use glob() instead of "ls" as for the same reason. Fix the files size calculation.
+
 18.2.0
 ------
 

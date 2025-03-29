@@ -24,15 +24,16 @@ task('db:upload', function () {
         escapeshellarg($rsyncUtility->getHostWithDbStoragePath(get('argument_host')))
     ));
 
-    $filePathPattern = get('db_storage_path') . '/*dumpcode=' . $dumpCode . '*';
-    $files = run('ls ' . $filePathPattern);
-    $files = explode("\n", trim($files));
+    $filePathPattern = $localPath . '/*dumpcode=' . $dumpCode . '*';
+    $files = glob($filePathPattern);
     if (!empty($files)) {
-        $filePath = $files[0];
-        $fileSizeBytes = run('stat -c%s ' . escapeshellarg($filePath));
-        $fileSizeMB = number_format($fileSizeBytes / (1024 * 1024), 2);
-        output()->write($consoleUtility->formattingTaskOutputHeader("Sql file size: "));
-        output()->write($consoleUtility->formattingTaskOutputContent(sprintf("%s MB", $fileSizeMB), false));
+        $totalSizeBytes = 0;
+        foreach ($files as $filePath) {
+            $totalSizeBytes += filesize($filePath);
+        }
+        $totalSizeMB = number_format($totalSizeBytes / (1024 * 1024), 2);
+        output()->write($consoleUtility->formattingTaskOutputHeader("Transferred files size: "));
+        output()->write($consoleUtility->formattingTaskOutputContent(sprintf("%s MB", $totalSizeMB), false));
     }
 
 })->desc('Upload the database dump for given dumpcode from local to remote database dumps storage');

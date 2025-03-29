@@ -25,14 +25,15 @@ task('db:download', function () {
     ));
 
     $filePathPattern = $localPath . '/*dumpcode=' . $dumpCode . '*';
-    $files = runLocally('ls ' . $filePathPattern);
-    $files = explode("\n", trim($files));
+    $files = glob($filePathPattern);
     if (!empty($files)) {
-        $filePath = $files[0];
-        $fileSizeBytes = runLocally('stat -c%s ' . escapeshellarg($filePath));
-        $fileSizeMB = number_format($fileSizeBytes / (1024 * 1024), 2);
-        output()->write($consoleUtility->formattingTaskOutputHeader("Sql file size: "));
-        output()->write($consoleUtility->formattingTaskOutputContent(sprintf("%s MB", $fileSizeMB), false));
+        $totalSizeBytes = 0;
+        foreach ($files as $filePath) {
+            $totalSizeBytes += filesize($filePath);
+        }
+        $totalSizeMB = number_format($totalSizeBytes / (1024 * 1024), 2);
+        output()->write($consoleUtility->formattingTaskOutputHeader("Transferred files size: "));
+        output()->write($consoleUtility->formattingTaskOutputContent(sprintf("%s MB", $totalSizeMB), false));
     }
 
 })->desc('Download the database dumps with given dumpcode from remote to local database dumps storage');
