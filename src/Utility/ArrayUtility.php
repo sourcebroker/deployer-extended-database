@@ -2,15 +2,9 @@
 
 namespace SourceBroker\DeployerExtendedDatabase\Utility;
 
-/**
- * Class ArrayUtility
- * @package SourceBroker\DeployerExtendedDatabase\Utility
- */
 class ArrayUtility
 {
     /**
-     * @param array $array1
-     * @param array $array2
      * @return array|mixed
      */
     public function arrayMergeRecursiveDistinct(array &$array1, array &$array2)
@@ -50,10 +44,6 @@ class ArrayUtility
      * Filter $haystack array items with items from array $patterns.
      * Example usage:
      * filterWithRegexp(['cf_.*', 'bcd'], ['abc', 'cf_test1', 'bcd' ,'cf_test2', 'cde']) will return ['cf_test1', 'bcd', 'cf_test2']
-     *
-     * @param array $patterns
-     * @param array $haystack
-     * @return array
      */
     public function filterWithRegexp(array $patterns, array $haystack): array
     {

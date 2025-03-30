@@ -5,20 +5,8 @@ namespace SourceBroker\DeployerExtendedDatabase\Driver;
 use RuntimeException;
 use SourceBroker\DeployerInstance\Env;
 
-/**
- * Configuration reader for database data stored in .env file.
- *
- * Class EnvDriver
- * @package SourceBroker\DeployerExtendedDatabase\Driver
- */
 class EnvDriver
 {
-    /**
-     * @param string|null $prefix
-     * @param string|null $absolutePath
-     * @return array
-     * @throws \Exception
-     */
     public function getDatabaseConfig(string $prefix = null, string $absolutePath = null): array
     {
         $envFilePath = rtrim($absolutePath ?? getcwd(), DIRECTORY_SEPARATOR) . '/.env';
