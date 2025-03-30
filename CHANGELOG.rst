@@ -2,27 +2,28 @@
 Changelog
 ---------
 
-master
+19.0.0
 ------
 
-1) [BUGFIX][POSSIBLE BREAKING] Fix using `bin/php` for local context. Deployer `bin/php`, when not a explicitly set as string, is using `which()`
-    function, that is using `run()` in background, which is trying to make connection to local ssh. This fix uses `local/bin/php`
-    instead which will check locally: first `php_version` setting of host, then if not found it will check `composer.json` for the
-    php version. If php version is found the binary will be searched first for X.Y (like 8.4) and then for XY (84).
-    Finally if `php_version` or `composer.json` do not give answer about php version it will fallback just to search `php` binary.
+1) [BUGFIX] Fix wrong use of ``bin/php`` for local context. Deployer ``bin/php``, when not a explicitly set as string,
+   is using ``which()`` function, that is using ``run()`` in background, which is trying to make connection to local ssh.
+   This fix uses ``local/bin/php`` instead which will check locally: first ``php_version`` setting of host, then if not
+   found it will check ``composer.json`` for the php version. If php version is found, then the binary will be searched first
+   for X.Y (like 8.4) and then for XY (84). Finally if ``php_version`` or ``composer.json`` do not give answer about
+   php version it will fallback just to search ``php`` binary.
 
 2) [BUGFIX] Fix some edge cases for replacing the task names in nested outputs.
 
-3) [BUGFIX] Remove using "stat" as db:download and db:upload commands because not available on some systems. Use filesize()
-   from php as command is run locally, use glob() instead of "ls" as for the same reason. Fix the files size calculation.
+3) [BUGFIX] Remove using "stat" command in ``db:download`` and ``db:upload`` commands because not available on some systems. Use ``filesize()``
+   from php as command is run locally, use ``glob()`` instead of ``ls`` as for the same reason. Fix the files size calculation.
 
-4) [FEATURE] Add options to disable task infos: db_download_info_enable, db_upload_info_enable,
-   db_import_big_table_info_enable, db_pull_from_local_storage_info_enable. By default, they all are enabled.
+4) [FEATURE] Add options to disable task infos: ``db_download_info_enable``, ``db_upload_info_enable``,
+   ``db_import_big_table_info_enable``, ``db_pull_from_local_storage_info_enable``. By default, they all are enabled.
 
-5) [BUGFIX][BREAKING] Fix wrong name of option in db:import task. It was "db_import_show_ignore_tables_output_max_line_length"
-   but should be "db_import_big_table_output_max_line_length". Rename option "db_export_mysqldump_show_ignore_tables_out"
-   to "db_export_mysqldump_show_ignore_tables_out_info_enable" in db:export. Set default value of
-   'db_export_mysqldump_show_ignore_tables_out_max_line_length' from 250 to 120.
+5) [BUGFIX][BREAKING] Fix wrong name of option in db:import task. It was ``db_import_show_ignore_tables_output_max_line_length``
+   but should be ``db_import_big_table_output_max_line_length``. Rename option ``db_export_mysqldump_show_ignore_tables_out``
+   to ``db_export_mysqldump_show_ignore_tables_out_info_enable`` in db:export. Change default value of
+   ``db_export_mysqldump_show_ignore_tables_out_max_line_length`` from 250 to 120.
 
 6) [TASK] Add ``localhost('local')`` by default.
 
