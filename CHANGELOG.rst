@@ -24,6 +24,7 @@ master
    to "db_export_mysqldump_show_ignore_tables_out_info_enable" in db:export. Set default value of
    'db_export_mysqldump_show_ignore_tables_out_max_line_length' from 250 to 120.
 
+6) [TASK] Add ``localhost('local')`` by default.
 
 18.2.0
 ------
