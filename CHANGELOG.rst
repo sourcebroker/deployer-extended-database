@@ -2,6 +2,12 @@
 Changelog
 ---------
 
+20.0.0
+------
+
+1) [TASK][BREAKING] Use new version of ``sourcebroker/deployer-instance``. This version has fallback when no .env (or .env.local)
+   file exists. It will take the system variables then. This should not break anything, but anyway a major version just to be sure.
+
 19.0.0
 ------
 
