@@ -63,11 +63,11 @@ task('db:copy', function () {
 
     $verbosity = $consoleUtility->getVerbosityAsParameter();
     $sourceInstance = get('argument_host');
-    $dl = get('local/bin/php') . ' ' . get('local/bin/deployer');
+    $local = get('local_host');
+    $dl = host($local)->get('local/bin/php') . ' ' . get('local/bin/deployer');
     $optionUtility->setOption('dumpcode', $consoleUtility->getDumpCode());
     $optionUtility->setOption('tags', ['copy']);
     $options = $optionUtility->getOptionsString();
-    $local = get('local_host');
     if (get('is_argument_host_the_same_as_local_host')) {
         output()->writeln($consoleUtility->formattingSubtaskTree(runLocally($dl . ' db:export ' . $local . ' ' . $options . ' ' . $verbosity)));
     } else {

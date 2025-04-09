@@ -41,7 +41,7 @@ task('db:pull', function () {
         }
     }
     $local = get('local_host');
-    $dl = get('local/bin/php') . ' ' . get('local/bin/deployer');
+    $dl = host($local)->get('local/bin/php') . ' ' . get('local/bin/deployer');
     $consoleUtility = new ConsoleUtility();
     $verbosity = $consoleUtility->getVerbosityAsParameter();
     $optionUtility = new OptionUtility(input()->getOption('options'));
