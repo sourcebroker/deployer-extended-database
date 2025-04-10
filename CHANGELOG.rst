@@ -2,6 +2,11 @@
 Changelog
 ---------
 
+20.0.1
+------
+
+1) [BUGFIX] Fix the way the ``local/bin/php`` is determined.
+
 20.0.0
 ------
 
