@@ -6,6 +6,7 @@ use Deployer\Exception\GracefulShutdownException;
 use SourceBroker\DeployerExtendedDatabase\Utility\ArrayUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\DatabaseUtility;
 use SourceBroker\DeployerExtendedDatabase\Utility\ConsoleUtility;
+use SourceBroker\DeployerExtendedDatabase\Utility\OptionUtility;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /*
@@ -14,8 +15,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 task('db:truncate', function () {
     $arrayUtility = new ArrayUtility();
     $databaseUtility = new DatabaseUtility();
+    $optionUtility = new OptionUtility(input()->getOption('options'));
+
     if (get('is_argument_host_the_same_as_local_host')) {
-        foreach (get('db_databases_merged') as $databaseConfig) {
+        foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
+            if ($optionUtility->getOption('dbCodeFilter')) {
+                if (!in_array($databaseCode, $optionUtility->getOption('dbCodeFilter'), true)) {
+                    continue;
+                }
+            }
+
             if (isset($databaseConfig['truncate_tables']) && is_array($databaseConfig['truncate_tables'])) {
                 $truncateTables = $arrayUtility->filterWithRegexp(
                     $databaseConfig['truncate_tables'],

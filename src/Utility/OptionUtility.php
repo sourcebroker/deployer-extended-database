@@ -9,6 +9,7 @@ class OptionUtility
 {
     public const AVAILABLE_OPTIONS = [
         'dumpcode',
+        'dbCodeFilter',
         'tags',
         'target',
         'fromLocalStorage',
@@ -20,6 +21,7 @@ class OptionUtility
 
     public const ARRAY_OPTIONS = [
         'tags',
+        'dbCodeFilter'
     ];
 
     private $options = [];

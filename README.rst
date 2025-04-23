@@ -590,6 +590,10 @@ Example output files located in folder {{deploy_path}}/.dep/databases/dumps/:
    2025-02-26_14:56:08#server=live#dbcode=database_default#type=data#dumpcode=362d7ca0ff065f489c9b79d0a73720f5.sql
    2025-02-26_14:56:08#server=live#dbcode=database_default#type=structure#dumpcode=362d7ca0ff065f489c9b79d0a73720f5.sql
 
+Example, if you want to export only some databases :
+::
+
+   dep db:export live --options=dbCodeFilter:db1+db2
 
 db:import
 +++++++++
@@ -602,6 +606,10 @@ on target instance. There is required option ``--options=dumpcode:[value]`` to b
 
    dep db:import dev --options=dumpcode:0772a8d396911951022db5ea385535f66
 
+Example, if you want to import only some databases :
+::
+
+   dep db:import live --options=dbCodeFilter:db1+db2
 
 
 db:process
@@ -639,6 +647,9 @@ without getting it again and again from remote host.
    # import from database storage of current host
    dep db:pull live --options=fromLocalStorage
 
+   # export and import only some databases
+   dep db:pull live --options=dbCodeFilter:db1+db2
+
 db:push
 +++++++
 
@@ -662,6 +673,9 @@ You can also forbid push to live instance by setting ``db_allow_push_live`` to `
 ::
 
    dep db:push live
+
+   # Only push some databases
+   dep db:push live --options=dbCodeFilter:db1+db2
 
 db:rmdump
 +++++++++

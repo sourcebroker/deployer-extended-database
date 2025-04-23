@@ -23,6 +23,12 @@ task('db:export', function () {
 
     if (get('is_argument_host_the_same_as_local_host')) {
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
+            if ($optionUtility->getOption('dbCodeFilter')) {
+                if (!in_array($databaseCode, $optionUtility->getOption('dbCodeFilter'), true)) {
+                    continue;
+                }
+            }
+
             $filenameParts = [
                 'dateTime' => date('Y-m-d_H-i-s'),
                 'server' => 'server=' . $fileUtility->normalizeFilename(get('local_host')),

@@ -19,6 +19,12 @@ task('db:import', function () {
     if (get('is_argument_host_the_same_as_local_host')) {
         $databaseStoragePathLocal = get('db_storage_path_local');
         foreach (get('db_databases_merged') as $databaseCode => $databaseConfig) {
+            if ($optionUtility->getOption('dbCodeFilter')) {
+                if (!in_array($databaseCode, $optionUtility->getOption('dbCodeFilter'), true)) {
+                    continue;
+                }
+            }
+
             $globStart = $databaseStoragePathLocal
                 . '*dbcode=' . $fileUtility->normalizeFilename($databaseCode)
                 . '*dumpcode=' . $dumpCode;
