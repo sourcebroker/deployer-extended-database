@@ -85,10 +85,11 @@ task('db:import', function () {
                 ));
                 // Import dump with data.
                 runLocally(sprintf(
-                    '%s --defaults-file=%s %s -D%s -e%s',
+                    '%s --defaults-file=%s %s %s -D%s -e%s',
                     get('local/bin/mysql'),
                     escapeshellarg($tmpMyCnfFile),
                     get('db_import_mysql_options_data', ''),
+                    DatabaseUtility::getSslCliOptions($databaseConfig),
                     escapeshellarg($databaseConfig['dbname']),
                     escapeshellarg('SOURCE ' . $dataSqlFile[0])
                 ));
