@@ -61,16 +61,16 @@ task('db:import', function () {
                 // Drop all tables.
                 if (empty($optionUtility->getOption('importTaskDoNotDropAllTablesBeforeImport'))) {
                     runLocally(sprintf(
-                        '%s --defaults-file=%s %s --add-drop-table --no-data | ' .
-                        'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s --defaults-file=%s %s -D%s %s',
+                        '%s --defaults-file=%s %s %s --add-drop-table --no-data | ' .
+                        'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s %s --defaults-file=%s %s -D%s',
                         get('local/bin/mysqldump'),
                         escapeshellarg($tmpMyCnfFile),
+                        DatabaseUtility::getSslCliOptions($databaseConfig),
                         escapeshellarg($databaseConfig['dbname']),
                         get('local/bin/mysql'),
                         escapeshellarg($tmpMyCnfFile),
                         DatabaseUtility::getSslCliOptions($databaseConfig),
-                        escapeshellarg($databaseConfig['dbname']),
-                        DatabaseUtility::getSslCliOptions($databaseConfig)
+                        escapeshellarg($databaseConfig['dbname'])
                     ));
                 }
                 // Import dump with database structure.
