@@ -62,7 +62,7 @@ task('db:import', function () {
                 if (empty($optionUtility->getOption('importTaskDoNotDropAllTablesBeforeImport'))) {
                     runLocally(sprintf(
                         '%s --defaults-file=%s %s %s --add-drop-table --no-data | ' .
-                        'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s %s --defaults-file=%s %s -D%s',
+                        'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s --defaults-file=%s %s -D%s',
                         get('local/bin/mysqldump'),
                         escapeshellarg($tmpMyCnfFile),
                         DatabaseUtility::getSslCliOptions($databaseConfig),
