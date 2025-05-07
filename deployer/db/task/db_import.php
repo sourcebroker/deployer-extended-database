@@ -67,16 +67,16 @@ task('db:import', function () {
                 // Drop all tables.
                 if (empty($optionUtility->getOption('importTaskDoNotDropAllTablesBeforeImport'))) {
                     runLocally(sprintf(
-                        '%s --defaults-file=%s %s --add-drop-table --no-data | ' .
-                        'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s --defaults-file=%s %s -D%s %s',
+                        '%s --defaults-file=%s %s %s --add-drop-table --no-data | ' .
+                        'grep -e \'^DROP \| FOREIGN_KEY_CHECKS\' | %s --defaults-file=%s %s -D%s',
                         get('local/bin/mysqldump'),
                         escapeshellarg($tmpMyCnfFile),
+                        DatabaseUtility::getSslCliOptions($databaseConfig),
                         escapeshellarg($databaseConfig['dbname']),
                         get('local/bin/mysql'),
                         escapeshellarg($tmpMyCnfFile),
                         DatabaseUtility::getSslCliOptions($databaseConfig),
-                        escapeshellarg($databaseConfig['dbname']),
-                        DatabaseUtility::getSslCliOptions($databaseConfig)
+                        escapeshellarg($databaseConfig['dbname'])
                     ));
                 }
                 // Import dump with database structure.
@@ -91,15 +91,16 @@ task('db:import', function () {
                 ));
                 // Import dump with data.
                 runLocally(sprintf(
-                    '%s --defaults-file=%s %s -D%s -e%s',
+                    '%s --defaults-file=%s %s %s -D%s -e%s',
                     get('local/bin/mysql'),
                     escapeshellarg($tmpMyCnfFile),
                     get('db_import_mysql_options_data', ''),
+                    DatabaseUtility::getSslCliOptions($databaseConfig),
                     escapeshellarg($databaseConfig['dbname']),
                     escapeshellarg('SOURCE ' . $dataSqlFile[0])
                 ));
                 $postSqlInCollected = [];
-                if (isset($databaseConfig['post_sql_in_markers'])) {
+                if ($databaseConfig['post_sql_in_markers'] ?? false) {
                     // Prepare some markers to use in post_sql_in_markers:
                     $markersArray = [];
                     if (!empty(get('public_urls', []))) {
@@ -130,17 +131,18 @@ task('db:import', function () {
                         $databaseConfig['post_sql_in_markers']
                     );
                 }
-                if (isset($databaseConfig['post_sql_in'])) {
+                if ($databaseConfig['post_sql_in'] ?? false) {
                     $postSqlInCollected[] = $databaseConfig['post_sql_in'];
                 }
                 if (!empty($postSqlInCollected)) {
                     $importSqlFile = $databaseStoragePathLocal . $dumpCode . '.sql';
                     file_put_contents($importSqlFile, implode(' ', $postSqlInCollected));
                     runLocally(sprintf(
-                        ' %s --defaults-file=%s %s -D%s -e%s',
+                        ' %s --defaults-file=%s %s %s -D%s -e%s',
                         get('local/bin/mysql'),
                         escapeshellarg($tmpMyCnfFile),
                         get('db_import_mysql_options_post_sql_in', ''),
+                        DatabaseUtility::getSslCliOptions($databaseConfig),
                         escapeshellarg($databaseConfig['dbname']),
                         escapeshellarg('SOURCE ' . $importSqlFile)
                     ));
