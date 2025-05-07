@@ -100,8 +100,7 @@ task('db:import', function () {
                     escapeshellarg('SOURCE ' . $dataSqlFile[0])
                 ));
                 $postSqlInCollected = [];
-                if ($databaseConfig['post_sql_in_markers'] ?? false) {
-                    // Prepare some markers to use in post_sql_in_markers:
+                if (isset($databaseConfig['post_sql_in_markers']) && is_string($databaseConfig['post_sql_in_markers']) && $databaseConfig['post_sql_in_markers'] !== '') {
                     $markersArray = [];
                     if (!empty(get('public_urls', []))) {
                         $publicUrlCollected = [];
@@ -131,7 +130,7 @@ task('db:import', function () {
                         $databaseConfig['post_sql_in_markers']
                     );
                 }
-                if ($databaseConfig['post_sql_in'] ?? false) {
+                if (isset($databaseConfig['post_sql_in']) && is_string($databaseConfig['post_sql_in']) && $databaseConfig['post_sql_in'] !== '') {
                     $postSqlInCollected[] = $databaseConfig['post_sql_in'];
                 }
                 if (!empty($postSqlInCollected)) {

@@ -7,6 +7,7 @@ master
 
 1) [FEATURE] Add dbCodeFilter option to filter database (credits to `SimonVanacco <https://github.com/SimonVanacco>`_ )
 2) [BUGFIX] SSL options in drop tables command (credits to `maikschneider <https://github.com/maikschneider>`_ )
+3) [BUGFIX] Make strict boolean conditions for `post_sql_in_markers` and `post_sql_in`.
 
 20.0.1
 ------
