@@ -2,7 +2,7 @@
 Changelog
 ---------
 
-master
+20.1.0
 ------
 
 1) [FEATURE] Add dbCodeFilter option to filter database (credits to `SimonVanacco <https://github.com/SimonVanacco>`_ )
