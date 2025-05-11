@@ -70,11 +70,18 @@ Installation
       localhost('local')
           ->set('deploy_path', getcwd())
           ->set('bin/php', 'php')
+          //->set('local/bin/php', 'php') // this is auto detected but if you have problems with it you can set it manually. This path must be the same as ``bin/php``.
           ->set('db_databases', [
               'database_default' => [
                   (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
               ]
           ])
+
+   The ``local/bin/php`` is used to run deployer binary at remote. The value for ``local/bin/php`` is
+   auto detected, based on ``composer.json``, but if you have non standard php binary location you can set it manually.
+   It should have the same value as ``bin/php`. If you want ``bin/php`` to be also auto detected then you need to
+   install https://github.com/sourcebroker/deployer-extended and add ``'path' => 'vendor/sourcebroker/deployer-extended/includes/settings/bin_php.php'``
+   to loader from point 2. Then for standard hosting config you do not need to set either `bin/php` or `local/bin/php`.
 
 6) Add "db_databases" var for all other hosts. For example for live host it can be:
    ::
@@ -83,6 +90,7 @@ Installation
           ->setHostname('my-server.example.com')
           ->setRemoteUser('deploy')
           ->set('bin/php', '/usr/bin/php82')
+          //->set('local/bin/php', '/usr/bin/php82') // this is auto detected but if you have problems with it you can set it manually. This path must be the same as ``bin/php``.
           ->set('deploy_path', '/var/www/myapplication/')
           ->set('db_databases', [
               'database_default' => [
