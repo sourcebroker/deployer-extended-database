@@ -92,6 +92,8 @@ class DatabaseUtility
         $content .= "port=\"" . ((isset($dbConfig['port']) && $dbConfig['port']) ? $dbConfig['port'] : 3306) . "\"\n";
         $content .= "user=\"{$dbConfig['user']}\"\n";
         $content .= "password=\"{$dbConfig['password']}\"\n";
+        $content .= "[client-mariadb]\n";
+        $content .= "disable-ssl-verify-server-cert\n";
         file_put_contents($tmpMyCnfFile, $content);
 
         return $tmpMyCnfFile;
