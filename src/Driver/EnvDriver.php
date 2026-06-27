@@ -31,6 +31,8 @@ class EnvDriver
             'ssl_ca' => $this->getenv($prefix . 'DATABASE_SSL_CA'),
             'ssl_capath' => $this->getenv($prefix . 'DATABASE_SSL_CAPATH'),
             'ssl_cipher' => $this->getenv($prefix . 'DATABASE_SSL_CIPHER'),
+            'ssl_disabled' => $this->getenv($prefix . 'DATABASE_SSL_DISABLED'),
+            'ssl_skip_verify' => $this->getenv($prefix . 'DATABASE_SSL_SKIP_VERIFY'),
         ];
     }
 

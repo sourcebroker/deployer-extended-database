@@ -2,6 +2,16 @@
 Changelog
 ---------
 
+20.2.0
+------
+
+1) [FEATURE] Add ``ssl_disabled`` and ``ssl_skip_verify`` per-database SSL configuration options. ``ssl_disabled`` fully
+   disables SSL by writing ``ssl=false`` into the temporary ``.cnf`` file. Useful for local environments such as
+   DDEV 1.25+ where the MySQL server does not have SSL configured. ``ssl_skip_verify`` keeps SSL active but skips
+   server certificate verification by writing ``ssl-verify-server-cert=false`` — useful when connecting to a server
+   with a self-signed certificate. Both options are also readable from environment variables (``DATABASE_SSL_DISABLED``,
+   ``DATABASE_SSL_SKIP_VERIFY``) via ``EnvDriver``.
+
 20.1.0
 ------
 

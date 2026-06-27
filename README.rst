@@ -217,6 +217,70 @@ understanding.
     marker allows to change active domain in database after import to other instance as some frameworks keeps domain
     names in database.
 
+  |
+- | **flags**
+  | *default value:* null
+  |
+  | Integer flags passed to ``mysqli::real_connect()``. For example set to ``MYSQLI_CLIENT_SSL`` (value ``64``) to
+    require an SSL connection.
+
+  |
+- | **ssl_key**
+  | *default value:* null
+  |
+  | Path to the SSL key file used for the database connection and passed to ``mysqldump``/``mysql`` as ``--ssl-key``.
+
+  |
+- | **ssl_cert**
+  | *default value:* null
+  |
+  | Path to the SSL certificate file used for the database connection and passed to ``mysqldump``/``mysql`` as ``--ssl-cert``.
+
+  |
+- | **ssl_ca**
+  | *default value:* null
+  |
+  | Path to the SSL CA file used for the database connection and passed to ``mysqldump``/``mysql`` as ``--ssl-ca``.
+
+  |
+- | **ssl_capath**
+  | *default value:* null
+  |
+  | Path to a directory containing trusted SSL CA certificates in PEM format, passed as ``--ssl-capath``.
+
+  |
+- | **ssl_cipher**
+  | *default value:* null
+  |
+  | Allowed cipher list for the SSL connection, passed as ``--ssl-cipher``.
+
+  |
+- | **ssl_disabled**
+  | *default value:* null
+  |
+  | Set to ``true`` to fully disable SSL for the database connection. Writes ``ssl=false`` into the temporary
+    ``.cnf`` file used by ``mysqldump``/``mysql``. Useful for local environments such as DDEV where the MySQL
+    server does not have SSL configured (DDEV 1.25+ uses a Trixie image with stricter SSL defaults).
+    ::
+
+       localhost('local')
+           ->set('db_databases', [
+               'database_default' => [
+                   [
+                       'ssl_disabled' => true,
+                   ],
+                   (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
+               ]
+           ]);
+
+  |
+- | **ssl_skip_verify**
+  | *default value:* null
+  |
+  | Set to ``true`` to keep SSL enabled but skip server certificate verification. Writes
+    ``ssl-verify-server-cert=false`` into the temporary ``.cnf`` file. Useful when connecting to a server
+    that uses a self-signed certificate.
+
 
 Examples
 --------
