@@ -7,7 +7,7 @@ use SourceBroker\DeployerInstance\Env;
 
 class EnvDriver
 {
-    public function getDatabaseConfig(string $prefix = null, string $absolutePath = null): array
+    public function getDatabaseConfig(?string $prefix = null, ?string $absolutePath = null): array
     {
         $envFilePath = rtrim($absolutePath ?? getcwd(), DIRECTORY_SEPARATOR) . '/.env';
         (new Env)->load($envFilePath);

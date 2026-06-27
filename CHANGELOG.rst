@@ -11,6 +11,7 @@ Changelog
    server certificate verification by writing ``ssl-verify-server-cert=false`` — useful when connecting to a server
    with a self-signed certificate. Both options are also readable from environment variables (``DATABASE_SSL_DISABLED``,
    ``DATABASE_SSL_SKIP_VERIFY``) via ``EnvDriver``.
+2) [BUGFIX] Implicitly nullable parameter types in `getDatabaseConfig()` deprecated since PHP 8.1.
 
 20.1.0
 ------
