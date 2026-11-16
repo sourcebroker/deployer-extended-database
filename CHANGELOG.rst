@@ -14,7 +14,8 @@ Changelog
 2) [BUGFIX] Implicitly nullable parameter types in `getDatabaseConfig()` deprecated since PHP 8.1.
 3) [FEATURE] Support for Deployer 8 (`deployer/deployer ^8.0.0`) with backward compatibility for Deployer 7.
 4) [TASK] Raise ``sourcebroker/deployer-instance`` requirement to ``^7.1.0`` (first version supporting Deployer 8).
-
+5) [BUGFIX] Missing required ``DATABASE_*`` variables in ``.env`` were never reported by ``EnvDriver`` because
+   the check compared against ``false`` while the value for a missing variable is ``null``.
 
 20.1.0
 ------

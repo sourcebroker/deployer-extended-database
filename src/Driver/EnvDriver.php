@@ -12,7 +12,7 @@ class EnvDriver
         $envFilePath = rtrim($absolutePath ?? getcwd(), DIRECTORY_SEPARATOR) . '/.env';
         (new Env)->load($envFilePath);
         foreach (['DATABASE_HOST', 'DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD'] as $requiredEnv) {
-            if (false === $this->getenv($prefix . $requiredEnv)) {
+            if (null === $this->getenv($prefix . $requiredEnv)) {
                 throw new RuntimeException('Missing ' . $prefix . $requiredEnv . ' in ' . $envFilePath . ' file.');
             }
         }
