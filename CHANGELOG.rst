@@ -13,6 +13,8 @@ Changelog
    ``DATABASE_SSL_SKIP_VERIFY``) via ``EnvDriver``.
 2) [BUGFIX] Implicitly nullable parameter types in `getDatabaseConfig()` deprecated since PHP 8.1.
 3) [FEATURE] Support for Deployer 8 (`deployer/deployer ^8.0.0`) with backward compatibility for Deployer 7.
+4) [TASK] Raise ``sourcebroker/deployer-instance`` requirement to ``^7.1.0`` (first version supporting Deployer 8).
+
 
 20.1.0
 ------
