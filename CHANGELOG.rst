@@ -16,6 +16,8 @@ Changelog
 4) [TASK] Raise ``sourcebroker/deployer-instance`` requirement to ``^7.1.0`` (first version supporting Deployer 8).
 5) [BUGFIX] Missing required ``DATABASE_*`` variables in ``.env`` were never reported by ``EnvDriver`` because
    the check compared against ``false`` while the value for a missing variable is ``null``.
+6) [BUGFIX] Parse ``ssl_disabled`` and ``ssl_skip_verify`` as booleans, so string values from ``.env`` like
+   ``DATABASE_SSL_DISABLED=false`` no longer enable the option.
 
 20.1.0
 ------

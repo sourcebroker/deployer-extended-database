@@ -92,10 +92,10 @@ class DatabaseUtility
         $content .= "port=\"" . ((isset($dbConfig['port']) && $dbConfig['port']) ? $dbConfig['port'] : 3306) . "\"\n";
         $content .= "user=\"{$dbConfig['user']}\"\n";
         $content .= "password=\"{$dbConfig['password']}\"\n";
-        if (!empty($dbConfig['ssl_disabled'])) {
+        if (filter_var($dbConfig['ssl_disabled'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
             $content .= "ssl=false\n";
         }
-        if (!empty($dbConfig['ssl_skip_verify'])) {
+        if (filter_var($dbConfig['ssl_skip_verify'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
             $content .= "ssl-verify-server-cert=false\n";
         }
         file_put_contents($tmpMyCnfFile, $content);
