@@ -2,6 +2,16 @@
 Changelog
 ---------
 
+20.2.1
+------
+
+1) [BUGFIX] Create temporary mysql defaults file (``.cnf`` with database credentials) with ``0600`` permissions.
+   With ``umask 0000`` (e.g. DDEV web container) the file was world-writable and MySQL/MariaDB ignored it with warning
+   ``World-writable config file ... is ignored``, so ``db:export``, ``db:import`` and all tasks using them failed
+   with error 2002 (connecting through local socket instead of using configured host). It also prevents the file with
+   password from being readable by other users. Mode can be changed with ``db_defaults_file_mode`` (e.g. ``0640``)
+   or set to ``false`` to not change file permissions at all.
+
 20.2.0
 ------
 

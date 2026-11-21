@@ -2,6 +2,8 @@
 
 namespace SourceBroker\DeployerExtendedDatabase\Utility;
 
+use function Deployer\get;
+
 class DatabaseUtility
 {
     private function connect(array $dbConf): \mysqli
@@ -86,6 +88,7 @@ class DatabaseUtility
         array $dbConfig,
         string $localInstanceDatabaseStoragePath
     ): string {
+        $fileMode = get('db_defaults_file_mode', 0600);
         $tmpMyCnfFile = $localInstanceDatabaseStoragePath . 'tmp_mysql_defaults_file_' . date('YmdHis') . '.cnf';
         $content = "[client]\n";
         $content .= "host=\"{$dbConfig['host']}\"\n";
@@ -97,6 +100,13 @@ class DatabaseUtility
         }
         if (filter_var($dbConfig['ssl_skip_verify'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
             $content .= "ssl-verify-server-cert=false\n";
+        }
+        // Set permissions before writing credentials. MySQL/MariaDB ignore world-writable option files
+        // ("World-writable config file ... is ignored"), which happens with umask 0000 (e.g. DDEV).
+        // Errors are suppressed for filesystems without POSIX permissions - then it behaves as without chmod.
+        if ($fileMode !== false && $fileMode !== null) {
+            @touch($tmpMyCnfFile);
+            @chmod($tmpMyCnfFile, is_string($fileMode) ? octdec($fileMode) : (int)$fileMode);
         }
         file_put_contents($tmpMyCnfFile, $content);
 

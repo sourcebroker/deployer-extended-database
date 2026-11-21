@@ -148,6 +148,14 @@ Options
   |
   | Options `mysql` used for importing the additional SQL from ``post_sql_in``.
 
+  |
+- | **db_defaults_file_mode**
+  | *default value:* 0600
+  |
+  | Permissions of the temporary ``.cnf`` file with database credentials passed to ``mysql``/``mysqldump`` as
+    ``--defaults-file``. MySQL/MariaDB ignore world-writable option files, which happens with ``umask 0000``
+    (e.g. DDEV).
+
 
 NOTE: watch that ``utf8mb4`` is forced for all mysql/mysqldump operations.
 
