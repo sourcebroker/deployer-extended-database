@@ -113,6 +113,21 @@ Options
     options available inside db_databases. Look for `Examples`_ for better understanding of structure.
 
   |
+- | **db_databases_overwrite_global**
+  | *default value:* null
+  |
+  | Array merged into ``db_databases`` for all instances. Use it to change ``db_databases`` (e.g. add tables to
+    ``ignore_tables_out``) without redefining it. See `Changing db_databases with overwrites`_.
+
+  |
+- | **db_databases_overwrite**
+  | *default value:* null
+  |
+  | Array merged into ``db_databases`` after ``db_databases_overwrite_global``. Set it on host level to change
+    ``db_databases`` for one instance only (e.g. ``post_sql_in`` executed after import into that instance).
+    See `Changing db_databases with overwrites`_.
+
+  |
 - | **db_storage_path_relative**
   | *default value:* .dep/database/dumps
   |
@@ -517,6 +532,58 @@ Real life example for CMS TYPO3:
            'tx_devlog',
        ],
    ]);
+
+
+Changing db_databases with overwrites
++++++++++++++++++++++++++++++++++++++
+
+``db_databases`` is often defined in a package (e.g. ``sourcebroker/deployer-typo3-database``) and contains closures
+which read database credentials, so it should not be redefined or modified with array functions in ``deploy.php``.
+Instead set:
+
+- ``db_databases_overwrite_global`` - changes for all instances,
+- ``db_databases_overwrite`` - changes for one instance, set on host level.
+
+When database tasks read the config, it is merged in this order (later wins):
+``db_databases`` -> ``db_databases_overwrite_global`` -> ``db_databases_overwrite``.
+
+Settings of the host on which the task runs are used: ``db:export`` runs on the source instance (e.g. its
+``ignore_tables_out``), ``db:import`` on the target instance (e.g. its ``post_sql_in``). So for ``dep db:pull live``
+run on instance ``prelive`` the ``post_sql_in`` from ``host('prelive')`` is executed after import. Remote instances run
+these tasks with ``deploy.php`` from their current release, so changes there take effect after the instance is
+deployed.
+
+Merge rules:
+
+- Use the same structure as ``db_databases``: database code -> list of config parts -> config. Overwrite the first
+  config part (index ``0``). Other parts are often closures reading credentials and can not be overwritten.
+- Lists (``ignore_tables_out``, ``truncate_tables``) are extended: new values are added, duplicates are skipped.
+  Values can not be removed with an overwrite.
+- Strings (``post_sql_in``, ``post_sql_in_markers``) are replaced: host level value wins over global one.
+- Do not forget the inner array for the config part. Without it (``'database_default' => ['post_sql_in' => '...']``)
+  the string is treated as path to config file and the task stops with "The config file does not exists".
+
+Example:
+::
+
+   // Add table to ignore_tables_out on all instances. Extend the value instead of set() with new array,
+   // because packages (e.g. sourcebroker/deployer-extended-typo3) may already set db_databases_overwrite_global.
+   $dbDatabasesOverwriteGlobal = get('db_databases_overwrite_global', []);
+   $dbDatabasesOverwriteGlobal['database_default'][0]['ignore_tables_out'][] = 'tx_my_table';
+   set('db_databases_overwrite_global', $dbDatabasesOverwriteGlobal);
+
+   // SQL executed after the database is imported into "staging" (e.g. "dep db:pull live" run on staging or
+   // "dep db:copy live --options=target:staging").
+   host('staging')
+       ->set('db_databases_overwrite', [
+           'database_default' => [
+               [
+                   'post_sql_in' => '
+                       UPDATE tx_myext_table SET field = "value" WHERE uid = 1;
+                   ',
+               ],
+           ],
+       ]);
 
 
 Tasks

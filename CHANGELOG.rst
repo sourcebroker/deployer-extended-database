@@ -11,6 +11,8 @@ Changelog
    with error 2002 (connecting through local socket instead of using configured host). It also prevents the file with
    password from being readable by other users. Mode can be changed with ``db_defaults_file_mode`` (e.g. ``0640``)
    or set to ``false`` to not change file permissions at all.
+2) [DOCS] Document ``db_databases_overwrite_global`` and ``db_databases_overwrite``: merge order, on which instance
+   they are used and merge rules (lists extended, strings replaced, first config part only).
 
 20.2.0
 ------
