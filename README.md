@@ -1,0 +1,777 @@
+# deployer-extended-database
+
+[![image](https://poser.pugx.org/sourcebroker/deployer-extended-database/v/stable)](https://packagist.org/packages/sourcebroker/deployer-extended-database)
+
+[![image](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://packagist.org/packages/sourcebroker/deployer-extended-database)
+
+## What does it do?
+
+The package provides additional tasks for deployer (deployer.org) for synchronizing databases between instances.
+Most useful are tasks:
+
+1.  task "[db:pull](#dbpull) [source-instance]" task which allows you to pull database from remote instance to local instance,
+2.  task "[db:push](#dbpush) [target-instance]" task which allows you to push database from local to remote instance,
+3.  task "[db:copy](#dbcopy) [source-instance] --options=target:[target-instance]" which allows to copy database between remote instances.
+
+## Installation
+
+1)  Install package with composer:
+
+        composer require sourcebroker/deployer-extended-database
+
+2)  Put following lines in your deploy.php:
+
+        require_once(__DIR__ . '/vendor/autoload.php');
+        new \SourceBroker\DeployerLoader\Load([
+            ['path' => 'vendor/sourcebroker/deployer-instance/deployer'],
+            ['path' => 'vendor/sourcebroker/deployer-extended-database/deployer'],
+        ]);
+
+3)  Create ".env" file in your project root (where you store deploy.php file). The .env file should be out of
+    git because you need to store here information about instance name. Additionally put there info about database
+    you want to synchronise. You can move the info about database data to other file later but for the tests its better
+    to put it in .env file. Remember to protect .env file from downloading with https request (if the root folder
+    is readable from WWW server level).
+
+        INSTANCE="local"
+
+        DATABASE_HOST="127.0.0.1"
+        DATABASE_NAME="database_name"
+        DATABASE_USER="database_user"
+        DATABASE_PASSWORD="password"
+
+    The INSTANCE must correspond to `host()` name. You need to put the .env file with proper INSTANCE name and
+    database access data on on each of you instances.
+
+4)  Define "local" localhost and set the "db_databases" for it. Use following code:
+
+        (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
+
+    which will read database data from .env file.
+
+        localhost('local')
+            ->set('deploy_path', getcwd())
+            ->set('bin/php', 'php')
+            //->set('local/bin/php', 'php') // this is auto detected but if you have problems with it you can set it manually. This path must be the same as ``bin/php``.
+            ->set('db_databases', [
+                'database_default' => [
+                    (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
+                ]
+            ])
+
+    The `local/bin/php` is used to run deployer binary at remote. The value for `local/bin/php` is
+    auto detected, based on `composer.json`, but if you have non standard php binary location you can set it manually.
+    It should have the same value as `bin/php`. If you want `bin/php` to be also auto detected then you need to
+    install <https://github.com/sourcebroker/deployer-extended> and add `'path' => 'vendor/sourcebroker/deployer-extended/includes/settings/bin_php.php'`
+    to loader from point 2. Then for standard hosting config you do not need to set either `bin/php` or `local/bin/php`.
+
+5)  Add "db_databases" var for all other hosts. For example for live host it can be:
+
+        host('live')
+            ->setHostname('my-server.example.com')
+            ->setRemoteUser('deploy')
+            ->set('bin/php', '/usr/bin/php82')
+            //->set('local/bin/php', '/usr/bin/php82') // this is auto detected but if you have problems with it you can set it manually. This path must be the same as ``bin/php``.
+            ->set('deploy_path', '/var/www/myapplication/')
+            ->set('db_databases', [
+                'database_default' => [
+                    (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
+                ]
+            ])
+
+6)  Make sure all instances have the same `/vendors` folder with `deployer-extended-database` and the same `deploy.php` file.
+    Most problems are because of differences in `deploy.php` file between instances.
+
+7)  Run `dep db:pull live` to test if all works.
+
+## Options
+
+- **db_databases**  
+  *default value:* null  
+    
+  Databases to be synchronized. You can define more than one database to be synchronized. See [db_databases](#options-for-db_databases) for options available inside db_databases. Look for [Examples](#examples) for better understanding of structure.
+
+- **db_databases_overwrite_global**  
+  *default value:* null  
+    
+  Array merged into `db_databases` for all instances. Use it to change `db_databases` (e.g. add tables to `ignore_tables_out`) without redefining it. See [Changing db_databases with overwrites](#changing-db_databases-with-overwrites).
+
+- **db_databases_overwrite**  
+  *default value:* null  
+    
+  Array merged into `db_databases` after `db_databases_overwrite_global`. Set it on host level to change `db_databases` for one instance only (e.g. `post_sql_in` executed after import into that instance). See [Changing db_databases with overwrites](#changing-db_databases-with-overwrites).
+
+- **db_storage_path_relative**  
+  *default value:* .dep/database/dumps  
+    
+  Path relative to "deploy_path" where you want to store database dumps produced during database synchro commands. Permissions of this directory are set with `db_storage_dir_mode`.
+
+- **db_storage_dir_mode**  
+  *default value:* 700  
+    
+  Permissions set on the database dumps directory (see `db_storage_path_relative`) each time it is used, on local and remote instances. Dumps contain the whole database, so by default only the owner can access them. Set other mode (e.g. `'750'`) if another system user must read dumps, or `false` to not change permissions at all.
+
+- **db_export_mysqldump_options_structure**  
+  *default value:* --no-data=true --default-character-set=utf8mb4 --no-tablespaces  
+    
+  Options `mysqldump` used for exporting the database structure.
+
+- **db_export_mysqldump_options_data**  
+  *default value:* --opt --skip-lock-tables --single-transaction --no-create-db --default-character-set=utf8mb4 --no-tablespaces  
+    
+  Options `mysqldump` used for exporting the database data.
+
+- **db_import_mysql_options_structure**  
+  *default value:* --default-character-set=utf8mb4  
+    
+  Options `mysql` used for importing the database structure.
+
+- **db_import_mysql_options_data**  
+  *default value:* --default-character-set=utf8mb4  
+    
+  Options `mysql` used for importing the database data.
+
+- **db_import_mysql_options_post_sql_in**  
+  *default value:* --default-character-set=utf8mb4  
+    
+  Options `mysql` used for importing the additional SQL from `post_sql_in`.
+
+- **db_defaults_file_mode**  
+  *default value:* 0600  
+    
+  Permissions of the temporary `.cnf` file with database credentials passed to `mysql`/`mysqldump` as `--defaults-file`. MySQL/MariaDB ignore world-writable option files, which happens with `umask 0000` (e.g. DDEV).
+
+NOTE: watch that `utf8mb4` is forced for all mysql/mysqldump operations.
+
+<a id="options-for-db-databases"></a>
+
+## Options for "db_databases"
+
+"db_databases" is an array of "database configurations" and "database configuration" is array of configuration parts.
+Configuration part can be array or string. If its string then its treated as absolute path to file which should
+return array of configuration. Each or array configuration parts is merged. Look for [Examples](#examples) for better
+understanding.
+
+- **host**  
+  *default value:* null  
+    
+  Database host.
+
+- **user**  
+  *default value:* null  
+    
+  Database user.
+
+- **password**  
+  *default value:* null  
+    
+  Database user password.
+
+- **dbname**  
+  *default value:* null  
+    
+  Database name.
+
+- **truncate_tables**  
+  *default value:* null  
+    
+  Array of tables names that will be truncated with task [db:truncate](#dbtruncate). Usually it should be some caching tables that will be truncated while deployment. The value is put between ^ and $ and treated as preg_match. For example you can write "cf\_.\*" to truncate all tables that starts with "cf\_". The final preg_match checked is /^cf\_.\*$/i
+
+- **ignore_tables_out**  
+  *default value:* null  
+    
+  Array of tables names that will be ignored while pulling database from target instance with task [db:pull](#dbpull) The value is put between ^ and $ and treated as preg_match. For example you can write "cf\_.\*" to truncate all tables that starts with "cf\_". The final preg_match checked is /^cf\_.\*$/i
+
+- **post_sql_in**  
+  *default value:* null  
+    
+  SQL that will be executed after importing database on local instance.
+
+- **post_sql_in_markers**  
+  *default value:* null  
+    
+  SQL that will be executed after importing database on local instance. The diffrence over "post_sql_in" is that you can use some predefined markers. For now only marker is {{domainsSeparatedByComma}} which consist of all domains defined in `->set('public_urls', ['https://live.example.com']);` and separated by comma. Having such marker allows to change active domain in database after import to other instance as some frameworks keeps domain names in database.
+
+- **flags**  
+  *default value:* null  
+    
+  Integer flags passed to `mysqli::real_connect()`. For example set to `MYSQLI_CLIENT_SSL` (value `64`) to require an SSL connection.
+
+- **ssl_key**  
+  *default value:* null  
+    
+  Path to the SSL key file used for the database connection and passed to `mysqldump`/`mysql` as `--ssl-key`.
+
+- **ssl_cert**  
+  *default value:* null  
+    
+  Path to the SSL certificate file used for the database connection and passed to `mysqldump`/`mysql` as `--ssl-cert`.
+
+- **ssl_ca**  
+  *default value:* null  
+    
+  Path to the SSL CA file used for the database connection and passed to `mysqldump`/`mysql` as `--ssl-ca`.
+
+- **ssl_capath**  
+  *default value:* null  
+    
+  Path to a directory containing trusted SSL CA certificates in PEM format, passed as `--ssl-capath`.
+
+- **ssl_cipher**  
+  *default value:* null  
+    
+  Allowed cipher list for the SSL connection, passed as `--ssl-cipher`.
+
+- **ssl_disabled**  
+  *default value:* null  
+    
+  Set to `true` to fully disable SSL for the database connection. Writes `ssl=false` into the temporary `.cnf` file used by `mysqldump`/`mysql`. Useful for local environments such as DDEV where the MySQL server does not have SSL configured (DDEV 1.25+ uses a Trixie image with stricter SSL defaults).
+
+  ```php
+  localhost('local')
+      ->set('db_databases', [
+          'database_default' => [
+              [
+                  'ssl_disabled' => true,
+              ],
+              (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
+          ]
+      ]);
+  ```
+
+- **ssl_skip_verify**  
+  *default value:* null  
+    
+  Set to `true` to keep SSL enabled but skip server certificate verification. Writes `ssl-verify-server-cert=false` into the temporary `.cnf` file. Useful when connecting to a server that uses a self-signed certificate.
+
+## Examples
+
+Below examples should illustrate how you should build your database configuration.
+
+### Config with one database and database data read from .env file
+
+deploy.php file:
+
+    set('db_default', [
+       'ignore_tables_out' => [
+           'caching_.*'
+       ]
+    ]);
+
+    host('live')
+          ->setHostname('my-server.example.com')
+          ->setRemoteUser('deploy')
+          ->set('bin/php', '/usr/bin/php82')
+          ->set('deploy_path', '/var/www/myapplication')
+          ->set('db_databases',
+             [
+               'database_foo' => [
+                   get('db_default'),
+                   (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
+                ],
+             ]
+          );
+
+    localhost('local')
+          ->set('deploy_path', getcwd())
+          ->set('bin/php', 'php')
+          ->set('db_databases',
+             [
+               'database_foo' => [
+                   get('db_default'),
+                   (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
+                ],
+             ]
+          );
+
+Mind that because the `db_*` settings for all hosts will be the same then you can make the 'db_databases' setting global
+and put it out of host configurations. Look for below example where we simplified the config.
+
+deploy.php file:
+
+    set('db_databases',
+        [
+            'database_foo' => [
+                'ignore_tables_out' => [
+                   'caching_.*'
+                ]
+                (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig()
+             ],
+        ]
+    );
+
+    host('live')
+        ->setHostname('my-server.example.com')
+        ->setRemoteUser('deploy')
+        ->set('bin/php', '/usr/bin/php82')
+        ->set('deploy_path', '/var/www/myapplication/');
+
+    localhost('local')
+       ->set('bin/php', 'php')
+       ->set('deploy_path', getcwd());
+
+The .env file should look then like:
+
+    INSTANCE="[instance name]"
+
+    DATABASE_HOST="127.0.0.1"
+    DATABASE_NAME="database_name"
+    DATABASE_USER="database_user"
+    DATABASE_PASSWORD="password"
+
+### Config with two databases and database data read from .env file
+
+deploy.php file:
+
+    set('db_databases',
+        [
+             'database_application1' => [
+                'ignore_tables_out' => [
+                   'caching_.*'
+                ]
+             (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig('APP1_')
+          ],
+             'database_application2' => [
+                'ignore_tables_out' => [
+                   'cf_.*'
+                 ]
+             (new \SourceBroker\DeployerExtendedDatabase\Driver\EnvDriver())->getDatabaseConfig('APP2_')
+          ],
+        ]
+    );
+
+    host('live')
+        ->setHostname('my-server.example.com')
+        ->setRemoteUser('deploy')
+        ->set('bin/php', '/usr/bin/php82')
+        ->set('deploy_path', '/var/www/myapplication/');
+
+    localhost('local')
+       ->set('bin/php', 'php')
+       ->set('deploy_path', getcwd());
+
+The .env file should look then like:
+
+    INSTANCE="[instance name]"
+
+    APP1_DATABASE_HOST="127.0.0.1"
+    APP1_DATABASE_NAME="database_name"
+    APP1_DATABASE_USER="database_user"
+    APP1_DATABASE_PASSWORD="password"
+
+    APP2_DATABASE_HOST="127.0.0.1"
+    APP2_DATABASE_NAME="database_name"
+    APP2_DATABASE_USER="database_user"
+    APP2_DATABASE_PASSWORD="password"
+
+### Config with one database and database config read from from different sources
+
+In example we will use:
+
+1)  array,
+
+        'ignore_tables_out' => [
+                    'caching_*'
+                 ]
+
+2)  get() which returns array with database options,
+    `get('db_default')`
+
+3)  direct file include which returns array with database options
+    `__DIR__ . '/.dep/database/config/additional_db_config.php`
+
+4)  class/method which returns array with database options
+    `(new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig()`
+
+5)  closure which returns array with database options
+    `function() { return (new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig()` }
+
+Each of this arrays are merged to build final configuration for database synchro.
+
+deploy.php file:
+
+    set('db_default', [
+       'post_sql_in' => 'UPDATE sys_domains SET hidden=1;'
+    ]);
+
+    set('db_databases',
+        [
+            'database_foo' => [
+                [
+                    'ignore_tables_out' => [
+                       'caching_.*'
+                    ]
+                ],
+                get('db_default'),
+                __DIR__ . '/databases/config/additional_db_config.php',
+                (new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig(),
+                function() {
+                   return (new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig();
+                }
+             ],
+        ]
+    );
+
+    host('live')
+        ->setHostname('my-server.example.com')
+        ->setRemoteUser('deploy')
+        ->set('bin/php', '/usr/bin/php82')
+        ->set('deploy_path', '/var/www/myapplication/');
+
+    localhost('local')
+       ->set('bin/php', 'php')
+       ->set('deploy_path', getcwd());
+
+### Config with one database and database config read from "my framework" file
+
+Its advisable that you create you own special method that will return you framework database data. In below example
+its call to `\YourVendor\YourPackage\Driver\MyDriver()`. This way you do not need to repeat the data of database
+in .env file. In that case .env file should hold only INSTANCE.
+
+    set('db_databases',
+           [
+               'database_default' => [
+                   (new \YourVendor\YourPackage\Driver\MyDriver())->getDatabaseConfig()
+               ],
+           ]
+       );
+
+<a id="config-of-truncate-tables-ignore-tables-out-post-sql-in-markers"></a>
+
+### Config of truncate_tables, ignore_tables_out, post_sql_in_markers
+
+Real life example for CMS TYPO3:
+
+    set('db_default', [
+        'truncate_tables' => [
+            'cf_.*'
+        ],
+        'ignore_tables_out' => [
+            'cf_.*',
+            'cache_.*',
+            'be_sessions',
+            'fe_sessions',
+            'sys_file_processedfile',
+            'tx_devlog',
+        ],
+    ]);
+
+<a id="changing-db-databases-with-overwrites"></a>
+
+### Changing db_databases with overwrites
+
+`db_databases` is often defined in a package (e.g. `sourcebroker/deployer-typo3-database`) and contains closures
+which read database credentials, so it should not be redefined or modified with array functions in `deploy.php`.
+Instead set:
+
+- `db_databases_overwrite_global` - changes for all instances,
+- `db_databases_overwrite` - changes for one instance, set on host level.
+
+When database tasks read the config, it is merged in this order (later wins):
+`db_databases` -> `db_databases_overwrite_global` -> `db_databases_overwrite`.
+
+Settings of the host on which the task runs are used: `db:export` runs on the source instance (e.g. its
+`ignore_tables_out`), `db:import` on the target instance (e.g. its `post_sql_in`). So for `dep db:pull live`
+run on instance `prelive` the `post_sql_in` from `host('prelive')` is executed after import. Remote instances run
+these tasks with `deploy.php` from their current release, so changes there take effect after the instance is
+deployed.
+
+Merge rules:
+
+- Use the same structure as `db_databases`: database code -> list of config parts -> config. Overwrite the first
+  config part (index `0`). Other parts are often closures reading credentials and can not be overwritten.
+- Lists (`ignore_tables_out`, `truncate_tables`) are extended: new values are added, duplicates are skipped.
+  Values can not be removed with an overwrite.
+- Strings (`post_sql_in`, `post_sql_in_markers`) are replaced: host level value wins over global one.
+- Do not forget the inner array for the config part. Without it (`'database_default' => ['post_sql_in' => '...']`)
+  the string is treated as path to config file and the task stops with "The config file does not exists".
+
+Example:
+
+    // Add table to ignore_tables_out on all instances. Extend the value instead of set() with new array,
+    // because packages (e.g. sourcebroker/deployer-extended-typo3) may already set db_databases_overwrite_global.
+    $dbDatabasesOverwriteGlobal = get('db_databases_overwrite_global', []);
+    $dbDatabasesOverwriteGlobal['database_default'][0]['ignore_tables_out'][] = 'tx_my_table';
+    set('db_databases_overwrite_global', $dbDatabasesOverwriteGlobal);
+
+    // SQL executed after the database is imported into "staging" (e.g. "dep db:pull live" run on staging or
+    // "dep db:copy live --options=target:staging").
+    host('staging')
+        ->set('db_databases_overwrite', [
+            'database_default' => [
+                [
+                    'post_sql_in' => '
+                        UPDATE tx_myext_table SET field = "value" WHERE uid = 1;
+                    ',
+                ],
+            ],
+        ]);
+
+## Tasks
+
+<a id="db-backup"></a>
+
+### db:backup
+
+Backup database. In background, on target instance, three tasks are executed [db:export](#dbexport), [db:compress](#dbcompress) and [db:dumpclean](#dbdumpclean).
+Results are stored in `{{deploy_path}}/.dep/databases/dumps/`.
+
+If `release` folder will be detected on `deploy_path` (means we are in process of deploy) then it adds two tags to dump name:
+`release` and `release_[number]` like in example below:
+`2025-03-01_23-36-25#server=local#dbcode=database_default#dumpcode=e8cd33191dffe1642d3e9fb6bf99090f#tags=release+release_91#type=structure.sql.gz`
+
+You can add you own tags with `--options=tags:tag1+tag2`. Example:
+`2025-03-01_23-36-25#server=local#dbcode=database_default#dumpcode=e8cd33191dffe1642d3e9fb6bf99090f#tags=tag1+tag2#type=structure.sql.gz`
+
+**Example**
+
+    dep db:backup local
+    dep db:backup live
+    dep db:backup live --options=dumpcode:mycode
+    dep db:backup live --options=dumpcode:mycode,tags:tag1+tag2
+
+<a id="db-compress"></a>
+
+### db:compress
+
+Compress dumps with given dumpcode stored in folder `{{deploy_path}}/.dep/databases/dumps/` on target instance.
+There is required option `--options=dumpcode:[value]` to be passed.
+
+Look for config vars `db_compress_suffix`, `db_compress_command`, `db_uncompress_command` for possible ways to overwrite
+standard gzip compression with your own.
+
+**Example**
+
+    dep db:compress live --options=dumpcode:0772a8d396911951022db5ea385535f6
+
+<a id="db-copy"></a>
+
+### db:copy
+
+This command allows you to copy database between instances.
+
+    dep db:copy [source-instance] --options=target:[target-instance]
+
+In the background it runs several other tasks to accomplish this. Lets assume we want to copy database from live
+to dev instance. We will run following command on you local instance:
+
+    dep db:copy live --options=target:dev
+
+Here are the tasks that will be run in background:
+
+In below description:  
+- source instance = live
+- target instance = dev
+- local instance = local
+
+1\) First it runs `dep db:export live --options=dumpcode:123456` task on source instance. The dumps from export task are stored  
+in folder `{{deploy_path}}/.dep/databases/dumps/` on target instance.
+
+2\) Then it runs `db:download live --options=dumpcode:123456` on local instance to download dump files from live instance from  
+folder `{{deploy_path}}/.dep/databases/dumps/` to local instance to folder `{{deploy_path}}/.dep/databases/dumps/`. The dump at
+source instance is deleted at this point because already downloaded.
+
+3)  Then it runs `db:process local --options=dumpcode:123456` on local instance to make some operations directly on SQL dumps files.
+4)  Then it runs `db:upload dev --options=dumpcode:123456` on local instance. This task takes dump files with `code:123456`
+    and send it to dev instance and store it in folder `{{deploy_path}}/.dep/databases/dumps/`. The dump at
+    local instance is deleted at this point because already uploaded to target instance.
+5)  Then it make backup of target database before importing the dump.
+6)  Finally it runs `db:import dev --options=dumpcode:123456` on target instance. This task reads dumps with `code:123456` from folder
+    `{{deploy_path}}/.dep/databases/dumps/` on dev instance and import it to database.
+7)  At the very end it runs [db:dumpclean](#dbdumpclean) to clean up old dumps on target instance.
+
+Copy to instance defined in `instance_live_name` (default `live`) is special case.
+If you copy to highest instance then by default you will be asked twice if you really want to.
+You can disable asking by setting `db_allow_copy_live_force` to `true`.
+You can also forbid copy to live instance by setting `db_allow_copy_live` to `false`.
+
+<a id="db-decompress"></a>
+
+### db:decompress
+
+Decompress dumps with given dumpcode stored in folder `{{deploy_path}}/.dep/databases/dumps/` on target instance.
+There is required option `--options=dumpcode:[value]` to be passed.
+
+Look for config vars `db_compress_suffix`, `db_compress_command`, `db_uncompress_command` for possible ways to overwrite
+standard gzip compression with your own.
+
+**Example**
+
+    dep db:decompress live --options=dumpcode:0772a8d396911951022db5ea385535f6
+
+<a id="db-download"></a>
+
+### db:download
+
+Download database dumps with selected dumpcode from folder `{{deploy_path}}/.dep/databases/dumps/` on target instance
+and store it in folder `{{deploy_path}}/.dep/databases/dumps/` on local instance.
+There is required option `--options=dumpcode:[value]` to be passed.
+
+**Example**
+
+    dep db:download live --options=dumpcode:0772a8d396911951022db5ea385535f6
+
+<a id="db-dumpclean"></a>
+
+### db:dumpclean
+
+Clean database dump storage on target instance. By default it removes all dumps except last five but you can set your
+values and also change the values depending on instance.
+
+**Example**
+
+    set('db_dumpclean_keep', 10); // keep last 10 dumps for all instances
+
+    set('db_dumpclean_keep', [
+       'live' => 10 // keep last 10 dumps for live instance dumps
+       'dev' => 5   // keep last 5 dumps for dev instance dumps
+       '*' => 2     // keep last 5 dumps for all other instances dumps
+    ]);
+
+    dep db:dumpclean live
+
+<a id="db-export"></a>
+
+### db:export
+
+Dump database to folder on local instance located by default in `{{deploy_path}}/.dep/databases/dumps/`.
+Dumps will be stored in two separate files. One with tables structure. The second with data only.
+There is required option `--options=dumpcode:[value]` to be passed.
+
+**Example**
+
+Example task call:
+
+    dep db:export live --options=dumpcode:362d7ca0ff065f489c9b79d0a73720f5
+
+Example output files located in folder {{deploy_path}}/.dep/databases/dumps/:
+
+    2025-02-26_14:56:08#server=live#dbcode=database_default#type=data#dumpcode=362d7ca0ff065f489c9b79d0a73720f5.sql
+    2025-02-26_14:56:08#server=live#dbcode=database_default#type=structure#dumpcode=362d7ca0ff065f489c9b79d0a73720f5.sql
+
+Example, if you want to export only some databases :
+
+    dep db:export live --options=dbCodeFilter:db1+db2
+
+<a id="db-import"></a>
+
+### db:import
+
+Import database dump files to target database(s). Files are taken from folder `{{deploy_path}}/.dep/databases/dumps/`
+on target instance. There is required option `--options=dumpcode:[value]` to be passed.
+
+**Example**
+
+    dep db:import dev --options=dumpcode:0772a8d396911951022db5ea385535f66
+
+Example, if you want to import only some databases :
+
+    dep db:import live --options=dbCodeFilter:db1+db2
+
+<a id="db-process"></a>
+
+### db:process
+
+This command will run some defined commands on pure sql file as its sometimes needed to remove or replace some strings
+directly on sql file before importing. There is required option `--options=dumpcode:[value]` to be passed.
+
+**Example**
+
+    dep db:process local --options=dumpcode:0772a8d396911951022db5ea385535f66
+
+<a id="db-pull"></a>
+
+### db:pull
+
+This command allows you to pull database from target instance to local instance.
+In the background it runs several other tasks to accomplish this.
+
+Pull to instance defined in `instance_live_name` (default `live`) is special case.
+If you pull to highest instance then by default you will be asked twice if you really want to.
+You can disable asking by setting `db_allow_pull_live_force` to `true`.
+You can also forbid pull to live instance by setting `db_allow_pull_live` to `false`.
+
+When option `--options=fromLocalStorage` is set the it does not export from remote host but use local files from
+`{{deploy_path}}/.dep/databases/dumps/` folder. Useful to repeat import of database (for example to test upgrade process)
+without getting it again and again from remote host.
+
+**Example**
+
+    # export from live and import on current host
+    dep db:pull live
+
+    # import from database storage of current host
+    dep db:pull live --options=fromLocalStorage
+
+    # export and import only some databases
+    dep db:pull live --options=dbCodeFilter:db1+db2
+
+<a id="db-push"></a>
+
+### db:push
+
+This command allows you to push database from local instance to remote instance.
+In the background it runs several other tasks to accomplish this.
+
+Here is the list of tasks that will be done when you execute "db:push":
+
+1)  First it runs [db:export](#dbexport) task on local instance.
+2)  Then it runs [db:upload](#dbupload) on local instance with remote as argument.
+3)  Then it runs [db:process](#dbprocess) on remote instance.
+4)  Then it runs [db:backup](#dbbackup) on remote instance to make backup before import.
+5)  Then it runs [db:import](#dbimport) on remote instance.
+
+Push to instance defined in `instance_live_name` (default `live`) is special case.
+If you push to highest instance then by default you will be asked twice if you really want to.
+You can disable asking by setting `db_allow_push_live_force` to `true`.
+You can also forbid push to live instance by setting `db_allow_push_live` to `false`.
+
+**Example**
+
+    dep db:push live
+
+    # Only push some databases
+    dep db:push live --options=dbCodeFilter:db1+db2
+
+<a id="db-rmdump"></a>
+
+### db:rmdump
+
+This command will remove all dumps with given dumpcode (compressed and uncompressed).
+There is required option `--options=dumpcode:[value]` to be passed.
+
+**Example**
+
+    dep db:rmdump live --options=dumpcode:0772a8d396911951022db5ea385535f66
+
+<a id="db-truncate"></a>
+
+### db:truncate
+
+This command allows you to truncate database tables defined in database config var "truncate_tables".
+No dumpcode is needed because it operates directly on database.
+
+**Example**
+Truncate local instance databases tables.
+
+    dep db:truncate
+
+Truncate live instance databases tables.
+
+    dep db:truncate live
+
+<a id="db-upload"></a>
+
+### db:upload
+
+Upload database dumps with selected dumpcode from folder `{{deploy_path}}/.dep/databases/dumps/` on local instance and
+store it in folder `{{deploy_path}}/.dep/databases/dumps/` on target instance.
+There is required option `--options=dumpcode:[value]` to be passed.
+
+**Example**
+
+    dep db:upload live --options=dumpcode:0772a8d396911951022db5ea385535f6
+
+## Changelog
+
+See <https://github.com/sourcebroker/deployer-extended-database/blob/master/CHANGELOG.md>
