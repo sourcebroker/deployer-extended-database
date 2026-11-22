@@ -15,6 +15,8 @@ Changelog
    they are used and merge rules (lists extended, strings replaced, first config part only).
 3) [FEATURE] Set permissions of database dumps directory (``db_storage_path_relative``, default
    ``.dep/database/dumps``) on local and remote instances.
+4) [BUGFIX] In ``db:export`` create the temporary mysql defaults file (with database credentials) directly before
+   the dump, so it is always removed with "try".
 
 20.2.0
 ------

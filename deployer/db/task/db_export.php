@@ -40,13 +40,9 @@ task('db:export', function () {
                     . $fileUtility->normalizeFilename(implode(OptionUtility::ARRAY_OPTIONS_IMPLODE_CHAR, $tags));
             }
             $databaseStoragePathLocal = get('db_storage_path_local');
-            $tmpMyCnfFile = DatabaseUtility::getTemporaryMyCnfFile(
-                $databaseConfig,
-                $databaseStoragePathLocal
-            );
             $mysqlDumpArgs = [
                 'local/bin/mysqldump' => get('local/bin/mysqldump'),
-                escapeshellarg($tmpMyCnfFile),
+                'defaults-file' => '',
                 'options' => '',
                 'dbname' => escapeshellarg($databaseConfig['dbname']),
                 'absolutePath' => '',
@@ -95,6 +91,12 @@ task('db:export', function () {
                         }, $ignoreTables));
                 }
             }
+
+            $tmpMyCnfFile = DatabaseUtility::getTemporaryMyCnfFile(
+                $databaseConfig,
+                $databaseStoragePathLocal
+            );
+            $mysqlDumpArgs['defaults-file'] = escapeshellarg($tmpMyCnfFile);
 
             try {
                 // dump database structure
