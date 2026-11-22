@@ -480,7 +480,9 @@ Merge rules:
 - Use the same structure as `db_databases`: database code -> list of config parts -> config. Overwrite the first
   config part (index `0`). Other parts are often closures reading credentials and can not be overwritten.
 - Lists (`ignore_tables_out`, `truncate_tables`) are extended: new values are added, duplicates are skipped.
-  Values can not be removed with an overwrite.
+- To remove values from a list use special key `__UNSET`, e.g. `'ignore_tables_out' => ['__UNSET' => ['sys_log']]`.
+  Values are removed after merging, so also values added by packages in the same overwrite are removed. Only exact
+  values are removed: `'__UNSET' => ['cache_.*']` removes the pattern `cache_.*`, not single table `cache_pages`.
 - Strings (`post_sql_in`, `post_sql_in_markers`) are replaced: host level value wins over global one.
 - Do not forget the inner array for the config part. Without it (`'database_default' => ['post_sql_in' => '...']`)
   the string is treated as path to config file and the task stops with "The config file does not exists".
@@ -491,6 +493,11 @@ Example:
     // because packages (e.g. sourcebroker/deployer-extended-typo3) may already set db_databases_overwrite_global.
     $dbDatabasesOverwriteGlobal = get('db_databases_overwrite_global', []);
     $dbDatabasesOverwriteGlobal['database_default'][0]['ignore_tables_out'][] = 'tx_my_table';
+    set('db_databases_overwrite_global', $dbDatabasesOverwriteGlobal);
+
+    // Do not ignore sys_refindex anymore (remove it from ignore_tables_out) on all instances.
+    $dbDatabasesOverwriteGlobal = get('db_databases_overwrite_global', []);
+    $dbDatabasesOverwriteGlobal['database_default'][0]['ignore_tables_out']['__UNSET'][] = 'sys_refindex';
     set('db_databases_overwrite_global', $dbDatabasesOverwriteGlobal);
 
     // SQL executed after the database is imported into "staging" (e.g. "dep db:pull live" run on staging or

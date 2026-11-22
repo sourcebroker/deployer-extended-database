@@ -1,5 +1,11 @@
 # Changelog
 
+## 20.3.0
+
+1)  [FEATURE] Allow to remove values from lists (e.g. `ignore_tables_out`) in `db_databases_overwrite_global` and
+    `db_databases_overwrite` with special key `__UNSET`, e.g. `'ignore_tables_out' => ['__UNSET' => ['sys_refindex']]`.
+    Merging of configs without `__UNSET` key is not changed.
+
 ## 20.2.1
 
 1)  [BUGFIX] Create temporary mysql defaults file (`.cnf` with database credentials) with `0600` permissions.
