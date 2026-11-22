@@ -1,8 +1,7 @@
 # deployer-extended-database
 
-[![image](https://poser.pugx.org/sourcebroker/deployer-extended-database/v/stable)](https://packagist.org/packages/sourcebroker/deployer-extended-database)
-
-[![image](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://packagist.org/packages/sourcebroker/deployer-extended-database)
+[![Latest Stable Version](https://poser.pugx.org/sourcebroker/deployer-extended-database/v/stable)](https://packagist.org/packages/sourcebroker/deployer-extended-database)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://packagist.org/packages/sourcebroker/deployer-extended-database)
 
 ## What does it do?
 
