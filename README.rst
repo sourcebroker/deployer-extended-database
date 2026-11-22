@@ -132,6 +132,15 @@ Options
   | *default value:* .dep/database/dumps
   |
   | Path relative to "deploy_path" where you want to store database dumps produced during database synchro commands.
+    Permissions of this directory are set with ``db_storage_dir_mode``.
+
+  |
+- | **db_storage_dir_mode**
+  | *default value:* 700
+  |
+  | Permissions set on the database dumps directory (see ``db_storage_path_relative``) each time it is used, on local
+    and remote instances. Dumps contain the whole database, so by default only the owner can access them. Set other
+    mode (e.g. ``'750'``) if another system user must read dumps, or ``false`` to not change permissions at all.
 
   |
 - | **db_export_mysqldump_options_structure**

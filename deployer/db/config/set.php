@@ -93,6 +93,11 @@ set('db_storage_path_local', function () {
     }
     $dbStoragePathLocal = (new FileUtility())->resolveHomeDirectoryLocal($dbStoragePathLocal);
     runLocally('[ -d ' . $dbStoragePathLocal . ' ] || mkdir -p ' . $dbStoragePathLocal);
+    $dirMode = Configuration::getLocalHost()->get('db_storage_dir_mode', '700');
+    if ($dirMode !== false && $dirMode !== null && $dirMode !== '') {
+        $dirMode = is_int($dirMode) ? decoct($dirMode) : (string)$dirMode;
+        runLocally('chmod ' . escapeshellarg($dirMode) . ' ' . $dbStoragePathLocal . ' 2>/dev/null || true');
+    }
 
     return rtrim($dbStoragePathLocal, '/') . '/';
 });
@@ -106,6 +111,11 @@ set('db_storage_path', function () {
     }
     $dbStoragePath = (new FileUtility())->resolveHomeDirectory($dbStoragePath);
     run('[ -d ' . $dbStoragePath . ' ] || mkdir -p ' . $dbStoragePath);
+    $dirMode = get('db_storage_dir_mode', '700');
+    if ($dirMode !== false && $dirMode !== null && $dirMode !== '') {
+        $dirMode = is_int($dirMode) ? decoct($dirMode) : (string)$dirMode;
+        run('chmod ' . escapeshellarg($dirMode) . ' ' . $dbStoragePath . ' 2>/dev/null || true');
+    }
 
     return rtrim($dbStoragePath, '/') . '/';
 });

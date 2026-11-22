@@ -13,6 +13,8 @@ Changelog
    or set to ``false`` to not change file permissions at all.
 2) [DOCS] Document ``db_databases_overwrite_global`` and ``db_databases_overwrite``: merge order, on which instance
    they are used and merge rules (lists extended, strings replaced, first config part only).
+3) [FEATURE] Set permissions of database dumps directory (``db_storage_path_relative``, default
+   ``.dep/database/dumps``) on local and remote instances.
 
 20.2.0
 ------
